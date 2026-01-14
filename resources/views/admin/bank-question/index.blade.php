@@ -76,15 +76,28 @@
                             <td class="py-4 px-8">
                                 <div class="max-w-md">
                                     <div class="text-sm text-gray-900 dark:text-white font-medium line-clamp-2">
-                                        {!! Str::limit(strip_tags($value->question), 100) !!}
+                                        @if(($value->question_type ?? 'Text') === 'Text')
+                                            {!! Str::limit(strip_tags($value->question), 100) !!}
+                                        @else
+                                            <span class="text-gray-500 dark:text-gray-400">Soal berupa gambar.</span>
+                                        @endif
                                     </div>
-                                    @if($value->question_image)
-                                    <div class="mt-2">
-                                        <span class="inline-flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400">
-                                            <i class="ti ti-photo"></i> Dengan Gambar
-                                        </span>
+                                    <div class="mt-2 flex flex-wrap items-center gap-2">
+                                        @if(($value->question_type ?? 'Text') === 'Image')
+                                            <span class="inline-flex items-center gap-1 text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300 px-2 py-1 rounded-full">
+                                                <i class="ti ti-photo"></i> Image
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300 px-2 py-1 rounded-full">
+                                                <i class="ti ti-text-size"></i> Text
+                                            </span>
+                                        @endif
+                                        @if(($value->question_type ?? 'Text') === 'Image')
+                                            <span class="inline-flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400">
+                                                <i class="ti ti-photo"></i> Dengan Gambar
+                                            </span>
+                                        @endif
                                     </div>
-                                    @endif
                                 </div>
                             </td>
                             <td class="py-4 px-8 text-center">

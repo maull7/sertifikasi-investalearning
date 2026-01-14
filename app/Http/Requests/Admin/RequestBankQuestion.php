@@ -6,6 +6,14 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class RequestBankQuestion extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        // Ensure question is always a string for DB compatibility (question column is not nullable)
+        if (($this->input('question_type') ?? 'Text') === 'Image') {
+            $this->merge(['question' => $this->input('question', '')]);
+        }
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -23,7 +31,8 @@ class RequestBankQuestion extends FormRequest
     {
         $rules = [
             'type_id' => 'required|exists:master_types,id',
-            'question' => 'required|string',
+            'question_type' => 'required|in:Text,Image',
+            'question' => 'nullable|string|required_if:question_type,Text',
             'option_a' => 'required|string',
             'option_b' => 'required|string',
             'option_c' => 'required|string',
@@ -33,11 +42,13 @@ class RequestBankQuestion extends FormRequest
             'explanation' => 'required|string',
         ];
 
-        if ($this->isMethod('post')) {
-            $rules['question_image'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048';
-        } else {
-            $rules['question_image'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048';
-        }
+        $rules['question_file'] = [
+            'nullable',
+            'image',
+            'mimes:jpg,jpeg,png,webp',
+            'max:2048',
+            'required_if:question_type,Image',
+        ];
 
         return $rules;
     }
@@ -50,7 +61,9 @@ class RequestBankQuestion extends FormRequest
         return [
             'type_id.required' => 'Tipe soal wajib dipilih.',
             'type_id.exists' => 'Tipe soal tidak valid.',
-            'question.required' => 'Soal wajib diisi.',
+            'question_type.required' => 'Jenis soal wajib dipilih.',
+            'question_type.in' => 'Jenis soal harus Text atau Image.',
+            'question.required_if' => 'Soal wajib diisi jika jenis soal Text.',
             'option_a.required' => 'Opsi A wajib diisi.',
             'option_b.required' => 'Opsi B wajib diisi.',
             'option_c.required' => 'Opsi C wajib diisi.',
@@ -59,12 +72,14 @@ class RequestBankQuestion extends FormRequest
             'answer.in' => 'Jawaban harus salah satu dari A, B, C, atau D.',
             'solution.required' => 'Pembahasan wajib diisi.',
             'explanation.required' => 'Penjelasan wajib diisi.',
-            'question_image.image' => 'File harus berupa gambar.',
-            'question_image.mimes' => 'Format gambar harus jpg, jpeg, png, atau webp.',
-            'question_image.max' => 'Ukuran gambar maksimal 2MB.',
+            'question_file.image' => 'File harus berupa gambar.',
+            'question_file.mimes' => 'Format gambar harus jpg, jpeg, png, atau webp.',
+            'question_file.max' => 'Ukuran gambar maksimal 2MB.',
+            'question_file.required_if' => 'Gambar soal wajib diupload jika jenis soal Image.',
         ];
     }
 }
+
 
 
 

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BankQuestions extends Model
 {
@@ -30,6 +30,14 @@ class BankQuestions extends Model
 
     public function getQuestionImageUrlAttribute(): ?string
     {
-        return $this->question_image ? asset('storage/' . $this->question_image) : null;
+        if (($this->question_type ?? 'Text') !== 'Image') {
+            return null;
+        }
+
+        return $this->question ? asset('storage/' . ltrim($this->question, '/')) : null;
+    }
+    public function MappingQuestions(): HasMany
+    {
+        return $this->hasMany(MappingQuestions::class, 'id_question_bank');
     }
 }

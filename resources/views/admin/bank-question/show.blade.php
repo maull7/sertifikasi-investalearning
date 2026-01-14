@@ -41,6 +41,24 @@
                 </div>
             </div>
 
+            {{-- Jenis Soal --}}
+            <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 pb-6 border-b border-gray-50 dark:border-gray-800">
+                <div class="md:w-1/3">
+                    <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Jenis</span>
+                </div>
+                <div class="md:w-2/3">
+                    @if(($data->question_type ?? 'Text') === 'Image')
+                        <span class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">
+                            <i class="ti ti-photo mr-2"></i> Image
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
+                            <i class="ti ti-text-size mr-2"></i> Text
+                        </span>
+                    @endif
+                </div>
+            </div>
+
             {{-- Soal --}}
             <div class="flex flex-col gap-2 pb-6 border-b border-gray-50 dark:border-gray-800">
                 <div>
@@ -48,19 +66,23 @@
                 </div>
                 <div class="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-6">
                     <div class="prose prose-sm dark:prose-invert max-w-none text-gray-900 dark:text-white">
-                        {!! $data->question !!}
+                        @if(($data->question_type ?? 'Text') === 'Text')
+                            {!! $data->question !!}
+                        @else
+                            <span class="text-sm text-gray-500 dark:text-gray-400">Soal berupa gambar.</span>
+                        @endif
                     </div>
                 </div>
             </div>
 
             {{-- Gambar Soal --}}
-            @if($data->question_image)
+            @if(($data->question_type ?? 'Text') === 'Image' && $data->question)
             <div class="flex flex-col gap-2 pb-6 border-b border-gray-50 dark:border-gray-800">
                 <div>
                     <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Gambar Soal</span>
                 </div>
                 <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800">
-                    <img src="{{ asset('storage/' . $data->question_image) }}" alt="Question Image" class="w-full h-auto object-contain max-h-96">
+                    <img src="{{ asset('storage/' . $data->question) }}" alt="Question Image" class="w-full h-auto object-contain max-h-96">
                 </div>
             </div>
             @endif
@@ -152,5 +174,6 @@
     </x-card>
 </div>
 @endsection
+
 
 

@@ -86,8 +86,44 @@
                     </x-select>
                 </div>
 
+                {{-- Question Mode --}}
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Jenis Soal <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label class="flex items-center gap-3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 cursor-pointer">
+                            <input type="radio" name="question_type" value="Text" class="accent-indigo-600" {{ old('question_type', $data->question_type ?? 'Text') === 'Text' ? 'checked' : '' }}>
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center">
+                                    <i class="ti ti-text-size text-indigo-600 dark:text-indigo-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-900 dark:text-white">Text</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Soal berupa tulisan</p>
+                                </div>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 cursor-pointer">
+                            <input type="radio" name="question_type" value="Image" class="accent-indigo-600" {{ old('question_type', $data->question_type ?? '') === 'Image' ? 'checked' : '' }}>
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center">
+                                    <i class="ti ti-photo text-rose-600 dark:text-rose-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-900 dark:text-white">Image</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Soal berupa gambar</p>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    @error('question_type')
+                        <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 {{-- Rich Text Editor for Question --}}
-                <div class="md:col-span-2 mb-16">
+                <div class="md:col-span-2 mb-16" id="question-text-section">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                         Soal <span class="text-rose-500">*</span>
                     </label>
@@ -101,16 +137,16 @@
                 </div>
 
                 {{-- Question Image Upload --}}
-                <div class="md:col-span-2">
+                <div class="md:col-span-2" id="question-image-section">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                        Gambar Soal (Opsional)
+                        Gambar Soal <span class="text-rose-500">*</span>
                     </label>
                     
                     {{-- Existing Image --}}
-                    @if($data->question_image)
+                    @if(($data->question_type ?? 'Text') === 'Image' && $data->question)
                     <div id="existing-image" class="mb-4">
                         <div class="relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
-                            <img src="{{ asset('storage/' . $data->question_image) }}" alt="Current Image" class="w-full h-48 object-cover">
+                            <img src="{{ asset('storage/' . $data->question) }}" alt="Current Image" class="w-full h-48 object-cover">
                             <div class="absolute top-2 right-2">
                                 <button type="button" onclick="removeExistingImage()" class="w-8 h-8 bg-rose-500 hover:bg-rose-600 text-white rounded-lg flex items-center justify-center transition-colors">
                                     <i class="ti ti-x"></i>
@@ -125,13 +161,13 @@
                     <div class="relative">
                         <input 
                             type="file" 
-                            name="question_image" 
-                            id="question_image"
+                            name="question_file" 
+                            id="question_file"
                             accept="image/jpeg,image/jpg,image/png,image/webp"
                             class="hidden"
                             onchange="handleImageSelect(this)"
                         >
-                        <label for="question_image" class="flex items-center justify-center gap-3 px-6 py-6 bg-gray-50 dark:bg-gray-900/50 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-all group">
+                        <label for="question_file" class="flex items-center justify-center gap-3 px-6 py-6 bg-gray-50 dark:bg-gray-900/50 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-all group">
                             <div class="text-center">
                                 <div class="w-14 h-14 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                                     <i class="ti ti-photo text-2xl text-indigo-600 dark:text-indigo-400"></i>
@@ -153,7 +189,7 @@
                             </button>
                         </div>
                     </div>
-                    @error('question_image')
+                    @error('question_file')
                         <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
                     @enderror
                 </div>
@@ -261,6 +297,22 @@
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const questionTextSection = document.getElementById('question-text-section');
+        const questionImageSection = document.getElementById('question-image-section');
+        const questionTypeInputs = document.querySelectorAll('input[name="question_type"]');
+
+        const applyQuestionMode = () => {
+            const selected = document.querySelector('input[name="question_type"]:checked')?.value || 'Text';
+            if (selected === 'Image') {
+                questionTextSection.classList.add('hidden');
+                questionImageSection.classList.remove('hidden');
+            } else {
+                questionTextSection.classList.remove('hidden');
+                questionImageSection.classList.add('hidden');
+                removeImage();
+            }
+        };
+
         // Initialize Quill Editors
         const quillQuestion = new Quill('#editor-question', {
             theme: 'snow',
@@ -306,6 +358,9 @@
             document.getElementById('explanation').value = '';
             removeImage();
         }
+
+        questionTypeInputs.forEach((el) => el.addEventListener('change', applyQuestionMode));
+        applyQuestionMode();
     });
 
     // Image handling
@@ -327,7 +382,10 @@
     }
 
     function removeImage() {
-        document.getElementById('question_image').value = '';
+        const el = document.getElementById('question_file');
+        if (el) {
+            el.value = '';
+        }
         document.getElementById('image-preview').classList.add('hidden');
         // Show existing image again if present
         const existingImage = document.getElementById('existing-image');
@@ -343,5 +401,6 @@
     }
 </script>
 @endpush
+
 
 
