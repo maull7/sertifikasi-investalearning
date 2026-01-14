@@ -39,12 +39,17 @@ class BankQuestionController extends Controller
     {
         $data = $request->validated();
 
-        // Handle image upload
-        if ($request->hasFile('question_image')) {
-            $file = $request->file('question_image');
+        // Normalize question based on question_type
+        if (($data['question_type'] ?? 'Text') === 'Image') {
+            $data['question'] = $data['question'] ?? '';
+        }
+
+        // Handle image upload (stored into `question` as path)
+        if ($request->hasFile('question_file')) {
+            $file = $request->file('question_file');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $filePath = $file->storeAs('questions', $fileName, 'public');
-            $data['question_image'] = $filePath;
+            $data['question'] = $filePath;
         }
 
         $this->bankQuestionRepository->create($data);
@@ -69,17 +74,28 @@ class BankQuestionController extends Controller
         $question = $this->bankQuestionRepository->findById($id);
         $data = $request->validated();
 
-        // Handle image upload
-        if ($request->hasFile('question_image')) {
-            // Delete old image if exists
-            if ($question->question_image && Storage::disk('public')->exists($question->question_image)) {
-                Storage::disk('public')->delete($question->question_image);
+        // Normalize question based on question_type
+        if (($data['question_type'] ?? 'Text') === 'Image') {
+            $data['question'] = $data['question'] ?? '';
+        }
+
+        // Handle image upload (stored into `question` as path)
+        if ($request->hasFile('question_file')) {
+            if (($question->question_type ?? 'Text') === 'Image' && $question->question && Storage::disk('public')->exists($question->question)) {
+                Storage::disk('public')->delete($question->question);
             }
 
-            $file = $request->file('question_image');
+            $file = $request->file('question_file');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $filePath = $file->storeAs('questions', $fileName, 'public');
-            $data['question_image'] = $filePath;
+            $data['question'] = $filePath;
+        }
+
+        // If switching Image -> Text, delete old image file if any
+        if (($data['question_type'] ?? 'Text') === 'Text' && ($question->question_type ?? 'Text') === 'Image') {
+            if ($question->question && Storage::disk('public')->exists($question->question)) {
+                Storage::disk('public')->delete($question->question);
+            }
         }
 
         $this->bankQuestionRepository->update($id, $data);

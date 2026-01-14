@@ -22,8 +22,8 @@ class BankQuestionsFactory extends Factory
     {
         return [
             'type_id' => MasterTypes::factory(),
+            'question_type' => 'Text',
             'question' => '<p>' . $this->faker->paragraph(3) . '</p>',
-            'question_image' => null,
             'solution' => '<p>' . $this->faker->paragraph(2) . '</p>',
             'explanation' => '<p>' . $this->faker->paragraph(2) . '</p>',
             'option_a' => $this->faker->sentence(3),
@@ -34,5 +34,6 @@ class BankQuestionsFactory extends Factory
         ];
     }
 }
+
 
 

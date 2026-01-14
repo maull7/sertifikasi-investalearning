@@ -56,9 +56,9 @@ class BankQuestionRepository implements BankQuestionRepositoryInterface
     {
         $question = $this->findById($id);
         
-        // Delete image if exists
-        if ($question->question_image && Storage::disk('public')->exists($question->question_image)) {
-            Storage::disk('public')->delete($question->question_image);
+        // Delete image file if question is Image and stored in `question` field
+        if (($question->question_type ?? 'Text') === 'Image' && $question->question && Storage::disk('public')->exists($question->question)) {
+            Storage::disk('public')->delete($question->question);
         }
 
         return $question->delete();
