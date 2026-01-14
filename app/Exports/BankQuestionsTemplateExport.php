@@ -17,7 +17,8 @@ class BankQuestionsTemplateExport implements FromArray, WithHeadings, WithStyles
     {
         return [
             [
-                'Pilihan Ganda', // tipe_soal
+                'Matematika Dasar', // tipe_soal (isi harus sama persis dengan master_types.name_type)
+                'Text', // question_type (Text / Image)
                 'Apa ibukota Indonesia?', // soal
                 'Jakarta', // opsi_a
                 'Bandung', // opsi_b
@@ -28,7 +29,8 @@ class BankQuestionsTemplateExport implements FromArray, WithHeadings, WithStyles
                 'Ibukota adalah kota yang menjadi pusat pemerintahan suatu negara.', // penjelasan
             ],
             [
-                'Pilihan Ganda',
+                'Matematika Dasar',
+                'Text',
                 'Berapa hasil dari 2 + 2?',
                 '3',
                 '4',
@@ -37,6 +39,18 @@ class BankQuestionsTemplateExport implements FromArray, WithHeadings, WithStyles
                 'b',
                 'Hasil penjumlahan 2 + 2 adalah 4.',
                 'Operasi penjumlahan dasar dalam matematika.',
+            ],
+            [
+                'Matematika Dasar',
+                'Image',
+                'https://example.com/soal/soal-1.png',
+                'A',
+                'B',
+                'C',
+                'D',
+                'a',
+                'Jawaban yang benar adalah A.',
+                'Contoh soal dengan gambar. Kolom "soal" diisi URL gambar atau path storage (contoh: questions/soal-1.png).',
             ],
         ];
     }
@@ -48,6 +62,7 @@ class BankQuestionsTemplateExport implements FromArray, WithHeadings, WithStyles
     {
         return [
             'tipe_soal',
+            'question_type',
             'soal',
             'opsi_a',
             'opsi_b',
@@ -83,14 +98,15 @@ class BankQuestionsTemplateExport implements FromArray, WithHeadings, WithStyles
     {
         return [
             'A' => 20, // tipe_soal
-            'B' => 50, // soal
-            'C' => 25, // opsi_a
-            'D' => 25, // opsi_b
-            'E' => 25, // opsi_c
-            'F' => 25, // opsi_d
-            'G' => 10, // jawaban
-            'H' => 50, // pembahasan
-            'I' => 50, // penjelasan
+            'B' => 15, // question_type
+            'C' => 50, // soal
+            'D' => 25, // opsi_a
+            'E' => 25, // opsi_b
+            'F' => 25, // opsi_c
+            'G' => 25, // opsi_d
+            'H' => 10, // jawaban
+            'I' => 50, // pembahasan
+            'J' => 50, // penjelasan
         ];
     }
 }
