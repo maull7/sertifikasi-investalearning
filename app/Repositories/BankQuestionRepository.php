@@ -17,13 +17,18 @@ class BankQuestionRepository implements BankQuestionRepositoryInterface
         $this->model = $model;
     }
 
-    public function getAllWithPagination(?string $search = null, int $perPage = 10): LengthAwarePaginator
+    public function getAllWithPagination(?string $search = null, ?int $typeId = null, int $perPage = 10): LengthAwarePaginator
     {
         return $this->model
             ->with('type')
             ->when($search, function ($query, $search) {
-                $query->where('question', 'like', "%{$search}%")
-                    ->orWhere('solution', 'like', "%{$search}%");
+                $query->where(function ($q) use ($search) {
+                    $q->where('question', 'like', "%{$search}%")
+                        ->orWhere('solution', 'like', "%{$search}%");
+                });
+            })
+            ->when($typeId, function ($query, $typeId) {
+                $query->where('type_id', $typeId);
             })
             ->orderBy('created_at', 'desc')
             ->paginate($perPage)

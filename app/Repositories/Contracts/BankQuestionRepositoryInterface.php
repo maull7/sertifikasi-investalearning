@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Collection;
 interface BankQuestionRepositoryInterface
 {
     /**
-     * Get all bank questions with pagination and search
+     * Get all bank questions with pagination, search, and optional type filter
      */
-    public function getAllWithPagination(?string $search = null, int $perPage = 10): LengthAwarePaginator;
+    public function getAllWithPagination(?string $search = null, ?int $typeId = null, int $perPage = 10): LengthAwarePaginator;
 
     /**
      * Get all bank questions without pagination

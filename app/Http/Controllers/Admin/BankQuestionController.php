@@ -24,9 +24,17 @@ class BankQuestionController extends Controller
     public function index(Request $request)
     {
         $search = $request->query('search');
-        $data = $this->bankQuestionRepository->getAllWithPagination($search);
+        $typeId = $request->query('type_id') ? (int) $request->query('type_id') : null;
 
-        return view('admin.bank-question.index', compact('data', 'search'));
+        $data = $this->bankQuestionRepository->getAllWithPagination($search, $typeId);
+        $types = MasterTypes::orderBy('name_type')->get();
+
+        return view('admin.bank-question.index', [
+            'data' => $data,
+            'search' => $search,
+            'types' => $types,
+            'typeId' => $typeId,
+        ]);
     }
 
     public function create()

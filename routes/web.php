@@ -8,15 +8,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\MasterTypesController;
 use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\BankQuestionController;
+use App\Http\Controllers\Admin\DashboardController;
 
 
 Route::get('/', function () {
     return view('index');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard.index');
-})->name('dashboard')->middleware('auth', 'verified');
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -47,7 +46,7 @@ Route::middleware('auth')->group(function () {
         ->name('mapping-questions.show');
     Route::delete('exams/{exam}/mapping-questions/{mapping}', [MappingQuestionController::class, 'destroy'])
         ->name('mapping-questions.destroy');
-    
+
     // Bank Question routes
     Route::get('bank-questions/download-template', [BankQuestionController::class, 'downloadTemplate'])
         ->name('bank-questions.download-template');

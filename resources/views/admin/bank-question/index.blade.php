@@ -35,21 +35,41 @@
     </div>
 
     {{-- Search & Filter Section --}}
-    <div class="flex flex-col md:flex-row gap-4">
-        <form action="{{ route('bank-questions.index') }}" method="GET" class="relative flex-1 group">
-            <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors"></i>
-            <input 
-                type="text" 
-                name="search" 
-                value="{{ request('search') }}" 
-                placeholder="Cari soal..." 
-                class="w-full pl-11 pr-12 py-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all dark:text-white"
-            >
-            @if(request('search'))
-                <a href="{{ route('bank-questions.index') }}" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors">
-                    <i class="ti ti-x"></i>
+    <div class="flex flex-col lg:flex-row gap-4">
+        <form action="{{ route('bank-questions.index') }}" method="GET" class="flex-1 flex flex-col md:flex-row gap-3">
+            <div class="relative flex-1 group">
+                <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors"></i>
+                <input 
+                    type="text" 
+                    name="search" 
+                    value="{{ $search ?? request('search') }}" 
+                    placeholder="Cari soal..." 
+                    class="w-full pl-11 pr-12 py-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all dark:text-white"
+                >
+                @if(!empty($search ?? request('search')))
+                    <a href="{{ route('bank-questions.index') }}" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors">
+                        <i class="ti ti-x"></i>
+                    </a>
+                @endif
+            </div>
+            <div class="w-full md:w-64">
+                <x-select name="type_id" label="Filter Tipe Soal" inline>
+                    <option value="">Semua Tipe</option>
+                    @foreach($types as $type)
+                        <option value="{{ $type->id }}" {{ (int) ($typeId ?? 0) === $type->id ? 'selected' : '' }}>
+                            {{ $type->name_type }}
+                        </option>
+                    @endforeach
+                </x-select>
+            </div>
+            <div class="flex items-end gap-2">
+                <x-button type="submit" variant="primary" class="rounded-xl">
+                    Terapkan
+                </x-button>
+                <a href="{{ route('bank-questions.index') }}" class="text-xs text-gray-500 hover:text-rose-500">
+                    Reset
                 </a>
-            @endif
+            </div>
         </form>
     </div>
 

@@ -16,26 +16,26 @@
        @php
             $stats = [
                 [
-                    'label' => 'Total Kursus',
-                    'value' => 24,
+                    'label' => 'Total Paket',
+                    'value' => $data['package'],
                     'trend' => '+8.3%',
                     'icon'  => 'ti ti-book'
                 ],
                 [
-                    'label' => 'Total Jurusan',
-                    'value' => 6,
+                    'label' => 'Total Jenis Soal',
+                    'value' => $data['types'],
                     'trend' => '+2.1%',
                     'icon'  => 'ti ti-bleach-no-chlorine'
                 ],
                 [
                     'label' => 'Total Materi',
-                    'value' => 128,
+                    'value' => $data['material'],
                     'trend' => '+12.7%',
                     'icon'  => 'ti ti-checklist'
                 ],
                 [
-                    'label' => 'Total Siswa',
-                    'value' => 342,
+                    'label' => 'Total User',
+                    'value' => $data['user'],
                     'trend' => '+5.4%',
                     'icon'  => 'users'
                 ],
