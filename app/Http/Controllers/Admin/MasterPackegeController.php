@@ -1,0 +1,83 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\RequestPackage;
+use App\Models\Package;
+use Illuminate\Http\Request;
+
+class MasterPackegeController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $search = $request->query('search');
+
+        $data = Package::when($search, function ($query, $search) {
+            $query->where('title', 'like', "%{$search}%");
+        })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString(); // biar search kebawa pas ganti page
+
+        return view('admin.master-package.index', compact('data', 'search'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('admin.master-package.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(RequestPackage $request)
+    {
+        Package::create($request->validated());
+        return redirect()->route('master-packages.index')->with('success', 'Paket berhasil ditambahkan.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $data = Package::findOrFail($id);
+        return view('admin.master-package.show', compact('data'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        $data = Package::findOrFail($id);
+        return view('admin.master-package.edit', compact('data'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(RequestPackage $request, string $id)
+    {
+        $data = Package::findOrFail($id);
+        $data->update($request->validated());
+        return redirect()->route('master-packages.index')->with('success', 'Paket berhasil diperbarui.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $data = Package::findOrFail($id);
+        $data->delete();
+        return redirect()->route('master-packages.index')->with('success', 'Paket berhasil dihapus.');
+    }
+}

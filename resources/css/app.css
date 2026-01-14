@@ -1,0 +1,47 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@custom-variant dark (&:is(.dark *));
+
+/**
+ * --------------------------------------------------------------------------
+ * Laravael UI Dashboard
+ * --------------------------------------------------------------------------
+ * @package     Laravael UI
+ * @author      Rafael Nuansa <email@anda.com>
+ * @copyright   Copyright (c) 2026 Rafael Nuansa
+ * @license     MIT License
+ * @link        https://github.com/rafaelnuansa/laravael-ui-dashboard
+ * --------------------------------------------------------------------------
+ * Please do not remove this header. Respect the craft.
+ */
+ 
+[x-cloak] {
+    display: none !important;
+}
+
+@keyframes wiggle {
+
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(3deg);
+    }
+
+    75% {
+        transform: rotate(-3deg);
+    }
+}
+
