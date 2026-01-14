@@ -64,7 +64,7 @@
             @endif
 
             {{-- Duration & Passing Grade --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-gray-50 dark:border-gray-800">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-6 border-b border-gray-50 dark:border-gray-800">
                 <div>
                     <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-3">Durasi</span>
                     <div class="flex items-center gap-2">
@@ -74,6 +74,20 @@
                         <div>
                             <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $data->duration }}</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">Menit</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-3">Jumlah Soal</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-12 h-12 bg-sky-50 dark:bg-sky-500/10 rounded-xl flex items-center justify-center">
+                            <i class="ti ti-list-numbers text-2xl text-sky-500"></i>
+                        </div>
+                        <div>
+                            @php($total = $data->total_questions ?? $data->mappingQuestions()->count())
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $total }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Soal</p>
                         </div>
                     </div>
                 </div>

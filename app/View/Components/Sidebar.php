@@ -53,6 +53,7 @@ class Sidebar extends Component
                         'subItems' => [
                             ['name' => 'Exams', 'route' => 'exams.index'],
                             ['name' => 'Bank Questions', 'route' => 'bank-questions.index'],
+                            ['name' => 'Mapping Soal', 'route' => 'mapping-questions.index'],
                         ]
                     ],
                 ],

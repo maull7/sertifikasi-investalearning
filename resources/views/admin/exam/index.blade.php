@@ -56,7 +56,7 @@
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Judul</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Durasi</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">KKM</th>
-                      
+                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Jumlah Soal</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -91,7 +91,12 @@
                                     {{ $value->passing_grade }}
                                 </span>
                             </td>
-                           
+                            <td class="py-4 px-8 text-center">
+                                @php($total = $value->total_questions ?? $value->mappingQuestions()->count())
+                                <span class="inline-flex items-center justify-center px-3 py-1 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs font-semibold">
+                                    {{ $total }} Soal
+                                </span>
+                            </td>
                             <td class="py-4 px-8">
                                 <div class="flex items-center justify-end gap-2">
                                     <x-button variant="info" size="sm" href="{{ route('exams.show', $value->id) }}" class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">

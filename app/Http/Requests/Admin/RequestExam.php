@@ -27,6 +27,7 @@ class RequestExam extends FormRequest
             'description' => 'nullable|string',
             'duration' => 'required|integer|min:1',
             'passing_grade' => 'required|integer|min:0|max:100',
+            'total_questions' => 'nullable|integer|min:1',
         ];
     }
 
@@ -47,6 +48,8 @@ class RequestExam extends FormRequest
             'passing_grade.integer' => 'Nilai kelulusan harus berupa angka.',
             'passing_grade.min' => 'Nilai kelulusan minimal 0.',
             'passing_grade.max' => 'Nilai kelulusan maksimal 100.',
+            'total_questions.integer' => 'Jumlah soal harus berupa angka.',
+            'total_questions.min' => 'Jumlah soal minimal 1.',
         ];
     }
 }

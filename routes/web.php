@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\MasterMaterialController;
 use App\Http\Controllers\Admin\MasterPackegeController;
+use App\Http\Controllers\Admin\MappingQuestionController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\MasterTypesController;
@@ -32,6 +33,20 @@ Route::middleware('auth')->group(function () {
 
     // Exam routes
     Route::resource('exams', ExamController::class);
+    Route::get('mapping-questions', [MappingQuestionController::class, 'indexMappingQuestion'])
+        ->name('mapping-questions.index');
+    Route::get('mapping-questions/create', [MappingQuestionController::class, 'create'])
+        ->name('mapping-questions.create');
+    Route::get('exams/{exam}/mapping-questions', [MappingQuestionController::class, 'index'])
+        ->name('mapping-questions.manage');
+    Route::post('exams/{exam}/mapping-questions', [MappingQuestionController::class, 'store'])
+        ->name('mapping-questions.store');
+    Route::post('exams/{exam}/mapping-questions/random', [MappingQuestionController::class, 'random'])
+        ->name('mapping-questions.random');
+    Route::get('exams/{exam}/mapping-questions/{mapping}', [MappingQuestionController::class, 'show'])
+        ->name('mapping-questions.show');
+    Route::delete('exams/{exam}/mapping-questions/{mapping}', [MappingQuestionController::class, 'destroy'])
+        ->name('mapping-questions.destroy');
     
     // Bank Question routes
     Route::get('bank-questions/download-template', [BankQuestionController::class, 'downloadTemplate'])

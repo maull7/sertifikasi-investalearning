@@ -110,7 +110,20 @@
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Nilai minimum untuk lulus (0-100)</p>
                 </div>
 
-               
+                {{-- Total Questions --}}
+                <div>
+                    <x-input 
+                        label="Jumlah Soal Ujian (Opsional)" 
+                        name="total_questions" 
+                        type="number"
+                        min="1"
+                        placeholder="Contoh: 50" 
+                        value="{{ old('total_questions', $data->total_questions) }}"
+                    />
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        Isi jumlah soal yang direncanakan untuk ujian ini (boleh dikosongkan).
+                    </p>
+                </div>
             </div>
 
             {{-- Action Buttons --}}
