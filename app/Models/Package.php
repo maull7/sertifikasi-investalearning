@@ -25,4 +25,14 @@ class Package extends Model
     {
         return $this->belongsTo(MasterTypes::class, 'id_master_types');
     }
+    public function userJoins(): HasMany
+    {
+        return $this->hasMany(UserJoins::class, 'id_package');
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_joins', 'id_package', 'user_id')
+            ->withTimestamps();
+    }
 }

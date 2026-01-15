@@ -99,6 +99,27 @@ class Sidebar extends Component
                     ],
                 ],
             ],
+            [
+                'title' => 'Kursus',
+                'items' => [
+                    [
+                        'name' => 'Package / Kursus',
+                        'icon' => 'book',
+                        'activePattern' => 'user.packages.*',
+                        'subItems' => [
+                            ['name' => 'Semua Package', 'route' => 'user.packages.index'],
+                        ]
+                    ],
+                    [
+                        'name' => 'Package Saya',
+                        'icon' => 'bookmark',
+                        'activePattern' => 'user.my-packages.*',
+                        'subItems' => [
+                            ['name' => 'Package Saya', 'route' => 'user.my-packages.index'],
+                        ]
+                    ],
+                ],
+            ],
         ];
     }
 
