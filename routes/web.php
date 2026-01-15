@@ -11,6 +11,9 @@ use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\BankQuestionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
+use App\Http\Controllers\User\PackageController as UserPackageController;
+use App\Http\Controllers\User\MyPackageController;
+use App\Http\Controllers\User\ExamController as UserExamController;
 
 
 Route::get('/', function () {
@@ -29,15 +32,30 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // User Package routes
+    Route::get('user/packages', [UserPackageController::class, 'index'])->name('user.packages.index');
+    Route::get('user/packages/{package}', [UserPackageController::class, 'show'])->name('user.packages.show');
+    Route::post('user/packages/{package}/join', [UserPackageController::class, 'join'])->name('user.packages.join');
+
+    // My Packages routes
+    Route::get('user/my-packages', [MyPackageController::class, 'index'])->name('user.my-packages.index');
+    Route::get('user/my-packages/{package}', [MyPackageController::class, 'show'])->name('user.my-packages.show');
+
+    // User Exam routes
+    Route::get('user/packages/{package}/exams/{exam}', [UserExamController::class, 'show'])->name('user.exams.show');
+    Route::get('user/packages/{package}/exams/{exam}/questions', [UserExamController::class, 'getQuestions'])->name('user.exams.questions');
+    // Material preview & download (accessible for users who joined the package)
+    Route::get('master-materials/{id}/preview', [MasterMaterialController::class, 'serveFile'])
+        ->name('master-materials.preview');
+    Route::get('master-materials/{id}/download', [MasterMaterialController::class, 'downloadFile'])
+        ->name('master-materials.download');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('master-types', MasterTypesController::class);
     Route::resource('master-packages', MasterPackegeController::class);
-    Route::get('master-materials/{id}/preview', [MasterMaterialController::class, 'serveFile'])
-        ->name('master-materials.preview');
-    Route::get('master-materials/{id}/download', [MasterMaterialController::class, 'downloadFile'])
-        ->name('master-materials.download');
+
     Route::resource('master-materials', MasterMaterialController::class);
     Route::resource('subjects', SubjectController::class);
 

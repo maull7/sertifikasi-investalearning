@@ -53,4 +53,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function joinedPackages()
+    {
+        return $this->hasMany(UserJoins::class, 'user_id');
+    }
 }
