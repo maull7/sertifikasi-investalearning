@@ -4,6 +4,7 @@ namespace App\View\Components;
 
 use Closure;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Component;
 
 class Sidebar extends Component
@@ -12,7 +13,19 @@ class Sidebar extends Component
 
     public function __construct()
     {
-        $this->menuGroups = [
+        $user = Auth::user();
+        $isAdmin = $user && $user->role === 'Admin';
+
+        if ($isAdmin) {
+            $this->menuGroups = $this->getAdminMenu();
+        } else {
+            $this->menuGroups = $this->getUserMenu();
+        }
+    }
+
+    private function getAdminMenu(): array
+    {
+        return [
             [
                 'title' => 'Main Menu',
                 'items' => [
@@ -22,8 +35,12 @@ class Sidebar extends Component
                         'activePattern' => 'dashboard.*',
                         'subItems' => [
                             ['name' => 'Dashboard', 'route' => 'dashboard'],
-
                         ]
+                    ],
+                    [
+                        'name' => 'Profile',
+                        'icon' => 'user',
+                        'route' => 'profile.edit',
                     ],
                 ],
             ],
@@ -49,7 +66,7 @@ class Sidebar extends Component
                     [
                         'name' => 'Exams',
                         'icon' => 'ti ti-id',
-                        'activePattern' => 'exams.*',
+                        'activePattern' => 'exams.*|bank-questions.*|mapping-questions.*',
                         'subItems' => [
                             ['name' => 'Exams', 'route' => 'exams.index'],
                             ['name' => 'Bank Questions', 'route' => 'bank-questions.index'],
@@ -58,7 +75,30 @@ class Sidebar extends Component
                     ],
                 ],
             ],
+        ];
+    }
 
+    private function getUserMenu(): array
+    {
+        return [
+            [
+                'title' => 'Main Menu',
+                'items' => [
+                    [
+                        'name' => 'Dashboard',
+                        'icon' => 'smart-home',
+                        'activePattern' => 'user.dashboard',
+                        'subItems' => [
+                            ['name' => 'Dashboard', 'route' => 'user.dashboard'],
+                        ]
+                    ],
+                    [
+                        'name' => 'Profile',
+                        'icon' => 'user',
+                        'route' => 'profile.edit',
+                    ],
+                ],
+            ],
         ];
     }
 

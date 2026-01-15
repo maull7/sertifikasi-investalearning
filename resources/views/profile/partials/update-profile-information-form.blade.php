@@ -12,53 +12,117 @@
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf
     </form>
+<form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    @csrf
+    @method('patch')
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
-        @csrf
-        @method('patch')
+    {{-- Row 1 --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <x-input
+            label="Nama Lengkap"
+            name="name"
+            placeholder="Masukkan nama lengkap"
+            :value="old('name', $user->name)"
+            required
+        />
+
+        <x-input
+            label="Email"
+            name="email"
+            type="email"
+            placeholder="Masukkan email"
+            :value="old('email', $user->email)"
+            required
+        />
+    </div>
+
+    {{-- Row 2 --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <x-input
+            label="Nomor Telepon"
+            name="phone"
+            placeholder="Masukkan nomor telepon"
+            :value="old('phone', $user->phone)"
+            required
+        />
+
+        <x-select
+            label="Jenis Kelamin"
+            name="jenis_kelamin"
+        >
+            <option value="">Pilih jenis kelamin</option>
+            <option value="Laki-laki" @selected(old('jenis_kelamin', $user->jenis_kelamin) === 'Laki-laki')>
+                Laki-laki
+            </option>
+            <option value="Perempuan" @selected(old('jenis_kelamin', $user->jenis_kelamin) === 'Perempuan')>
+                Perempuan
+            </option>
+        </x-select>
+    </div>
+
+    {{-- Row 3 --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <x-input
+            label="Profesi"
+            name="profesi"
+            placeholder="Masukkan profesi"
+            :value="old('profesi', $user->profesi)"
+        />
 
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Tanggal Lahir
+            </label>
+               <input 
+                type="date" 
+                 name="tanggal_lahir" 
+                                value="{{ old('tanggal_lahir',$user->tanggal_lahir) }}"
+                                class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 px-4 py-3"
+                            />
+                            @error('tanggal_lahir')
+                                <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                            @enderror  
+
         </div>
+    </div>
 
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+    {{-- Row 4 --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <x-input
+            label="Institusi"
+            name="institusi"
+            placeholder="Masukkan institusi"
+            :value="old('institusi', $user->institusi)"
+        />
 
-            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                <div>
-                    <p class="text-sm mt-2 text-gray-800 dark:text-gray-200">
-                        {{ __('Your email address is unverified.') }}
+        <x-textarea
+            label="Alamat"
+            name="alamat"
+            rows="3"
+            placeholder="Masukkan alamat lengkap"
+        >
+            {{ old('alamat', $user->alamat) }}
+        </x-textarea>
+    </div>
 
-                        <button form="send-verification" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
-                            {{ __('Click here to re-send the verification email.') }}
-                        </button>
-                    </p>
+    {{-- Action --}}
+    <div class="flex items-center gap-4">
+        <x-button type="submit" variant="primary">
+            Save
+        </x-button>
 
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600 dark:text-green-400">
-                            {{ __('A new verification link has been sent to your email address.') }}
-                        </p>
-                    @endif
-                </div>
-            @endif
-        </div>
+        @if (session('status') === 'profile-updated')
+            <p
+                x-data="{ show: true }"
+                x-show="show"
+                x-transition
+                x-init="setTimeout(() => show = false, 2000)"
+                class="text-sm text-gray-600 dark:text-gray-400"
+            >
+                Saved.
+            </p>
+        @endif
+    </div>
+</form>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-            @if (session('status') === 'profile-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600 dark:text-gray-400"
-                >{{ __('Saved.') }}</p>
-            @endif
-        </div>
-    </form>
 </section>

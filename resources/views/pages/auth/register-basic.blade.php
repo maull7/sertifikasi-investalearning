@@ -27,7 +27,7 @@
         </h1>
     </div>
 
-    <div class="w-full max-w-md">
+    <div class="w-full max-w-4xl">
         <x-card class="shadow-sm border-gray-200 dark:border-gray-800">
             <div class="space-y-6">
                 
@@ -40,56 +40,128 @@
                 <form action="{{ route('register') }}" method="POST" class="space-y-5">
                     @csrf
 
-                    {{-- NAME --}}
-                    <x-input 
-                        label="Nama Lengkap" 
-                        name="name" 
-                        type="text" 
-                        icon="user"
-                        placeholder="John Doe" 
-                        required 
-                        autofocus
-                    />
+                    {{-- ROW 1: Nama & Email --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <x-input 
+                            label="Nama Lengkap" 
+                            name="name" 
+                            type="text" 
+                            icon="user"
+                            placeholder="John Doe" 
+                            required 
+                            autofocus
+                        />
 
-                    {{-- EMAIL --}}
-                    <x-input 
-                        label="Email" 
-                        name="email" 
-                        type="email" 
-                        icon="mail"
-                        placeholder="yourname@example.com" 
-                        required 
-                    />
+                        <x-input 
+                            label="Email" 
+                            name="email" 
+                            type="email" 
+                            icon="mail"
+                            placeholder="yourname@example.com" 
+                            required 
+                        />
+                    </div>
 
-                    <x-input 
-                        label="Nomor Telepon" 
-                        name="phone" 
-                        type="text" 
-                        icon="phone"
-                        placeholder="081234567890" 
-                        required
-                        autofocus
-                    />
+                    {{-- ROW 2: Phone & Jenis Kelamin --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <x-input 
+                            label="Nomor Telepon" 
+                            name="phone" 
+                            type="text" 
+                            icon="phone"
+                            placeholder="081234567890" 
+                            required
+                        />
 
-                    {{-- PASSWORD --}}
-                    <x-input 
-                        label="Password" 
-                        name="password" 
-                        type="password" 
-                        icon="lock"
-                        placeholder="••••••••" 
-                        required 
-                    />
+                        
+                        <div>
+                            <x-select 
+                                label="Pilih Jenis Kelamin" 
+                                name="jenis_kelamin" 
+                                required
+                            >
+                                <option value="Laki-laki" {{ old('jenis_kelamin') === 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                <option value="Perempuan" {{ old('jenis_kelamin') === 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                            </x-select>
+                            
+                            @error('jenis_kelamin')
+                                <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
 
-                    {{-- CONFIRM PASSWORD --}}
-                    <x-input 
-                        label="Konfirmasi Password" 
-                        name="password_confirmation" 
-                        type="password" 
-                        icon="lock-check"
-                        placeholder="••••••••" 
-                        required 
-                    />
+                    {{-- ROW 3: Profesi & Tanggal Lahir --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <x-input 
+                            label="Profesi" 
+                            name="profesi" 
+                            type="text" 
+                            icon="briefcase"
+                            placeholder="Guru, Siswa, Profesional, dll" 
+                        />
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Tanggal Lahir
+                            </label>
+                            <input 
+                                type="date" 
+                                name="tanggal_lahir" 
+                                value="{{ old('tanggal_lahir') }}"
+                                class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 px-4 py-3"
+                            />
+                            @error('tanggal_lahir')
+                                <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- ROW 4: Institusi & Alamat --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <x-input 
+                            label="Institusi" 
+                            name="institusi" 
+                            type="text" 
+                            icon="building"
+                            placeholder="Nama sekolah / kampus / instansi" 
+                        />
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Alamat
+                            </label>
+                            <textarea 
+                                name="alamat" 
+                                rows="3"
+                                class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="Alamat lengkap"
+                            >{{ old('alamat') }}</textarea>
+                            @error('alamat')
+                                <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- ROW 5: Password & Konfirmasi Password --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <x-input 
+                            label="Password" 
+                            name="password" 
+                            type="password" 
+                            icon="lock"
+                            placeholder="••••••••" 
+                            required 
+                        />
+
+                        <x-input 
+                            label="Konfirmasi Password" 
+                            name="password_confirmation" 
+                            type="password" 
+                            icon="lock-check"
+                            placeholder="••••••••" 
+                            required 
+                        />
+                    </div>
 
                   
 
