@@ -25,6 +25,7 @@ class RequestPackage extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'status' => 'required|in:active,inactive',
+            'id_master_types' => 'required|exists:master_types,id',
         ];
     }
 }

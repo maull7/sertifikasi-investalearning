@@ -36,6 +36,21 @@
                         </ul>
                     </div>
                 @endif
+                 <div class="md:col-span-2">
+                    <x-select 
+                        label="Jenis" 
+                        name="id_master_types" 
+                        required
+                    >
+                        <option value="">Pilih Jenis</option>
+                        @foreach($types as $type)
+                            <option value="{{ $type->id }}" {{ old('id_master_types') == $type->id ? 'selected' : '' }}>
+                                {{ $type->name_type }}
+                            </option>
+                        @endforeach
+                    </x-select>
+                </div>
+
                 {{-- Name Input --}}
                 <div class="md:col-span-2">
                     <x-input 

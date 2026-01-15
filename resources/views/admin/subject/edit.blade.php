@@ -38,14 +38,14 @@
                     </div>
                 @endif
 
-                {{-- Jurusan --}}
+                {{-- Jenis --}}
                 <div class="md:col-span-2">
                     <x-select 
                         label="Jurusan" 
                         name="master_type_id" 
                         required
                     >
-                        <option value="">Pilih Jurusan</option>
+                        <option value="">Pilih Jenis</option>
                         @foreach($types as $type)
                             <option value="{{ $type->id }}" {{ old('master_type_id', $data->master_type_id) == $type->id ? 'selected' : '' }}>
                                 {{ $type->name_type }}

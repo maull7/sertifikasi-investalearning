@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RequestPackage;
 use App\Models\Package;
+use App\Models\MasterTypes;
 use Illuminate\Http\Request;
 
 class MasterPackegeController extends Controller
@@ -31,7 +32,8 @@ class MasterPackegeController extends Controller
      */
     public function create()
     {
-        return view('admin.master-package.create');
+        $types = MasterTypes::all();
+        return view('admin.master-package.create', compact('types'));
     }
 
     /**
@@ -57,8 +59,9 @@ class MasterPackegeController extends Controller
      */
     public function edit(string $id)
     {
+        $types = MasterTypes::all();
         $data = Package::findOrFail($id);
-        return view('admin.master-package.edit', compact('data'));
+        return view('admin.master-package.edit', compact('data', 'types'));
     }
 
     /**
