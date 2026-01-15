@@ -10,19 +10,28 @@ use App\Http\Controllers\Admin\MasterTypesController;
 use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\BankQuestionController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\User\DashboardController as UserDashboardController;
 
 
 Route::get('/', function () {
     return view('index');
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'admin'])
+    ->name('dashboard');
+
+Route::get('/user/dashboard', [UserDashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('user.dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
+Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('master-types', MasterTypesController::class);
     Route::resource('master-packages', MasterPackegeController::class);
     Route::get('master-materials/{id}/preview', [MasterMaterialController::class, 'serveFile'])

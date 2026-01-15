@@ -24,6 +24,11 @@ class User extends Authenticatable
         'avatar',
         'role',
         'password',
+        'jenis_kelamin',
+        'profesi',
+        'tanggal_lahir',
+        'institusi',
+        'alamat',
     ];
 
     /**

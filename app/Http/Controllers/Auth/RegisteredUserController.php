@@ -32,6 +32,12 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'phone' => ['required', 'string', 'max:20'],
+            'jenis_kelamin' => ['required', 'in:Laki-laki,Perempuan'],
+            'profesi' => ['nullable', 'string', 'max:255'],
+            'tanggal_lahir' => ['nullable', 'date'],
+            'institusi' => ['nullable', 'string', 'max:255'],
+            'alamat' => ['nullable', 'string', 'max:500'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -39,6 +45,11 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'profesi' => $request->profesi,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'institusi' => $request->institusi,
+            'alamat' => $request->alamat,
             'role' => 'User',
             'avatar' => 'default.jpeg',
             'password' => Hash::make($request->password),
@@ -48,6 +59,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->route('user.dashboard');
     }
 }
