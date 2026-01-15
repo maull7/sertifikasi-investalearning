@@ -13,4 +13,9 @@ class MasterTypes extends Model
     protected $fillable = [
         'name_type',
     ];
+
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class, 'master_type_id');
+    }
 }

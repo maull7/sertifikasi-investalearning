@@ -38,6 +38,7 @@ class Sidebar extends Component
                             ['name' => 'Master Jenis', 'route' => 'master-types.index'],
                             ['name' => 'Master Paket', 'route' => 'master-packages.index'],
                             ['name' => 'Master Materi', 'route' => 'master-materials.index'],
+                            ['name' => 'Master Mata Pelajaran', 'route' => 'subjects.index'],
 
                         ]
                     ],

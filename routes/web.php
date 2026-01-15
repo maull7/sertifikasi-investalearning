@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\MasterMaterialController;
 use App\Http\Controllers\Admin\MasterPackegeController;
 use App\Http\Controllers\Admin\MappingQuestionController;
+use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\MasterTypesController;
@@ -29,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::get('master-materials/{id}/download', [MasterMaterialController::class, 'downloadFile'])
         ->name('master-materials.download');
     Route::resource('master-materials', MasterMaterialController::class);
+    Route::resource('subjects', SubjectController::class);
 
     // Exam routes
     Route::resource('exams', ExamController::class);
