@@ -63,7 +63,8 @@
                     <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Paket</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Title</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">File</th>
+                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Mata Pelajaran</th>
+                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Topik</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Preview</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">Aksi</th>
                     </tr>
@@ -84,21 +85,17 @@
                                     </button>
                                 </div>
                             </td>
-                            <td class="py-4 px-8">
-                                @if($value->value)
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-                                        <i class="{{ $value->file_icon }} text-xl {{ $value->file_type === 'pdf' ? 'text-rose-600' : 'text-blue-600' }}"></i>
-                                    </div>
-                                    <div class="min-w-0">
-                                        <p class="text-xs font-semibold text-gray-900 dark:text-white truncate max-w-[150px]">{{ $value->file_name }}</p>
-                                        <p class="text-[10px] text-gray-500">{{ $value->file_size_formatted }}</p>
-                                    </div>
-                                </div>
-                                @else
-                                <span class="text-xs text-gray-400">Tidak ada file</span>
-                                @endif
+                             <td class="py-4 px-8">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
+                                    {{ $value->subject->name ?? '-' }}
+                                </span>
                             </td>
+                             <td class="py-4 px-8">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
+                                    {{ $value->topic ?? '-' }}
+                                </span>
+                            </td>
+                           
                             <td class="py-4 px-8">
                                 <div class="flex items-center justify-center gap-2">
                                     @if($value->value)

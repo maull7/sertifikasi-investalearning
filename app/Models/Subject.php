@@ -26,3 +26,4 @@ class Subject extends Model
         return $this->hasMany(Materials::class, 'id_subject');
     }
 }
+
