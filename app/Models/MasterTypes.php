@@ -12,10 +12,15 @@ class MasterTypes extends Model
 
     protected $fillable = [
         'name_type',
+
     ];
 
     public function subjects()
     {
         return $this->hasMany(Subject::class, 'master_type_id');
+    }
+    public function packages()
+    {
+        return $this->hasMany(Package::class, 'id_master_types');
     }
 }

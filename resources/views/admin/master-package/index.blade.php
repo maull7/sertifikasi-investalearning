@@ -56,6 +56,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
+                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Jenis</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Title</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Description</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Status</th>
@@ -68,6 +69,9 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group">
                            
                        
+                            <td class="py-4 px-8 text-sm text-gray-500 font-medium">
+                                {{ $value->masterType->name_type }}
+                            </td>
                             <td class="py-4 px-8 text-sm text-gray-500 font-medium">
                                 {{ $value->title }}
                             </td>
