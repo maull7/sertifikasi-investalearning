@@ -36,10 +36,9 @@ class Sidebar extends Component
                         'activePattern' => 'master.*',
                         'subItems' => [
                             ['name' => 'Master Jenis', 'route' => 'master-types.index'],
+                            ['name' => 'Master Mata Pelajaran', 'route' => 'subjects.index'],
                             ['name' => 'Master Paket', 'route' => 'master-packages.index'],
                             ['name' => 'Master Materi', 'route' => 'master-materials.index'],
-                            ['name' => 'Master Mata Pelajaran', 'route' => 'subjects.index'],
-
                         ]
                     ],
                 ],

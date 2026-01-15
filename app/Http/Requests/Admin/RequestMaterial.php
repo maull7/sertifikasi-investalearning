@@ -33,6 +33,8 @@ class RequestMaterial extends FormRequest
                 'mimes:pdf,doc,docx',
                 'max:10240',
             ],
+            'id_subject' => 'required|exists:subjects,id',
+            'topic' => 'required|string|max:255',
         ];
     }
 }

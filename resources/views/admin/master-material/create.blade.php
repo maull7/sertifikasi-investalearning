@@ -52,6 +52,20 @@
                         @endforeach
                     </x-select>
                 </div>
+                <div class="md:col-span-2">
+                    <x-select 
+                        label="Mata Pelajaran" 
+                        name="id_subject" 
+                        required
+                    >
+                        <option value="">Pilih Mata Pelajaran</option>
+                        @foreach($subjects as $subject)
+                            <option value="{{ $subject->id }}" {{ old('id_subject') == $subject->id ? 'selected' : '' }}>
+                                {{ $subject->name }}
+                            </option>
+                        @endforeach
+                    </x-select>
+                </div>
 
                 {{-- Title Input --}}
                 <div class="md:col-span-2">
@@ -62,6 +76,16 @@
                         value="{{ old('title') }}"
                         required 
                     />
+                </div>
+                  {{-- Topic Input --}}
+                <div class="md:col-span-2">
+                    <x-textarea 
+                        label="Topik Materi" 
+                        name="topic" 
+                        placeholder="Topik singkat mengenai materi ini..." 
+                        rows="3"
+                        required 
+                    >{{ old('topic') }}</x-textarea>
                 </div>
 
                 {{-- Description Input --}}

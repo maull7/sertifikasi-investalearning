@@ -18,6 +18,8 @@ class Materials extends Model
         'file_name',
         'file_type',
         'file_size',
+        'id_subject',
+        'topic',
     ];
 
     protected $appends = [
@@ -28,6 +30,10 @@ class Materials extends Model
     public function package(): BelongsTo
     {
         return $this->belongsTo(Package::class, 'package_id');
+    }
+    public function subject(): BelongsTo
+    {
+        return $this->belongsTo(Subject::class, 'id_subject');
     }
 
     public function getFileIconAttribute(): string

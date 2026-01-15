@@ -238,8 +238,8 @@
 
                 <!-- Desktop Buttons -->
                 <div class="hidden md:flex items-center space-x-2 lg:space-x-4">
-                    <a href="#register" class="bg-gradient-to-r from-cyan-700 to-cyan-600 text-white px-3 lg:px-6 py-2 text-sm lg:text-base hover:from-cyan-800 hover:to-cyan-700 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg">Register</a>
-                    <a href="#login" class="bg-white text-cyan-800 px-3 lg:px-6 py-2 text-sm lg:text-base border-2 border-cyan-300 rounded-lg hover:bg-cyan-700 hover:text-white transition-all duration-300 hover:scale-105 hover:shadow-lg">Login</a>
+                    <a href="{{route('register')}}" class="bg-gradient-to-r from-cyan-700 to-cyan-600 text-white px-3 lg:px-6 py-2 text-sm lg:text-base hover:from-cyan-800 hover:to-cyan-700 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg">Register</a>
+                    <a href="{{route('login')}}" class="bg-white text-cyan-800 px-3 lg:px-6 py-2 text-sm lg:text-base border-2 border-cyan-300 rounded-lg hover:bg-cyan-700 hover:text-white transition-all duration-300 hover:scale-105 hover:shadow-lg">Login</a>
                 </div>
 
                 <!-- Mobile menu button -->
@@ -269,8 +269,8 @@
                 <a href="#about" class="block text-lg text-gray-700 hover:text-cyan-800 py-2 transition hover:translate-x-2">About</a>
                 <a href="#contact" class="block text-lg text-gray-700 hover:text-cyan-800 py-2 transition hover:translate-x-2">Contact</a>
                 <div class="pt-4 space-y-2">
-                    <a href="#register" class="block w-full text-center bg-gradient-to-r from-cyan-700 to-cyan-600 text-white px-4 py-2 hover:from-cyan-800 hover:to-cyan-700 rounded-lg transition">Register</a>
-                    <a href="#login" class="block w-full text-center bg-white text-cyan-800 px-4 py-2 border-2 border-gray-300 rounded-lg hover:bg-cyan-700 hover:text-white transition">Login</a>
+                    <a href="{{route('register')}}" class="block w-full text-center bg-gradient-to-r from-cyan-700 to-cyan-600 text-white px-4 py-2 hover:from-cyan-800 hover:to-cyan-700 rounded-lg transition">Register</a>
+                    <a href="{{route('login')}}" class="block w-full text-center bg-white text-cyan-800 px-4 py-2 border-2 border-gray-300 rounded-lg hover:bg-cyan-700 hover:text-white transition">Login</a>
                 </div>
             </div>
         </div>
