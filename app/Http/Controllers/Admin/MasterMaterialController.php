@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RequestMaterial;
 use App\Models\Materials;
 use App\Models\Package;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,7 +19,7 @@ class MasterMaterialController extends Controller
     {
         $search = $request->query('search');
 
-        $data = Materials::with('package')
+        $data = Materials::with('package', 'subject')
             ->when($search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
@@ -36,7 +37,8 @@ class MasterMaterialController extends Controller
     public function create()
     {
         $packages = Package::where('status', 'active')->get();
-        return view('admin.master-material.create', compact('packages'));
+        $subjects = Subject::all();
+        return view('admin.master-material.create', compact('packages', 'subjects'));
     }
 
     /**
@@ -77,7 +79,8 @@ class MasterMaterialController extends Controller
     {
         $data = Materials::findOrFail($id);
         $packages = Package::where('status', 'active')->get();
-        return view('admin.master-material.edit', compact('data', 'packages'));
+        $subjects = Subject::all();
+        return view('admin.master-material.edit', compact('data', 'packages', 'subjects'));
     }
 
     /**

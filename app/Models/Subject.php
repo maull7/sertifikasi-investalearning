@@ -21,6 +21,8 @@ class Subject extends Model
     {
         return $this->belongsTo(MasterTypes::class, 'master_type_id');
     }
+    public function materials()
+    {
+        return $this->hasMany(Materials::class, 'id_subject');
+    }
 }
-
-

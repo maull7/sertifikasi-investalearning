@@ -106,10 +106,7 @@
                                             <i class="ti ti-eye text-sm"></i>
                                             Preview
                                         </a>
-                                        <a href="{{ route('master-materials.download', $value->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800/40 dark:hover:bg-gray-800/70 text-gray-700 dark:text-gray-200 text-xs font-semibold rounded-lg transition-colors">
-                                            <i class="ti ti-download text-sm"></i>
-                                            Download
-                                        </a>
+
                                     @else
                                         <span class="text-xs text-gray-400">-</span>
                                     @endif
