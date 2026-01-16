@@ -4,8 +4,8 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Exams;
-use App\Models\MappingQuestions;
 use App\Models\Package;
+use App\Services\ExamService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,50 +13,56 @@ use Illuminate\View\View;
 
 class ExamController extends Controller
 {
+    public function __construct(
+        protected ExamService $examService
+    ) {
+    }
+
     public function show(Package $package, Exams $exam): View
     {
         $user = Auth::user();
-        
-        $userJoin = \App\Models\UserJoins::where('user_id', $user->id)
-            ->where('id_package', $package->id)
-            ->first();
+        $this->examService->ensureUserCanAccessExam($user, $package, $exam);
 
-        if (!$userJoin) {
-            abort(403, 'Anda belum bergabung dengan package ini.');
-        }
-
-        if ($exam->package_id !== $package->id) {
-            abort(404, 'Ujian tidak ditemukan dalam package ini.');
-        }
-
-        $totalQuestions = MappingQuestions::where('id_exam', $exam->id)->count();
+        $totalQuestions = $this->examService->getTotalQuestions($exam);
 
         return view('user.exams.show', compact('package', 'exam', 'totalQuestions'));
+    }
+
+    public function submit(Request $request, Package $package, Exams $exam): JsonResponse
+    {
+        $user = Auth::user();
+
+        try {
+            $answers = $request->input('answers', []);
+            $result = $this->examService->submitExam($user, $package, $exam, $answers);
+
+            session()->flash('exam_result', [
+                'score' => $result['score'],
+                'correct' => $result['correct'],
+                'total' => $result['total'],
+                'status' => $result['status'],
+                'exam_title' => $exam->title,
+            ]);
+
+            return response()->json([
+                'redirect' => route('user.my-packages.show', $package->id),
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'error' => 'Terjadi kesalahan saat menyimpan hasil ujian.',
+            ], 500);
+        }
     }
 
     public function getQuestions(Request $request, Package $package, Exams $exam): JsonResponse
     {
         $user = Auth::user();
-        
-        $userJoin = \App\Models\UserJoins::where('user_id', $user->id)
-            ->where('id_package', $package->id)
-            ->first();
+        $page = (int) $request->get('page', 1);
+        $perPage = 1;
 
-        if (!$userJoin) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        if ($exam->package_id !== $package->id) {
-            return response()->json(['error' => 'Exam not found'], 404);
-        }
-
-        $page = $request->get('page', 1);
-        $perPage = 1; // Satu soal per halaman
-
-        $mappingQuestions = MappingQuestions::where('id_exam', $exam->id)
-            ->with('questionBank.type')
-            ->orderBy('id')
-            ->paginate($perPage, ['*'], 'page', $page);
+        $mappingQuestions = $this->examService->getQuestionPage($user, $package, $exam, $page, $perPage);
 
         $questions = $mappingQuestions->map(function ($mapping) {
             $question = $mapping->questionBank;
@@ -65,9 +71,9 @@ class ExamController extends Controller
                 'mapping_id' => $mapping->id,
                 'question_type' => $question->question_type,
                 'question' => $question->question,
-                'question_image_url' => $question->question_type === 'Image' 
-                    ? (str_starts_with($question->question, 'http') 
-                        ? $question->question 
+                'question_image_url' => $question->question_type === 'Image'
+                    ? (str_starts_with($question->question, 'http')
+                        ? $question->question
                         : asset('storage/' . ltrim($question->question, '/')))
                     : null,
                 'option_a' => $question->option_a,
