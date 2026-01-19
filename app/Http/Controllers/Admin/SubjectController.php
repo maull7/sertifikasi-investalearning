@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\RequestSubject;
-use App\Models\MasterTypes;
 use App\Models\Subject;
+use App\Models\MasterTypes;
 use Illuminate\Http\Request;
+use App\Exports\MasterSubjectExport;
+use App\Http\Controllers\Controller;
+use App\Imports\MasterSubjectImport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Requests\Admin\RequestSubject;
 
 class SubjectController extends Controller
 {
@@ -84,8 +87,22 @@ class SubjectController extends Controller
             ->route('subjects.index')
             ->with('success', 'Mata pelajaran berhasil dihapus.');
     }
+    public function TemplateExport()
+    {
+        return Excel::download(new MasterSubjectExport, 'template_master_mapel.xlsx');
+    }
+    public function ImportExcel(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        $file = $request->file('file');
+
+        Excel::import(new MasterSubjectImport, $file);
+
+        return redirect()
+            ->route('subjects.index')
+            ->with('success', 'Data master mata pelajaran berhasil diimport.');
+    }
 }
-
-
-
-
