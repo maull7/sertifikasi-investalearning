@@ -23,7 +23,7 @@ class RequestMasterType extends FormRequest
     {
         return [
             'name_type' => ['required', 'string', 'max:255'],
-            'code' => ['nullable', 'string', 'max:100'],
+            'code' => ['nullable', 'string', 'max:100', 'unique:master_types,code'],
             'description' => ['nullable', 'string'],
         ];
     }

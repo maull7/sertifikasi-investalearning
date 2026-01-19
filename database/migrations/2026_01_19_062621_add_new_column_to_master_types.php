@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('master_types', function (Blueprint $table) {
-            $table->string('code')->nullable();
+            $table->string('code')->nullable()->unique();
             $table->text('description')->nullable()->after('code');
         });
     }
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('master_types', function (Blueprint $table) {
-            //
+            $table->dropColumn(['code', 'description']);
         });
     }
 };
