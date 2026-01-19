@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\RequestPackage;
 use App\Models\Package;
 use App\Models\MasterTypes;
 use Illuminate\Http\Request;
+use App\Exports\PaketTemplate;
+use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Requests\Admin\RequestPackage;
+use App\Imports\PaketImport;
 
 class MasterPackegeController extends Controller
 {
@@ -82,5 +85,31 @@ class MasterPackegeController extends Controller
         $data = Package::findOrFail($id);
         $data->delete();
         return redirect()->route('master-packages.index')->with('success', 'Paket berhasil dihapus.');
+    }
+
+    public function DownloadTemplate()
+    {
+        return Excel::download(new PaketTemplate, 'template_paket.xlsx');
+    }
+
+    public function importPackage(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        try {
+            Excel::import(new PaketImport, $request->file('file'));
+            return redirect()->route('master-packages.index')->with('success', 'Data paket berhasil diimpor.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errorMessages = [];
+
+            foreach ($failures as $failure) {
+                $errorMessages[] = 'Baris ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+            }
+
+            return redirect()->back()->withErrors($errorMessages);
+        }
     }
 }

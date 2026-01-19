@@ -161,7 +161,7 @@
     </x-card>
 
 
-       <div x-show="ModalMapel" 
+    <div x-show="ModalMapel" 
         class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
         x-cloak
         x-transition:enter="transition ease-out duration-300"
