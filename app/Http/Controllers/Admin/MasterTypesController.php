@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\RequestMasterType;
 use App\Models\MasterTypes;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\MasterTypesTemplateExport;
+use App\Http\Requests\Admin\RequestMasterType;
 use PhpParser\Lexer\TokenEmulator\VoidCastEmulator;
 
 class MasterTypesController extends Controller
@@ -80,5 +82,30 @@ class MasterTypesController extends Controller
         $data = MasterTypes::findOrFail($id);
         $data->delete();
         return redirect()->route('master-types.index')->with('success', 'Jenis berhasil dihapus.');
+    }
+
+    public function ExportTemplate()
+    {
+        return Excel::download(new MasterTypesTemplateExport, 'jenis_template.xlsx');
+    }
+    public function ImportTemplate(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        try {
+            Excel::import(new \App\Imports\MasterTypesImport, $request->file('file'));
+            return redirect()->route('master-types.index')->with('success', 'Data jenis berhasil diimpor.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errorMessages = [];
+
+            foreach ($failures as $failure) {
+                $errorMessages[] = "Baris {$failure->row()}: " . implode(', ', $failure->errors());
+            }
+
+            return redirect()->back()->withErrors($errorMessages);
+        }
     }
 }

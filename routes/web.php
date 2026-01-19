@@ -54,7 +54,12 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
+    Route::post('master-types/import', [MasterTypesController::class, 'ImportTemplate'])->name('master-types.import');
+    Route::get('master-types/export-template', [MasterTypesController::class, 'ExportTemplate'])->name('master-types.export-template');
     Route::resource('master-types', MasterTypesController::class);
+
+
+
     Route::resource('master-packages', MasterPackegeController::class);
 
     Route::resource('master-materials', MasterMaterialController::class);
