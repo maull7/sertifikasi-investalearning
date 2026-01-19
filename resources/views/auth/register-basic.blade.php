@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', 'Register - Admin InvestaLearning')
+@section('title', 'Register - User InvestaLearning')
 
 @section('content')
 <div class="min-h-screen flex flex-col justify-center items-center p-6 bg-gray-50 dark:bg-gray-950 relative" x-data>
@@ -127,18 +127,16 @@
                         />
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Alamat
-                            </label>
-                            <textarea 
+                            <x-textarea
+                                label="Alamat" 
                                 name="alamat" 
+                                placeholder="Alamat lengkap" 
                                 rows="3"
-                                class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                placeholder="Alamat lengkap"
-                            >{{ old('alamat') }}</textarea>
-                            @error('alamat')
-                                <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
-                            @enderror
+                                required
+                            >
+                                {{old('alamat')}}
+                            </x-textarea>
+                          
                         </div>
                     </div>
 

@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', 'Login - Admin InvestaLearning')
+@section('title', 'Login - InvestaLearning')
 
 @section('content')
 <div class="min-h-screen flex flex-col justify-center items-center p-6 bg-gray-50 dark:bg-gray-950 relative" x-data>
@@ -19,7 +19,7 @@
              <x-logo :with-text="false" size="md" />
         </a>
         <h1 class="text-xl font-bold text-gray-900 dark:text-white ">
-            Investalearning <span class="text-indigo-600">Dashboard</span>
+            Investalearning <span class="text-indigo-600">Authentication</span>
         </h1>
     </div>
 

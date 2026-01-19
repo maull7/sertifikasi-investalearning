@@ -48,7 +48,7 @@
                 type="text" 
                 name="search" 
                 value="{{ request('search') }}" 
-                placeholder="Cari nama atau email pengguna..." 
+                placeholder="Cari nama jenis..." 
                 class="w-full pl-11 pr-12 py-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all dark:text-white"
             >
             @if(request('search'))
@@ -60,7 +60,7 @@
     </div>
 
     {{-- Main Data Card --}}
-    <x-card :padding="false" title="Daftar Pengguna Aktif">
+    <x-card :padding="false" title="Daftar Jenis / Type">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
