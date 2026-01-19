@@ -20,7 +20,7 @@
 
     {{-- Search & Filter --}}
     <div class="flex flex-col lg:flex-row gap-4">
-        <form action="{{ route('subjects.index') }}" method="GET" class="flex-1 flex flex-col md:flex-row gap-3">
+        <form action="{{ route('subjects.index') }}" method="GET" class="flex-1 flex flex-col md:flex-row gap-3 items-end">
             <div class="relative flex-1 group">
                 <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors"></i>
                 <input 
@@ -37,8 +37,8 @@
                 @endif
             </div>
             <div class="w-full md:w-64">
-                <x-select name="type_id" label="Filter Jurusan" inline>
-                    <option value="">Semua Jurusan</option>
+                <x-select name="type_id" label="Filter Jenis" inline>
+                    <option value="">Semua Jenis</option>
                     @foreach($types as $type)
                         <option value="{{ $type->id }}" {{ (int) ($typeId ?? 0) === $type->id ? 'selected' : '' }}>
                             {{ $type->name_type }}
@@ -46,13 +46,10 @@
                     @endforeach
                 </x-select>
             </div>
-            <div class="flex items-end gap-2">
+            <div class="flex gap-2">
                 <x-button type="submit" variant="primary" class="rounded-xl">
                     Terapkan
                 </x-button>
-                <a href="{{ route('subjects.index') }}" class="text-xs text-gray-500 hover:text-rose-500">
-                    Reset
-                </a>
             </div>
         </form>
     </div>

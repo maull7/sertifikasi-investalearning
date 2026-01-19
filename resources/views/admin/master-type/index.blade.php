@@ -57,7 +57,9 @@
                 <thead>
                     <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Nama Jenis / Tipe</th>
-                      
+                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Code Jenis</th>
+                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Deskripsi</th>
+                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
@@ -67,6 +69,12 @@
                        
                             <td class="py-4 px-8 text-sm text-gray-500 font-medium">
                                 {{ $value->name_type }}
+                            </td>
+                            <td class="py-4 px-8 text-sm text-gray-500 font-medium">
+                                {{ $value->code }}
+                            </td>
+                            <td class="py-4 px-8 text-sm text-gray-500 font-medium">
+                                {{ $value->description }}
                             </td>
                             <td class="py-4 px-8">
                                 <div class="flex items-center justify-end gap-2">

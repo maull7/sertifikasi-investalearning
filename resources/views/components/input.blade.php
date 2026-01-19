@@ -5,7 +5,13 @@
     'type' => 'text',
 ])
 
-<div class="w-full space-y-1" x-data="{ show: false }">
+<div
+    class="w-full space-y-1"
+    x-data="{
+        show: false,
+        inputType: '{{ $type }}'
+    }"
+>
 
     {{-- Label --}}
     @if($label)
@@ -18,17 +24,17 @@
 
         {{-- Icon Prefix --}}
         @if($icon)
-            <div class="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-400 dark:text-gray-400
-                        group-focus-within:text-indigo-500 transition-colors pointer-events-none">
+            <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
                 <i class="ti ti-{{ $icon }} text-lg"></i>
             </div>
         @endif
 
         {{-- Input Field --}}
         <input
-            :type="type === 'password' && show ? 'text' : '{{ $type }}'"
+            :type="inputType === 'password' && show ? 'text' : inputType"
             name="{{ $name }}"
             id="{{ $name }}"
+            value="{{ old($name, $attributes->get('value')) }}"
             {{ $attributes->merge([
                 'class' => "w-full h-12 text-sm font-semibold rounded-xl
                             bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-white
@@ -39,15 +45,15 @@
                                 ? ' focus:ring-rose-500/30 ring-1 ring-rose-500/50'
                                 : ' focus:ring-indigo-500/30')
             ]) }}
-            value="{{ old($name, $attributes->get('value')) }}"
         >
 
-        {{-- Show/Hide Password Toggle --}}
+        {{-- Show / Hide Password --}}
         @if($type === 'password')
-            <button type="button"
-                    @click="show = !show"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-400 dark:text-gray-400
-                           hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
+            <button
+                type="button"
+                @click="show = !show"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400
+                       hover:text-indigo-500 transition-colors"
             >
                 <i :class="show ? 'ti ti-eye' : 'ti ti-eye-off'" class="text-lg"></i>
             </button>
@@ -55,7 +61,7 @@
 
     </div>
 
-    {{-- Error Message --}}
+    {{-- Error --}}
     @error($name)
         <p class="mt-1 text-[10px] font-bold text-rose-500 flex items-center gap-1">
             <i class="ti ti-alert-circle text-xs"></i> {{ $message }}

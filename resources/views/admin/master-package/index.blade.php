@@ -60,7 +60,7 @@
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Title</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Description</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Status</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Aksi</th>
+                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">Aksi</th>
                       
                     </tr>
                 </thead>
