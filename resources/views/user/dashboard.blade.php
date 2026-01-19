@@ -3,57 +3,121 @@
 @section('title', 'Dashboard User')
 
 @section('content')
-<div class="space-y-6">
-    <div class="flex items-center justify-between gap-4">
+<div class="space-y-8">
+
+    {{-- Header --}}
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Dashboard User</h1>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                Dashboard
+            </h1>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-                Selamat datang kembali, {{ $user->name }}.
+                Selamat datang kembali, <span class="font-semibold">{{ $user->name }}</span>
             </p>
         </div>
-        <div>
-            <x-button href="{{ route('profile.edit') }}" variant="secondary">
-                Ubah Profil
-            </x-button>
-        </div>
+        <x-button href="{{ route('profile.edit') }}" variant="secondary" class="rounded-xl">
+            <i class="ti ti-user-edit mr-2"></i> Ubah Profil
+        </x-button>
     </div>
 
-    <x-card>
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Profil Singkat</h2>
-        <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div>
-                <dt class="text-gray-500 dark:text-gray-400">Email</dt>
-                <dd class="font-medium text-gray-900 dark:text-white">{{ $user->email }}</dd>
+    {{-- Stats --}}
+    @php
+        $stats = [
+            [
+                'label' => 'Paket Diikuti',
+                'value' => $totalPackages ?? 0,
+                'icon'  => 'book',
+                'color' => 'indigo',
+            ],
+            [
+                'label' => 'Materi DiPelajari',
+                'value' => $completedMaterials ?? 0,
+                'icon'  => 'checklist',
+                'color' => 'emerald',
+            ],
+            [
+                'label' => 'Ujian Diikuti',
+                'value' => $totalExams ?? 0,
+                'icon'  => 'file-text',
+                'color' => 'amber',
+            ],
+            [
+                'label' => 'Progress Rata-rata',
+                'value' => ($avgProgress ?? 0) . '%',
+                'icon'  => 'chart-line',
+                'color' => 'rose',
+            ],
+        ];
+    @endphp
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        @foreach($stats as $stat)
+            <x-card>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center
+                        bg-{{ $stat['color'] }}-50 dark:bg-{{ $stat['color'] }}-500/10
+                        text-{{ $stat['color'] }}-600">
+                        <i class="ti ti-{{ $stat['icon'] }} text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400 font-semibold">{{ $stat['label'] }}</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                            {{ $stat['value'] }}
+                        </p>
+                    </div>
+                </div>
+            </x-card>
+        @endforeach
+    </div>
+
+    {{-- Paket Aktif --}}
+    <x-card title="Paket yang Sedang Diikuti">
+        @forelse($activePackages ?? [] as $package)
+            <div class="flex items-center justify-between py-3 border-b last:border-0 border-gray-100 dark:border-gray-800">
+                <div>
+                    <p class="font-semibold text-gray-900 dark:text-white">
+                        {{ $package->title }}
+                    </p>
+                    <p class="text-xs text-gray-400">
+                        Progress {{ $package->progress }}%
+                    </p>
+                </div>
+                <x-button size="sm" variant="primary" class="rounded-lg">
+                    Lanjutkan
+                </x-button>
             </div>
-            <div>
-                <dt class="text-gray-500 dark:text-gray-400">Nomor Telepon</dt>
-                <dd class="font-medium text-gray-900 dark:text-white">{{ $user->phone ?? '-' }}</dd>
+        @empty
+            <div class="py-10 text-center">
+                <i class="ti ti-books text-4xl text-gray-300 mb-3"></i>
+                <p class="text-sm text-gray-500">
+                    Anda belum mengikuti paket apa pun
+                </p>
             </div>
-            <div>
-                <dt class="text-gray-500 dark:text-gray-400">Jenis Kelamin</dt>
-                <dd class="font-medium text-gray-900 dark:text-white">{{ $user->jenis_kelamin ?? '-' }}</dd>
-            </div>
-            <div>
-                <dt class="text-gray-500 dark:text-gray-400">Profesi</dt>
-                <dd class="font-medium text-gray-900 dark:text-white">{{ $user->profesi ?? '-' }}</dd>
-            </div>
-            <div>
-                <dt class="text-gray-500 dark:text-gray-400">Tanggal Lahir</dt>
-                <dd class="font-medium text-gray-900 dark:text-white">
-                    {{ $user->tanggal_lahir ? \Illuminate\Support\Carbon::parse($user->tanggal_lahir)->format('d M Y') : '-' }}
-                </dd>
-            </div>
-            <div>
-                <dt class="text-gray-500 dark:text-gray-400">Institusi</dt>
-                <dd class="font-medium text-gray-900 dark:text-white">{{ $user->institusi ?? '-' }}</dd>
-            </div>
-            <div class="md:col-span-2">
-                <dt class="text-gray-500 dark:text-gray-400">Alamat</dt>
-                <dd class="font-medium text-gray-900 dark:text-white">{{ $user->alamat ?? '-' }}</dd>
-            </div>
-        </dl>
+        @endforelse
     </x-card>
+
+    {{-- Aktivitas Terakhir --}}
+    <x-card title="Aktivitas Terakhir">
+        @forelse($activities ?? [] as $activity)
+            <div class="flex items-start gap-3 py-3 border-b last:border-0 border-gray-100 dark:border-gray-800">
+                <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 flex items-center justify-center">
+                    <i class="ti ti-activity text-sm"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                        {{ $activity->description }}
+                    </p>
+                    <p class="text-xs text-gray-400">
+                        {{ $activity->created_at->diffForHumans() }}
+                    </p>
+                </div>
+            </div>
+        @empty
+            <p class="text-sm text-gray-500 text-center py-6">
+                Belum ada aktivitas terbaru
+            </p>
+        @endforelse
+    </x-card>
+
 </div>
 @endsection
-
-

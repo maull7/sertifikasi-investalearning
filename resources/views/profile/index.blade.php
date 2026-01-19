@@ -67,7 +67,6 @@
                 {{-- Tab Content: Keamanan (ganti password + hapus akun) --}}
                 <div x-show="activeTab === 'security'" class="p-8 space-y-8" x-transition x-cloak>
                     @include('profile.partials.update-password-form')
-                    @include('profile.partials.delete-user-form')
                 </div>
             </x-card>
         </div>
