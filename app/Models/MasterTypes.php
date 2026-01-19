@@ -12,7 +12,8 @@ class MasterTypes extends Model
 
     protected $fillable = [
         'name_type',
-
+        'code',
+        'description',
     ];
 
     public function subjects()

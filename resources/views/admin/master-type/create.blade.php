@@ -46,6 +46,25 @@
                         required 
                     />
                 </div>
+                {{-- Code Input --}}
+                <div class="md:col-span-2">
+                    <x-input 
+                        label="Code jenis ( Optional )" 
+                        name="code" 
+                        placeholder="Contoh: WEP-01" 
+                        value="{{ old('code') }}"
+                        required 
+                    />
+                </div>
+                {{-- Description Input --}}
+                <div class="md:col-span-2">
+                    <x-textarea 
+                        label="Deskripsi ( Optional )" 
+                        name="description" 
+                        placeholder="Deskripsi jenis..." 
+                        value="{{ old('description') }}"
+                    />
+                </div>
 
                
             </div>
