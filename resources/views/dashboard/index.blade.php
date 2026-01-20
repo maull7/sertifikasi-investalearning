@@ -87,21 +87,26 @@
         </x-card>
 
         {{-- Recent Customers Card --}}
-        <x-card title="Recent Student">
+        <x-card title="Recent User Exam">
             <div class="space-y-6">
-                @for($i = 1; $i <= 5; $i++)
-                <div class="flex items-center gap-4">
-                    <x-avatar name="User {{ $i }}" size="sm" />
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold text-gray-900 dark:text-white truncate">Student #{{ $i }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">student.{{ $i }}@example.com</p>
+                @forelse ($recents as $recent)     
+                    <div class="flex items-center gap-4">
+                        <x-avatar name="User {{ $recent->User->name }}" size="sm" />
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-gray-900 dark:text-white truncate">{{ $recent->User->name }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $recent->User->email }}</p>
+                        </div>
+                        <div class="text-right">
+                        
+                            <p class="text-[10px] text-black font-bold">{{ $recent->Exam->title }}</p>
+                            <p class="text-sm font-bold text-gray-900 dark:text-white">{{ $recent->total_score }}</p>
+                            <p class="text-[10px] text-emerald-500 font-bold">{{ $recent->status }}</p>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-gray-900 dark:text-white">88.20</p>
-                        <p class="text-[10px] text-emerald-500 font-bold">LULUS</p>
-                    </div>
-                </div>
-                @endfor
+                @empty
+                    <p class="text-sm text-gray-500 dark:text-gray-400">No recent user exams found.</p>
+                @endforelse
+                
             </div>
 
           

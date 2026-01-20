@@ -1,19 +1,20 @@
 <?php
 
-use App\Http\Controllers\Admin\MasterMaterialController;
-use App\Http\Controllers\Admin\MasterPackegeController;
-use App\Http\Controllers\Admin\MappingQuestionController;
-use App\Http\Controllers\Admin\SubjectController;
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\MasterTypesController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\ExamController;
-use App\Http\Controllers\Admin\BankQuestionController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\User\DashboardController as UserDashboardController;
-use App\Http\Controllers\User\PackageController as UserPackageController;
+use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\User\MyPackageController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\User\HistoryExamController;
+use App\Http\Controllers\Admin\MasterTypesController;
+use App\Http\Controllers\Admin\BankQuestionController;
+use App\Http\Controllers\Admin\MasterPackegeController;
+use App\Http\Controllers\Admin\MasterMaterialController;
+use App\Http\Controllers\Admin\MappingQuestionController;
 use App\Http\Controllers\User\ExamController as UserExamController;
+use App\Http\Controllers\User\PackageController as UserPackageController;
+use App\Http\Controllers\User\DashboardController as UserDashboardController;
 
 
 Route::get('/', function () {
@@ -51,6 +52,12 @@ Route::middleware('auth')->group(function () {
         ->name('master-materials.preview');
     Route::get('master-materials/{id}/download', [MasterMaterialController::class, 'downloadFile'])
         ->name('master-materials.download');
+
+    // History Exam routes
+    Route::get('user/history-exams', [HistoryExamController::class, 'index'])
+        ->name('user.history-exams.index');
+    Route::get('user/history-exams/{id}/detail', [HistoryExamController::class, 'detail'])
+        ->name('user.history-exams.detail');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {

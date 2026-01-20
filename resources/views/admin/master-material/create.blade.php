@@ -105,7 +105,7 @@
                     </label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <label class="flex items-center gap-3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 cursor-pointer">
-                            <input type="radio" name="materi_type" value="File" class="accent-indigo-600" {{ old('materi_type', 'Text') === 'Text' ? 'checked' : '' }}>
+                            <input type="radio" name="materi_type" value="File" class="accent-indigo-600" {{ old('materi_type', 'File') === 'File' ? 'checked' : '' }}>
                             <div class="flex items-center gap-2">
                                 <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center">
                                     <i class="ti ti-file-type-docx text-indigo-600 dark:text-indigo-400"></i>

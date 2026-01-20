@@ -46,6 +46,7 @@ class MasterMaterialController extends Controller
      */
     public function store(RequestMaterial $request)
     {
+
         $data = $request->validated();
 
         if ($request->materi_type === 'File') {

@@ -99,7 +99,7 @@
                                     <a href="{{ route('master-materials.preview', $material->id) }}" target="_blank" 
                                     class="inline-flex items-center gap-1 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-semibold rounded-lg transition-colors">
                                         <i class="ti ti-eye"></i>
-                                        Preview
+                                        Baca Materi
                                     </a>
                                     <a href="{{ route('master-materials.download', $material->id) }}" 
                                     class="inline-flex items-center gap-1 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold rounded-lg transition-colors">

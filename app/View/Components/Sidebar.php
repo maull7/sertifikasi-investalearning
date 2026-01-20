@@ -118,6 +118,15 @@ class Sidebar extends Component
                             ['name' => 'Package Saya', 'route' => 'user.my-packages.index'],
                         ]
                     ],
+                    [
+                        'name' => 'Riwayat Ujian',
+                        'icon' => 'list-check',
+                        'activePattern' => 'user.history-exams.*',
+                        'subItems' => [
+                            ['name' => 'Riwayat Ujian', 'route' => 'user.history-exams.index'],
+                        ]
+                    ],
+
                 ],
             ],
         ];

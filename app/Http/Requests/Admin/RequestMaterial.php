@@ -36,6 +36,7 @@ class RequestMaterial extends FormRequest
             'topic' => 'required|string|max:255',
             'materi_type' => 'required|in:File,Video',
             'url_link' => [
+                'nullable',
                 'required_if:materi_type,Video',
                 'url',
             ],
