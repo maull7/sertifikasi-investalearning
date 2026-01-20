@@ -19,11 +19,11 @@ return new class extends Migration
             $table->foreignId('id_package')
                 ->constrained('packages')
                 ->cascadeOnDelete();
-            $table->foreignId('user_id')
-                ->constrained('users')
+            $table->foreignId('id_exam')
+                ->constrained('exams')
                 ->cascadeOnDelete();
-            $table->foreignId('id_question')
-                ->constrained('bank_questions')
+            $table->foreignId('id_type')
+                ->constrained('master_types')
                 ->cascadeOnDelete();
             $table->integer('questions_answered');
             $table->integer('total_questions');

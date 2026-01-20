@@ -70,16 +70,8 @@
                         required
                     >{{ old('description') }}</x-textarea>
                 </div>
-                <div class="md:col-span-2">
-                    <x-select 
-                        label="Status Paket" 
-                        name="status" 
-                        required
-                    >
-                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
-                    </x-select>
-                </div>
+                
+                <input type="text" hidden name="status" value="active">
             </div>
 
           

@@ -101,9 +101,44 @@
                     >{{ old('description', $data->description) }}</x-textarea>
                 </div>
 
+                  <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Jenis Materi <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label class="flex items-center gap-3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 cursor-pointer">
+                            <input type="radio" name="materi_type" value="File" class="accent-indigo-600" {{ old('materi_type', $data->materi_type ?? 'File') === 'File' ? 'checked' : '' }}>
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center">
+                                    <i class="ti ti-file-type-docx text-indigo-600 dark:text-indigo-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-900 dark:text-white">File</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Materi berupa file</p>
+                                </div>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 cursor-pointer">
+                            <input type="radio" name="materi_type" value="Video" class="accent-indigo-600" {{ old('materi_type', $data->materi_type ?? 'Video') === 'Video' ? 'checked' : '' }}>
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center">
+                                    <i class="ti ti-photo text-rose-600 dark:text-rose-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-900 dark:text-white">Video</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Materi berupa video</p>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    @error('materi_type')
+                        <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 {{-- Existing File --}}
                 @if($data->value)
-                <div class="md:col-span-2">
+                <div class="md:col-span-2" id="materi-file">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                         File Saat Ini
                     </label>
@@ -129,10 +164,22 @@
                         </div>
                     </div>
                 </div>
+                 <div class="md:col-span-2" id="materi-video">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                       Link Video <span class="text-rose-500">*</span>
+                    </label>
+                    <input 
+                        type="url" 
+                        name="url_link" 
+                        value="{{old('url_link', $data->value)}}"
+                        class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                    >
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Format: Link berupa youtube</p>
+                </div>
                 @endif
 
                 {{-- File Upload --}}
-                <div class="md:col-span-2">
+                <div class="md:col-span-2" id="new-file">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                         Ganti File (Opsional)
                     </label>
@@ -144,6 +191,24 @@
                     >
                     <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Format: PDF, DOC, DOCX. Maksimal 10MB.</p>
                 </div>
+
+                @if ($data->materi_type == 'Video')
+                    @php
+                        $url = $data->value;
+
+                        if (str_contains($url, 'youtu.be')) {
+                            $url = 'https://www.youtube.com/embed/' . explode('?', last(explode('/', $url)))[0];
+                        }
+
+                        if (str_contains($url, 'youtube.com/watch')) {
+                            parse_str(parse_url($url, PHP_URL_QUERY), $q);
+                            $url = 'https://www.youtube.com/embed/' . ($q['v'] ?? '');
+                        }
+                    @endphp
+                    <iframe id="frame-video" src="{{$url}}"  class="w-full aspect-video rounded-xl"
+                        frameborder="0"
+                        allowfullscreen></iframe>
+                @endif
             </div>
 
             {{-- Action Buttons --}}
@@ -159,6 +224,48 @@
     </x-card>
 </div>
 @endsection
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const materiFileDiv = document.getElementById('materi-file');
+            const materiVideoDiv = document.getElementById('materi-video');
+            const materiTypeRadios = document.getElementsByName('materi_type');
+            const materiFileNew = document.getElementById('new-file');
+            const frameVideo = document.getElementById('frame-video');
+
+          function toggleMateriFields() {
+                const selectedType = Array.from(materiTypeRadios).find(r => r.checked).value;
+
+                if (selectedType === 'File') {
+                    materiFileDiv.style.display = 'block';
+                    materiVideoDiv.style.display = 'none';
+                    materiFileNew.style.display = 'block';
+                    if (frameVideo) frameVideo.style.display = 'none'; // Tambahkan pengecekan
+
+                    document.querySelector('[name="url_link"]').disabled = true;
+                    document.querySelector('[name="file"]').disabled = false;
+                } else {
+                    materiFileDiv.style.display = 'none';
+                    materiVideoDiv.style.display = 'block';
+                    materiFileNew.style.display = 'none';
+                    if (frameVideo) frameVideo.style.display = 'block'; // Tambahkan pengecekan
+
+                    document.querySelector('[name="url_link"]').disabled = false;
+                    document.querySelector('[name="file"]').disabled = true;
+                }
+            }
+
+
+            // Initial toggle based on old input or default
+            toggleMateriFields();
+
+            // Add event listeners to radio buttons
+            materiTypeRadios.forEach(radio => {
+                radio.addEventListener('change', toggleMateriFields);
+            });
+        });
+    </script>
+@endpush
 
 
 

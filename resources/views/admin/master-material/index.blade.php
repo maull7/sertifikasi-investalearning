@@ -63,7 +63,7 @@
                     <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Paket</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Title</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">File</th>
+                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Jenis Materi</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Preview</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">Aksi</th>
                     </tr>
@@ -85,30 +85,31 @@
                                 </div>
                             </td>
                             <td class="py-4 px-8">
-                                @if($value->value)
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-                                        <i class="{{ $value->file_icon }} text-xl {{ $value->file_type === 'pdf' ? 'text-rose-600' : 'text-blue-600' }}"></i>
-                                    </div>
-                                    <div class="min-w-0">
-                                        <p class="text-xs font-semibold text-gray-900 dark:text-white truncate max-w-[150px]">{{ $value->file_name }}</p>
-                                        <p class="text-[10px] text-gray-500">{{ $value->file_size_formatted }}</p>
-                                    </div>
-                                </div>
+                                @if($value->materi_type === 'File')
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                        File
+                                    </span>
                                 @else
-                                <span class="text-xs text-gray-400">Tidak ada file</span>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">
+                                        Link Video
+                                    </span>
                                 @endif
                             </td>
+                    
                             <td class="py-4 px-8">
                                 <div class="flex items-center justify-center gap-2">
-                                    @if($value->value)
+                                    @if($value->materi_type === 'File')
                                         <a href="{{ route('master-materials.preview', $value->id) }}" target="_blank" class="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-semibold rounded-lg transition-colors">
                                             <i class="ti ti-eye text-sm"></i>
                                             Preview
                                         </a>
 
                                     @else
-                                        <span class="text-xs text-gray-400">-</span>
+                                         <a href="{{ $value->value }}" target="_blank" class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold rounded-lg transition-colors">
+                                            <i class="ti ti-eye text-sm"></i>
+                                            Lihat Video
+                                        </a>
+
                                     @endif
                                 </div>
                             </td>

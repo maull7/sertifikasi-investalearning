@@ -10,8 +10,8 @@ class TransQuestions extends Model
     protected $fillable = [
         'id_user',
         'id_package',
-        'user_id',
-        'id_question',
+        'id_exam',
+        'id_type',
         'questions_answered',
         'total_questions',
         'total_score',
@@ -20,5 +20,22 @@ class TransQuestions extends Model
     public function detailResults()
     {
         return $this->hasMany(DetailResults::class, 'id_trans_question');
+    }
+    public function User()
+    {
+        return $this->belongsTo(User::class, 'id_user');
+    }
+    public function Package()
+    {
+        return $this->belongsTo(Package::class, 'id_package');
+    }
+
+    public function Exam()
+    {
+        return $this->belongsTo(Exams::class, 'id_exam');
+    }
+    public function Type()
+    {
+        return $this->belongsTo(MasterTypes::class, 'id_type');
     }
 }

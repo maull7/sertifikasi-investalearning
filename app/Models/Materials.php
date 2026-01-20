@@ -20,6 +20,7 @@ class Materials extends Model
         'file_size',
         'id_subject',
         'topic',
+        'materi_type',
     ];
 
     protected $appends = [

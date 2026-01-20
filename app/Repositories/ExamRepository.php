@@ -53,7 +53,8 @@ class ExamRepository implements ExamRepositoryInterface
             'id_user' => $user->id,
             'id_package' => $package->id,
             'user_id' => $user->id,
-            'id_question' => $exam->id,
+            'id_exam' => $exam->id,
+            'id_type' => $package->id_master_types,
             'questions_answered' => $questionsAnswered,
             'total_questions' => $totalQuestions,
             'total_score' => 0,
@@ -85,7 +86,3 @@ class ExamRepository implements ExamRepositoryInterface
         ]);
     }
 }
-
-
-
-

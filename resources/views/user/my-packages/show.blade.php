@@ -61,7 +61,12 @@
                 @foreach($materials as $index => $material)
                     <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                         <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg flex items-center justify-center shrink-0">
+                            @if ($material->materi_type == 'File')
                             <i class="{{ $material->file_icon }} text-xl {{ $material->file_type === 'pdf' ? 'text-rose-600' : 'text-blue-600' }}"></i>
+                            
+                            @else
+                                <i class="ti ti-video text-xl text-indigo-600"></i>
+                            @endif
                         </div>
                         <div class="flex-1 min-w-0">
                             <h4 class="font-semibold text-gray-900 dark:text-white mb-1">{{ $material->title }}</h4>
@@ -88,22 +93,47 @@
                                 </p>
                             @endif
                         </div>
-                        <div class="flex items-center gap-2 shrink-0">
-                            @if($material->value)
-                                <a href="{{ route('master-materials.preview', $material->id) }}" target="_blank" 
-                                   class="inline-flex items-center gap-1 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-semibold rounded-lg transition-colors">
-                                    <i class="ti ti-eye"></i>
-                                    Preview
-                                </a>
-                                <a href="{{ route('master-materials.download', $material->id) }}" 
-                                   class="inline-flex items-center gap-1 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold rounded-lg transition-colors">
-                                    <i class="ti ti-download"></i>
-                                    Download
-                                </a>
-                            @else
-                                <span class="text-xs text-gray-400">Tidak ada file</span>
-                            @endif
+                        @if ($material->materi_type == 'File')
+                            <div class="flex items-center gap-2 shrink-0">
+                                @if($material->value)
+                                    <a href="{{ route('master-materials.preview', $material->id) }}" target="_blank" 
+                                    class="inline-flex items-center gap-1 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-semibold rounded-lg transition-colors">
+                                        <i class="ti ti-eye"></i>
+                                        Baca Materi
+                                    </a>
+                                    <a href="{{ route('master-materials.download', $material->id) }}" 
+                                    class="inline-flex items-center gap-1 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold rounded-lg transition-colors">
+                                        <i class="ti ti-download"></i>
+                                        Download
+                                    </a>
+                                @else
+                                    <span class="text-xs text-gray-400">Tidak ada file</span>
+                                @endif
+                            </div>
+                        @else
+                            <div class="flex items-center gap-2 shrink-0">
+                                @if($material->value)
+                                    @php
+                                $url = $material->value;
+
+                                if (str_contains($url, 'youtu.be')) {
+                                    $url = 'https://www.youtube.com/embed/' . explode('?', last(explode('/', $url)))[0];
+                                }
+
+                                if (str_contains($url, 'youtube.com/watch')) {
+                                    parse_str(parse_url($url, PHP_URL_QUERY), $q);
+                                    $url = 'https://www.youtube.com/embed/' . ($q['v'] ?? '');
+                                }
+                            @endphp
+                            <iframe id="frame-video" src="{{$url}}"  class="w-full aspect-video rounded-xl"
+                                frameborder="0"
+                                allowfullscreen></iframe>
+                                @else
+                                    <span class="text-xs text-gray-400">Tidak ada file</span>
+                                @endif
                         </div>
+                        @endif
+                      
                     </div>
                 @endforeach
             </div>

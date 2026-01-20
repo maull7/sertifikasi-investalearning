@@ -29,24 +29,24 @@
                 'icon'  => 'book',
                 'color' => 'indigo',
             ],
-            [
-                'label' => 'Materi DiPelajari',
-                'value' => $completedMaterials ?? 0,
-                'icon'  => 'checklist',
-                'color' => 'emerald',
-            ],
+            // [
+            //     'label' => 'Materi DiPelajari',
+            //     'value' => $completedMaterials ?? 0,
+            //     'icon'  => 'checklist',
+            //     'color' => 'emerald',
+            // ],
             [
                 'label' => 'Ujian Diikuti',
                 'value' => $totalExams ?? 0,
                 'icon'  => 'file-text',
                 'color' => 'amber',
             ],
-            [
-                'label' => 'Progress Rata-rata',
-                'value' => ($avgProgress ?? 0) . '%',
-                'icon'  => 'chart-line',
-                'color' => 'rose',
-            ],
+            // [
+            //     'label' => 'Progress Rata-rata',
+            //     'value' => ($avgProgress ?? 0) . '%',
+            //     'icon'  => 'chart-line',
+            //     'color' => 'rose',
+            // ],
         ];
     @endphp
 
@@ -72,17 +72,17 @@
 
     {{-- Paket Aktif --}}
     <x-card title="Paket yang Sedang Diikuti">
-        @forelse($activePackages ?? [] as $package)
+        @forelse($packageFollow ?? [] as $package)
             <div class="flex items-center justify-between py-3 border-b last:border-0 border-gray-100 dark:border-gray-800">
                 <div>
                     <p class="font-semibold text-gray-900 dark:text-white">
-                        {{ $package->title }}
+                        {{ $package->package->title }}
                     </p>
                     <p class="text-xs text-gray-400">
-                        Progress {{ $package->progress }}%
+                         {{ $package->package->description }}
                     </p>
                 </div>
-                <x-button size="sm" variant="primary" class="rounded-lg">
+                <x-button size="sm" href="{{ route('user.my-packages.show', $package->package->id) }}" variant="primary" class="rounded-lg">
                     Lanjutkan
                 </x-button>
             </div>
@@ -95,27 +95,28 @@
             </div>
         @endforelse
     </x-card>
-
-    {{-- Aktivitas Terakhir --}}
-    <x-card title="Aktivitas Terakhir">
-        @forelse($activities ?? [] as $activity)
-            <div class="flex items-start gap-3 py-3 border-b last:border-0 border-gray-100 dark:border-gray-800">
-                <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 flex items-center justify-center">
-                    <i class="ti ti-activity text-sm"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-900 dark:text-white">
-                        {{ $activity->description }}
+    <x-card title="Paket Terbaru">
+        @forelse($packageActive ?? [] as $package)
+            <div class="flex items-center justify-between py-3 border-b last:border-0 border-gray-100 dark:border-gray-800">
+                <div>
+                    <p class="font-semibold text-gray-900 dark:text-white">
+                        {{ $package->title }}
                     </p>
                     <p class="text-xs text-gray-400">
-                        {{ $activity->created_at->diffForHumans() }}
+                         {{ $package->description }}
                     </p>
                 </div>
+                <x-button size="sm" href="{{ route('my-packages.index') }}" variant="primary" class="rounded-lg">
+                    Lihat Paket
+                </x-button>
             </div>
         @empty
-            <p class="text-sm text-gray-500 text-center py-6">
-                Belum ada aktivitas terbaru
-            </p>
+            <div class="py-10 text-center">
+                <i class="ti ti-books text-4xl text-gray-300 mb-3"></i>
+                <p class="text-sm text-gray-500">
+                   Belum ada paket terbaru
+                </p>
+            </div>
         @endforelse
     </x-card>
 
