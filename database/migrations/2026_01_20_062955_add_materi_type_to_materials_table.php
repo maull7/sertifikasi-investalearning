@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('exams', function (Blueprint $table) {
-            $table->unsignedInteger('total_questions')
-                ->nullable()
-                ->after('passing_grade');
+        Schema::table('materials', function (Blueprint $table) {
+            $table->enum('materi_type', ['File', 'Video']);
         });
     }
 
@@ -23,12 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('exams', function (Blueprint $table) {
-            $table->dropColumn('total_questions');
+        Schema::table('materials', function (Blueprint $table) {
+            //
         });
     }
 };
-
-
-
-

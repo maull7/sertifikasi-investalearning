@@ -48,15 +48,27 @@ class MasterMaterialController extends Controller
     {
         $data = $request->validated();
 
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs('materials', $fileName, 'public');
+        if ($request->materi_type === 'File') {
+            if (!$request->hasFile('file')) {
+                return redirect()->back()->withErrors(['file' => 'File harus diunggah untuk tipe materi File'])->withInput();
+            }
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $filePath = $file->storeAs('materials', $fileName, 'public');
 
-            $data['value'] = $filePath;
-            $data['file_name'] = $file->getClientOriginalName();
-            $data['file_type'] = $file->getClientOriginalExtension();
-            $data['file_size'] = $file->getSize();
+                $data['value'] = $filePath;
+                $data['file_name'] = $file->getClientOriginalName();
+                $data['file_type'] = $file->getClientOriginalExtension();
+                $data['file_size'] = $file->getSize();
+            }
+        } else {
+            // Untuk tipe Video, simpan URL link ke kolom 'value'
+            $data['value'] = $request->input('url_link');
+            // Kosongkan kolom file terkait
+            $data['file_name'] = null;
+            $data['file_type'] = null;
+            $data['file_size'] = null;
         }
 
         Materials::create($data);
@@ -91,23 +103,31 @@ class MasterMaterialController extends Controller
         $material = Materials::findOrFail($id);
         $data = $request->validated();
 
-        if ($request->hasFile('file')) {
-            if ($material->value && Storage::disk('public')->exists($material->value)) {
-                Storage::disk('public')->delete($material->value);
-            }
-
-            $file = $request->file('file');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs('materials', $fileName, 'public');
-
-            $data['value'] = $filePath;
-            $data['file_name'] = $file->getClientOriginalName();
-            $data['file_type'] = $file->getClientOriginalExtension();
-            $data['file_size'] = $file->getSize();
+        if ($request->materi_type === 'Video') {
+            // Untuk tipe Video, simpan URL link ke kolom 'value'
+            $data['value'] = $request->input('url_link');
+            // Kosongkan kolom file terkait
+            $data['file_name'] = null;
+            $data['file_type'] = null;
+            $data['file_size'] = null;
         } else {
-            unset($data['file']);
-        }
+            if ($request->hasFile('file')) {
+                if ($material->value && Storage::disk('public')->exists($material->value)) {
+                    Storage::disk('public')->delete($material->value);
+                }
 
+                $file = $request->file('file');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $filePath = $file->storeAs('materials', $fileName, 'public');
+
+                $data['value'] = $filePath;
+                $data['file_name'] = $file->getClientOriginalName();
+                $data['file_type'] = $file->getClientOriginalExtension();
+                $data['file_size'] = $file->getSize();
+            } else {
+                unset($data['file']);
+            }
+        }
         $material->update($data);
         return redirect()->route('master-materials.index')->with('success', 'Material berhasil diperbarui.');
     }

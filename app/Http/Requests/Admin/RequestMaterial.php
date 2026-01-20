@@ -21,20 +21,24 @@ class RequestMaterial extends FormRequest
      */
     public function rules(): array
     {
-        $materialId = $this->route('master_material');
 
         return [
-            'title' => 'required|string|max:255|unique:materials,title,' . $materialId,
+            'title' => 'required|string|max:255',
             'description' => 'required|string',
             'package_id' => 'required|exists:packages,id',
             'file' => [
-                $this->isMethod('post') ? 'required' : 'nullable',
+                'required_if:materi_type,File',
                 'file',
                 'mimes:pdf,doc,docx',
                 'max:10240',
             ],
             'id_subject' => 'required|exists:subjects,id',
             'topic' => 'required|string|max:255',
+            'materi_type' => 'required|in:File,Video',
+            'url_link' => [
+                'required_if:materi_type,Video',
+                'url',
+            ],
         ];
     }
 }
