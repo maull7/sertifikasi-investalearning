@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\User\MyPackageController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ShowGradeController;
 use App\Http\Controllers\User\HistoryExamController;
 use App\Http\Controllers\Admin\MasterTypesController;
 use App\Http\Controllers\Admin\BankQuestionController;
@@ -102,6 +103,13 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('bank-questions/import', [BankQuestionController::class, 'import'])
         ->name('bank-questions.import');
     Route::resource('bank-questions', BankQuestionController::class);
+
+
+    // Show Grade routes
+    Route::get('show-grades', [ShowGradeController::class, 'index'])
+        ->name('show-grades.index');
+    Route::get('show-grades/{id}/detail', [ShowGradeController::class, 'detail'])
+        ->name('show-grades.detail');
 });
 
 require __DIR__ . '/auth.php';
