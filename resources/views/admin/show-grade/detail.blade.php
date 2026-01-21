@@ -18,14 +18,14 @@
     {{-- Page Header --}}
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">History Exam</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Lihat riwayat ujian Anda</p>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Riwayat Jawaban user</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Lihat riwayat ujian</p>
         </div>
         <div class="flex gap-2">
             <x-button 
                 icon="ti ti-arrow-left"
                 type="submit"
-                href="{{ route('user.history-exams.index') }}" 
+                href="{{ route('show-grades.index') }}" 
                 variant="primary" 
                 class="h-12 px-6 rounded-xl"
             >
@@ -53,13 +53,13 @@
                     @forelse ($historyDetail as $data)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group">
                             <td class="py-4 px-8">
-                                 @if ($data->Question->question_type == 'Text')   
+                                @if ($data->Question->question_type == 'Text')   
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300">
                                     {{ $data->Question->question ?? '-' }}
                                 </span>
                                 @else
                                      <a href="{{asset('storage/' . $data->Question->question)}}"
-                                                 class="inline-flex items-center px-3 py-1 gap-1 text-xs text-indigo-600 dark:text-indigo-400"
+                                                 class="inline-flex px-3 py-1 items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400"
                                                 target="_blank"
                                                  >
                                                 <i class="ti ti-photo"></i> Lihat Gambar

@@ -75,6 +75,19 @@ class Sidebar extends Component
                     ],
                 ],
             ],
+            [
+                'title' => 'Result Grade',
+                'items' => [
+                    [
+                        'name' => 'Result Grade',
+                        'icon' => 'ti ti-id',
+                        'activePattern' => 'show-grades.*',
+                        'subItems' => [
+                            ['name' => 'Result Grade', 'route' => 'show-grades.index'],
+                        ]
+                    ],
+                ],
+            ],
         ];
     }
 

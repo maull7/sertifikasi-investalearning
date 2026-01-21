@@ -106,7 +106,7 @@
                          {{ $package->description }}
                     </p>
                 </div>
-                <x-button size="sm" href="{{ route('my-packages.index') }}" variant="primary" class="rounded-lg">
+                <x-button size="sm" href="{{ route('user.my-packages.index') }}" variant="primary" class="rounded-lg">
                     Lihat Paket
                 </x-button>
             </div>
