@@ -2,11 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Models\Exams;
-use App\Models\MappingQuestions;
+use App\Models\Exam;
+use App\Models\MappingQuestion;
 use App\Models\Package;
-use App\Models\TransQuestions;
-use App\Models\DetailResults;
+use App\Models\TransQuestion;
+use App\Models\DetailResult;
 use App\Models\User;
 use App\Repositories\Contracts\ExamRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -16,27 +16,27 @@ class ExamRepository implements ExamRepositoryInterface
 {
     public function userJoinedPackage(User $user, Package $package): bool
     {
-        return \App\Models\UserJoins::where('user_id', $user->id)
+        return \App\Models\UserJoin::where('user_id', $user->id)
             ->where('id_package', $package->id)
             ->exists();
     }
 
-    public function countQuestions(Exams $exam): int
+    public function countQuestions(Exam $exam): int
     {
-        return MappingQuestions::where('id_exam', $exam->id)->count();
+        return MappingQuestion::where('id_exam', $exam->id)->count();
     }
 
-    public function getQuestionsPage(Exams $exam, int $page = 1, int $perPage = 1): LengthAwarePaginator
+    public function getQuestionsPage(Exam $exam, int $page = 1, int $perPage = 1): LengthAwarePaginator
     {
-        return MappingQuestions::where('id_exam', $exam->id)
+        return MappingQuestion::where('id_exam', $exam->id)
             ->with('questionBank.type')
             ->orderBy('id')
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function getAllMappingsWithQuestions(Exams $exam): Collection
+    public function getAllMappingsWithQuestions(Exam $exam): Collection
     {
-        return MappingQuestions::where('id_exam', $exam->id)
+        return MappingQuestion::where('id_exam', $exam->id)
             ->with('questionBank')
             ->orderBy('id')
             ->get();
@@ -45,11 +45,11 @@ class ExamRepository implements ExamRepositoryInterface
     public function createTransQuestion(
         User $user,
         Package $package,
-        Exams $exam,
+        Exam $exam,
         int $questionsAnswered,
         int $totalQuestions
-    ): TransQuestions {
-        return TransQuestions::create([
+    ): TransQuestion {
+        return TransQuestion::create([
             'id_user' => $user->id,
             'id_package' => $package->id,
             'user_id' => $user->id,
@@ -62,7 +62,7 @@ class ExamRepository implements ExamRepositoryInterface
         ]);
     }
 
-    public function updateTransQuestionResult(TransQuestions $trans, float $score, string $status): void
+    public function updateTransQuestionResult(TransQuestion $trans, float $score, string $status): void
     {
         $trans->update([
             'total_score' => $score,
@@ -71,13 +71,13 @@ class ExamRepository implements ExamRepositoryInterface
     }
 
     public function createDetailResult(
-        TransQuestions $trans,
+        TransQuestion $trans,
         int $questionId,
         ?string $userAnswer,
         ?string $correctAnswer,
         float $scoreObtained
     ): void {
-        DetailResults::create([
+        DetailResult::create([
             'id_trans_question' => $trans->id,
             'id_question' => $questionId,
             'user_answer' => $userAnswer ?? '-',

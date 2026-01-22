@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\Models\MasterTypes;
+use App\Models\MasterType;
 use App\Models\Subject;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -24,7 +24,7 @@ class MasterSubjectImport implements ToCollection, WithHeadingRow
             }
 
             // cari master type berdasarkan code
-            $type = MasterTypes::where('code', $row['code_type'])->first();
+            $type = MasterType::where('code', $row['code_type'])->first();
 
             // kalau code_type ga ketemu → skip (atau bisa throw error)
             if (!$type) {

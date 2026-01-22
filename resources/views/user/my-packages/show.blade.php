@@ -154,7 +154,7 @@
 
     {{-- Exams List --}}
     @php
-        $exams = \App\Models\Exams::where('package_id', $package->id)->get();
+        $exams = \App\Models\Exam::where('package_id', $package->id)->get();
     @endphp
     
     @if($exams->count() > 0)
@@ -162,7 +162,7 @@
             <div class="space-y-4">
                 @foreach($exams as $examItem)
                     @php
-                        $totalQuestions = \App\Models\MappingQuestions::where('id_exam', $examItem->id)->count();
+                        $totalQuestions = \App\Models\MappingQuestion::where('id_exam', $examItem->id)->count();
                     @endphp
                     <div class="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-500/10 dark:to-violet-500/10 rounded-xl border border-indigo-100 dark:border-indigo-800">
                         <div class="flex items-center gap-4">

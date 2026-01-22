@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class UserJoins extends Model
+class UserJoin extends Model
 {
     protected $table = 'user_joins';
-    
+
     protected $fillable = [
         'user_id',
         'id_package',

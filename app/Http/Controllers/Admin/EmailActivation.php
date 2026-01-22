@@ -9,12 +9,23 @@ use Illuminate\Http\Request;
 
 class EmailActivation extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->search;
+
         $list = User::where('role', 'User')
             ->where('status_user', 'Belum Teraktivasi')
-            ->paginate(10);
-        return view('admin.user.index', compact('list'));
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%");
+                });
+            })
+            ->paginate(10)
+            ->withQueryString(); // biar pagination ga ilang search
+
+        return view('admin.user.index', compact('list', 'search'));
     }
 
     // 👇 FUNGSI AKTIVASI + KIRIM EMAIL

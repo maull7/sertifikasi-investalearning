@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class MappingQuestions extends Model
+class MappingQuestion extends Model
 {
     protected $table = 'mapping_questions';
 
@@ -15,10 +15,10 @@ class MappingQuestions extends Model
     ];
     public function questionBank(): BelongsTo
     {
-        return $this->belongsTo(BankQuestions::class, 'id_question_bank');
+        return $this->belongsTo(BankQuestion::class, 'id_question_bank');
     }
     public function exam(): BelongsTo
     {
-        return $this->belongsTo(Exams::class, 'id_exam');
+        return $this->belongsTo(Exam::class, 'id_exam');
     }
 }

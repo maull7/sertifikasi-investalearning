@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Exams extends Model
+class Exam extends Model
 {
     use HasFactory;
     protected $fillable = [
@@ -24,6 +24,6 @@ class Exams extends Model
     }
     public function mappingQuestions(): HasMany
     {
-        return $this->hasMany(MappingQuestions::class, 'id_exam');
+        return $this->hasMany(MappingQuestion::class, 'id_exam');
     }
 }

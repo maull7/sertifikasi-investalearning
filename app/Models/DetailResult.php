@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DetailResults extends Model
+class DetailResult extends Model
 {
     protected $table = 'detail_results';
     protected $fillable = [
@@ -17,11 +17,11 @@ class DetailResults extends Model
 
     public function Question()
     {
-        return $this->belongsTo(BankQuestions::class, 'id_question');
+        return $this->belongsTo(BankQuestion::class, 'id_question');
     }
 
     public function TransQuestion()
     {
-        return $this->belongsTo(TransQuestions::class, 'id_trans_question');
+        return $this->belongsTo(TransQuestion::class, 'id_trans_question');
     }
 }

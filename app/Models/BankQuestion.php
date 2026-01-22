@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class BankQuestions extends Model
+class BankQuestion extends Model
 {
     use HasFactory;
     protected $fillable = [
@@ -25,7 +25,7 @@ class BankQuestions extends Model
 
     public function type(): BelongsTo
     {
-        return $this->belongsTo(MasterTypes::class, 'type_id');
+        return $this->belongsTo(MasterType::class, 'type_id');
     }
 
     public function getQuestionImageUrlAttribute(): ?string
@@ -38,6 +38,6 @@ class BankQuestions extends Model
     }
     public function MappingQuestions(): HasMany
     {
-        return $this->hasMany(MappingQuestions::class, 'id_question_bank');
+        return $this->hasMany(MappingQuestion::class, 'id_question_bank');
     }
 }

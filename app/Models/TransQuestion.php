@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TransQuestions extends Model
+class TransQuestion extends Model
 {
     protected $table = 'trans_questions';
     protected $fillable = [
@@ -19,7 +19,7 @@ class TransQuestions extends Model
     ];
     public function detailResults()
     {
-        return $this->hasMany(DetailResults::class, 'id_trans_question');
+        return $this->hasMany(DetailResult::class, 'id_trans_question');
     }
     public function User()
     {
@@ -32,10 +32,10 @@ class TransQuestions extends Model
 
     public function Exam()
     {
-        return $this->belongsTo(Exams::class, 'id_exam');
+        return $this->belongsTo(Exam::class, 'id_exam');
     }
     public function Type()
     {
-        return $this->belongsTo(MasterTypes::class, 'id_type');
+        return $this->belongsTo(MasterType::class, 'id_type');
     }
 }

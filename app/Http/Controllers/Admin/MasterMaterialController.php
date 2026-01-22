@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RequestMaterial;
-use App\Models\Materials;
+use App\Models\Material;
 use App\Models\Package;
 use App\Models\Subject;
 use Illuminate\Http\Request;
@@ -19,7 +19,7 @@ class MasterMaterialController extends Controller
     {
         $search = $request->query('search');
 
-        $data = Materials::with('package', 'subject')
+        $data = Material::with('package', 'subject')
             ->when($search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
@@ -72,7 +72,7 @@ class MasterMaterialController extends Controller
             $data['file_size'] = null;
         }
 
-        Materials::create($data);
+        Material::create($data);
         return redirect()->route('master-materials.index')->with('success', 'Material berhasil ditambahkan.');
     }
 
@@ -81,7 +81,7 @@ class MasterMaterialController extends Controller
      */
     public function show(string $id)
     {
-        $data = Materials::with('package')->findOrFail($id);
+        $data = Material::with('package')->findOrFail($id);
         return view('admin.master-material.show', compact('data'));
     }
 
@@ -90,7 +90,7 @@ class MasterMaterialController extends Controller
      */
     public function edit(string $id)
     {
-        $data = Materials::findOrFail($id);
+        $data = Material::findOrFail($id);
         $packages = Package::where('status', 'active')->get();
         $subjects = Subject::all();
         return view('admin.master-material.edit', compact('data', 'packages', 'subjects'));
@@ -101,7 +101,7 @@ class MasterMaterialController extends Controller
      */
     public function update(RequestMaterial $request, string $id)
     {
-        $material = Materials::findOrFail($id);
+        $material = Material::findOrFail($id);
         $data = $request->validated();
 
         if ($request->materi_type === 'Video') {
@@ -138,7 +138,7 @@ class MasterMaterialController extends Controller
      */
     public function destroy(string $id)
     {
-        $data = Materials::findOrFail($id);
+        $data = Material::findOrFail($id);
 
         // Delete file if exists
         if ($data->value && Storage::disk('public')->exists($data->value)) {
@@ -154,7 +154,7 @@ class MasterMaterialController extends Controller
      */
     public function serveFile(string $id)
     {
-        $material = Materials::findOrFail($id);
+        $material = Material::findOrFail($id);
 
         if (!$material->value || !Storage::disk('public')->exists($material->value)) {
             abort(404, 'File tidak ditemukan');
@@ -174,7 +174,7 @@ class MasterMaterialController extends Controller
      */
     public function downloadFile(string $id)
     {
-        $material = Materials::findOrFail($id);
+        $material = Material::findOrFail($id);
 
         if (!$material->value || !Storage::disk('public')->exists($material->value)) {
             abort(404, 'File tidak ditemukan');

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\MasterTypes;
+use App\Models\MasterType;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
@@ -19,7 +19,7 @@ class MasterTypesController extends Controller
     {
         $search = $request->query('search');
 
-        $data = MasterTypes::when($search, function ($query, $search) {
+        $data = MasterType::when($search, function ($query, $search) {
             $query->where('name_type', 'like', "%{$search}%");
         })
             ->orderBy('created_at', 'desc')
@@ -41,7 +41,7 @@ class MasterTypesController extends Controller
      */
     public function store(RequestMasterType $request)
     {
-        MasterTypes::create($request->validated());
+        MasterType::create($request->validated());
         return redirect()->route('master-types.index')
             ->with('success', 'Jenis berhasil ditambahkan.');
     }
@@ -51,7 +51,7 @@ class MasterTypesController extends Controller
      */
     public function show(string $id)
     {
-        $data = MasterTypes::findOrFail($id);
+        $data = MasterType::findOrFail($id);
         return view('admin.master-types.show', compact('data'));
     }
 
@@ -60,7 +60,7 @@ class MasterTypesController extends Controller
      */
     public function edit(string $id)
     {
-        $data = MasterTypes::findOrFail($id);
+        $data = MasterType::findOrFail($id);
         return view('admin.master-type.edit', compact('data'));
     }
 
@@ -69,7 +69,7 @@ class MasterTypesController extends Controller
      */
     public function update(RequestMasterType $request, string $id)
     {
-        $data = MasterTypes::findOrFail($id);
+        $data = MasterType::findOrFail($id);
         $data->update($request->validated());
         return redirect()->route('master-types.index')->with('success', 'Jenis berhasil diperbarui.');
     }
@@ -79,7 +79,7 @@ class MasterTypesController extends Controller
      */
     public function destroy(string $id)
     {
-        $data = MasterTypes::findOrFail($id);
+        $data = MasterType::findOrFail($id);
         $data->delete();
         return redirect()->route('master-types.index')->with('success', 'Jenis berhasil dihapus.');
     }

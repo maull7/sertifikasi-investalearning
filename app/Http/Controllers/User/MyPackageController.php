@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\Materials;
+use App\Models\Material;
 use App\Models\Package;
-use App\Models\UserJoins;
+use App\Models\UserJoin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -15,8 +15,8 @@ class MyPackageController extends Controller
     public function index(): View
     {
         $user = Auth::user();
-        
-        $joinedPackages = UserJoins::where('user_id', $user->id)
+
+        $joinedPackages = UserJoin::where('user_id', $user->id)
             ->with(['package.masterType', 'package.materials'])
             ->paginate(12);
 
@@ -26,8 +26,8 @@ class MyPackageController extends Controller
     public function show(Package $package): View
     {
         $user = Auth::user();
-        
-        $userJoin = UserJoins::where('user_id', $user->id)
+
+        $userJoin = UserJoin::where('user_id', $user->id)
             ->where('id_package', $package->id)
             ->first();
 
@@ -35,15 +35,10 @@ class MyPackageController extends Controller
             abort(403, 'Anda belum bergabung dengan package ini.');
         }
 
-        $materials = Materials::where('package_id', $package->id)
+        $materials = Material::where('package_id', $package->id)
             ->with('subject')
             ->get();
 
         return view('user.my-packages.show', compact('package', 'materials'));
     }
 }
-
-
-
-
-

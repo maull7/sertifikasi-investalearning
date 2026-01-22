@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RequestBankQuestion;
-use App\Models\MasterTypes;
 use App\Repositories\Contracts\BankQuestionRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Imports\BankQuestionsImport;
 use App\Exports\BankQuestionsTemplateExport;
+use App\Models\MasterType;
 use Maatwebsite\Excel\Facades\Excel;
 
 class BankQuestionController extends Controller
@@ -27,7 +27,7 @@ class BankQuestionController extends Controller
         $typeId = $request->query('type_id') ? (int) $request->query('type_id') : null;
 
         $data = $this->bankQuestionRepository->getAllWithPagination($search, $typeId);
-        $types = MasterTypes::orderBy('name_type')->get();
+        $types = MasterType::orderBy('name_type')->get();
 
         return view('admin.bank-question.index', [
             'data' => $data,
@@ -39,7 +39,7 @@ class BankQuestionController extends Controller
 
     public function create()
     {
-        $types = MasterTypes::all();
+        $types = MasterType::all();
         return view('admin.bank-question.create', compact('types'));
     }
 
@@ -73,7 +73,7 @@ class BankQuestionController extends Controller
     public function edit(string $id)
     {
         $data = $this->bankQuestionRepository->findById($id);
-        $types = MasterTypes::all();
+        $types = MasterType::all();
         return view('admin.bank-question.edit', compact('data', 'types'));
     }
 
@@ -143,13 +143,13 @@ class BankQuestionController extends Controller
 
             // Check for failures
             $failures = $import->failures();
-            
+
             if ($failures->isNotEmpty()) {
                 $errorMessages = [];
                 foreach ($failures as $failure) {
                     $errorMessages[] = "Baris {$failure->row()}: " . implode(', ', $failure->errors());
                 }
-                
+
                 return redirect()->route('bank-questions.index')
                     ->with('error', 'Import gagal dengan error: ' . implode(' | ', $errorMessages));
             }
@@ -163,12 +163,9 @@ class BankQuestionController extends Controller
 
             return redirect()->route('bank-questions.index')
                 ->with('success', 'Soal berhasil diimport dari Excel!');
-                
         } catch (\Exception $e) {
             return redirect()->route('bank-questions.index')
                 ->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
         }
     }
 }
-
-
