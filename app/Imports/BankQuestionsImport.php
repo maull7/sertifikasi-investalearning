@@ -52,15 +52,15 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
      */
     public function model(array $row)
     {
-        $typeName = trim((string) ($row['tipe_soal'] ?? ''));
+        $codeType = trim((string) ($row['kode_jenis'] ?? ''));
 
         // Find type by name_type (case-insensitive + trimmed)
         $type = MasterTypes::query()
-            ->whereRaw('LOWER(name_type) = ?', [mb_strtolower($typeName)])
+            ->whereRaw('LOWER(code) = ?', [mb_strtolower($codeType)])
             ->first();
-        
+
         if (!$type) {
-            $this->errors[] = "Tipe soal '{$typeName}' tidak ditemukan pada master_types.";
+            $this->errors[] = "Tipe soal '{$codeType}' tidak ditemukan pada master_types.";
             return null;
         }
 
@@ -142,7 +142,7 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
     public function rules(): array
     {
         return [
-            'tipe_soal' => 'required|string',
+            'kode_jenis' => 'required|string',
             'question_type' => 'required|in:Text,Image,text,image',
             'soal' => 'required|string',
             'opsi_a' => 'required|string',
@@ -161,7 +161,7 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
     public function customValidationMessages()
     {
         return [
-            'tipe_soal.required' => 'Tipe soal wajib diisi',
+            'kode_jenis.required' => 'Kode Jenis wajib diisi',
             'question_type.required' => 'Jenis soal wajib diisi',
             'question_type.in' => 'Jenis soal harus Text atau Image',
             'soal.required' => 'Soal wajib diisi',
@@ -184,8 +184,3 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
         return $this->errors;
     }
 }
-
-
-
-
-
