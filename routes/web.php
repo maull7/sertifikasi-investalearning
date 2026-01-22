@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ShowGradeController;
 use App\Http\Controllers\User\HistoryExamController;
 use App\Http\Controllers\Admin\MasterTypesController;
 use App\Http\Controllers\Admin\BankQuestionController;
+use App\Http\Controllers\Admin\EmailActivation;
 use App\Http\Controllers\Admin\MasterPackegeController;
 use App\Http\Controllers\Admin\MasterMaterialController;
 use App\Http\Controllers\Admin\MappingQuestionController;
@@ -110,6 +111,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('show-grades.index');
     Route::get('show-grades/{id}/detail', [ShowGradeController::class, 'detail'])
         ->name('show-grades.detail');
+
+    // USER AKTIVASI
+    Route::get('user-not-activation', [EmailActivation::class, 'index'])->name('user.not.active');
+    Route::patch('users/{user}/activate', [EmailActivation::class, 'activate'])
+        ->name('user.activate');
 });
 
 require __DIR__ . '/auth.php';

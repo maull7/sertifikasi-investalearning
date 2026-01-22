@@ -30,12 +30,23 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
-        if ($user && $user->role === 'User') {
+        if ($user->role == 'User') {
+            if ($user->status_user !== 'Teraktivasi') {
+                auth()->logout();
+
+                return back()->withErrors([
+                    'email' => 'Akun Anda belum diaktivasi. Silakan cek email atau hubungi admin...',
+                ]);
+            }
+        }
+
+        if ($user->role === 'User') {
             return redirect()->intended(route('user.dashboard', absolute: false));
         }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
+
 
     /**
      * Destroy an authenticated session.
