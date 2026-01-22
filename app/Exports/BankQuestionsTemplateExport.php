@@ -61,7 +61,7 @@ class BankQuestionsTemplateExport implements FromArray, WithHeadings, WithStyles
     public function headings(): array
     {
         return [
-            'tipe_soal',
+            'kode_jenis',
             'question_type',
             'soal',
             'opsi_a',
@@ -110,8 +110,3 @@ class BankQuestionsTemplateExport implements FromArray, WithHeadings, WithStyles
         ];
     }
 }
-
-
-
-
-

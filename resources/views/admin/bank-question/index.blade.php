@@ -255,7 +255,7 @@
                                     <ul class="list-disc list-inside space-y-1 ml-2">
                                         <li>Download template Excel terlebih dahulu</li>
                                         <li>Isi data sesuai format yang ada di template</li>
-                                        <li>Pastikan kolom "tipe_soal" sesuai dengan master tipe yang ada</li>
+                                        <li>Pastikan kolom "kode jenis" sesuai dengan kode dari master jenis</li>
                                         <li>Jawaban harus berupa huruf A, B, C, atau D</li>
                                     </ul>
                                 </div>

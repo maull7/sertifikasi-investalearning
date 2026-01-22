@@ -52,8 +52,8 @@
     {{-- Logo Area --}}
     <div class="h-18 flex items-center p-4 overflow-hidden shrink-0">
         <a href="/" class="flex items-center gap-4 group shrink-0">
-            <div class="relative w-12 h-12 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:rotate-[10deg] group-hover:scale-110">
-                <i class="ti ti-brand-laravel text-white text-2xl"></i>
+            <div class="relative w-12 h-12 bg-gradient-to-tr from-slate-50 to-zinc-100 dark:from-slate-200 dark:to-slate-400 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:rotate-[10deg] group-hover:scale-110">
+                <img src="{{asset('img/favicon.png')}}" alt="Favicon">
             </div>
             <div x-show="expanded" x-transition class="flex flex-col">
                 <span class="font-bold text-lg dark:text-white leading-none">
