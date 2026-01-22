@@ -15,8 +15,10 @@
     </div>
 
     <div class="mb-8 flex flex-col items-center gap-4">
-        <a href="/">
-             <x-logo :with-text="false" size="md" />
+       <a href="/">
+            <div class="w-16 h-16 p-2 bg-slate-100 dark:bg-slate-700 rounded-[2rem] flex items-center justify-center text-white shadow-xl shadow-indigo-500/20 rotate-3 hover:rotate-0 transition-transform duration-500">
+                <img src="{{asset('img/favicon.png')}}" alt="">
+            </div>
         </a>
         <h1 class="text-xl font-bold text-gray-900 dark:text-white ">
             Investalearning <span class="text-indigo-600">Authentication</span>

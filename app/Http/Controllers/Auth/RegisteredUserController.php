@@ -57,8 +57,7 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
 
-        return redirect()->route('user.dashboard');
+        return redirect()->back()->with('success', 'Berhasil melakukan aktivasi, tunggu notifikasi ke email untuk akun dapat di gunakan');
     }
 }

@@ -35,6 +35,7 @@ class Sidebar extends Component
                         'activePattern' => 'dashboard.*',
                         'subItems' => [
                             ['name' => 'Dashboard', 'route' => 'dashboard'],
+                            ['name' => 'Activation akun', 'route' => 'user.not.active'],
                         ]
                     ],
                     [
