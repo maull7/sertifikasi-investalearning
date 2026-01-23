@@ -13,7 +13,6 @@
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Riwayat Ujian</h1>
             <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Lihat riwayat ujian user</p>
         </div>
-      
     </div>
 
     {{-- Search & Filter Section --}}
@@ -105,7 +104,6 @@
                                     {{ $data->Package->title ?? '-' }}
                                 </span>
                             </td>
-
                           
                             <td class="py-4 px-8 text-center">
                                 <span class="inline-flex items-center justify-center rounded-lg font-bold text-sm ">
