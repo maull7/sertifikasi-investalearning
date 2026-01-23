@@ -42,3 +42,5 @@ class MyPackageController extends Controller
         return view('user.my-packages.show', compact('package', 'materials'));
     }
 }
+
+

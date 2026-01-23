@@ -106,3 +106,5 @@ class SubjectController extends Controller
             ->with('success', 'Data master mata pelajaran berhasil diimport.');
     }
 }
+
+

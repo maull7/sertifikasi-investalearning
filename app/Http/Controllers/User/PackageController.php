@@ -67,3 +67,5 @@ class PackageController extends Controller
             ->with('success', 'Berhasil bergabung dengan package!');
     }
 }
+
+
