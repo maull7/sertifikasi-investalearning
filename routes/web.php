@@ -30,6 +30,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 Route::get('/user/dashboard', [UserDashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('user.dashboard');
+// Chart Data API
+Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
 
 Route::middleware('auth', 'akun-active')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

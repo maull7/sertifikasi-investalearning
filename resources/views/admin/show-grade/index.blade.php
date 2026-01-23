@@ -67,27 +67,38 @@
         </form>
     </div>
 
+    {{-- Chart (hanya muncul ketika sudah ada filter) --}}
+    @if(isset($chartData) && $chartData->count())
+        <x-card title="Trend Nilai Peserta">
+            {{-- Canvas full width dan tidak memaksa halaman melebar --}}
+            <div class="w-full h-72">
+                <canvas id="gradeChart"></canvas>
+            </div>
+        </x-card>
+    @endif
+
     {{-- Main Data Card --}}
     <x-card :padding="false" title="Riwayat Ujian Peserta">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+        {{-- Wrapper tabel responsif: kalau kolom kebanyakan, scroll horizontal hanya di tabel --}}
+        <div class="w-full overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm table-auto">
                 <thead>
                     <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Nama Peserta</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Paket</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Ujian / Exam</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Tipe</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Total Soal</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Terjawab</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Total Poin</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Aksi</th>
+                        <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider whitespace-nowrap">Nama Peserta</th>
+                        <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider whitespace-nowrap">Paket</th>
+                        <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider whitespace-nowrap">Ujian / Exam</th>
+                        <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center whitespace-nowrap">Tipe</th>
+                        <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center whitespace-nowrap">Total Soal</th>
+                        <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center whitespace-nowrap">Terjawab</th>
+                        <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center whitespace-nowrap">Total Poin</th>
+                        <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center whitespace-nowrap">Aksi</th>
                         
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
                     @forelse ($list as $data)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group">
-                            <td class="py-4 px-6">
+                            <td class="py-3 px-4 sm:px-6">
                                 <div class="flex flex-col">
                                     <span class="font-semibold text-sm text-gray-900 dark:text-white">
                                         {{ $data->User->name ?? '-' }}
@@ -98,39 +109,39 @@
                                 </div>
                             </td>
 
-                            <td class="py-4 px-6">
+                            <td class="py-3 px-4 sm:px-6">
                                 <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold
                                     bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
                                     {{ $data->Package->title ?? '-' }}
                                 </span>
                             </td>
                           
-                            <td class="py-4 px-8 text-center">
+                            <td class="py-3 px-4 sm:px-6 text-center">
                                 <span class="inline-flex items-center justify-center rounded-lg font-bold text-sm ">
                                     {{ strtoupper($data->Exam->title) }}
                                 </span>
                             </td>
-                            <td class="py-4 px-8 text-center">
+                            <td class="py-3 px-4 sm:px-6 text-center">
                                 <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm">
                                     {{ strtoupper($data->Type->name_type) }}
                                 </span>
                             </td>
-                            <td class="py-4 px-8 text-center">
+                            <td class="py-3 px-4 sm:px-6 text-center">
                                 <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm">
                                     {{ strtoupper($data->total_questions) }}
                                 </span>
                             </td>
-                            <td class="py-4 px-8 text-center">
+                            <td class="py-3 px-4 sm:px-6 text-center">
                                 <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm">
                                     {{ strtoupper($data->questions_answered) }}
                                 </span>
                             </td>
-                            <td class="py-4 px-8 text-center">
+                            <td class="py-3 px-4 sm:px-6 text-center">
                                 <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm">
                                     {{ strtoupper($data->total_score) }}
                                 </span>
                             </td>
-                            <td class="py-4 px-8 text-center">
+                            <td class="py-3 px-4 sm:px-6 text-center">
                                 <div class="flex items-center justify-end gap-2">
                                     <x-button variant="primary" size="sm" href="{{ route('show-grades.detail', $data->id) }}" class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">
                                         <i class="ti ti-eye text-base"></i>
@@ -186,3 +197,86 @@
 </div>
 @endsection
 
+@push('scripts')
+    {{-- Chart.js CDN --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('gradeChart');
+            if (!ctx) {
+                return;
+            }
+
+            // Data chart dikirim langsung dari controller sebagai koleksi
+            const rawData = @json($chartData ?? []);
+            if (!Array.isArray(rawData) || rawData.length === 0) {
+                return;
+            }
+
+            // Top 10 score, ditampilkan seperti grafik detak jantung (line chart)
+            const labels = rawData.map((item, index) => {
+                if (item.user && item.user.name) {
+                    return item.user.name;
+                }
+                return `User ${item.id_user ?? index + 1}`;
+            });
+            const scores = rawData.map(item => Number(item.total_score) || 0);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Top 10 Nilai Ujian',
+                            data: scores,
+                            borderColor: '#4f46e5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.15)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#4f46e5'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#9ca3af',
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 7
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#9ca3af',
+                                precision: 0
+                            },
+                            grid: {
+                                color: 'rgba(156, 163, 175, 0.2)'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+@endpush

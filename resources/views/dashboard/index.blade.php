@@ -67,24 +67,67 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {{-- Chart Analytics Card --}}
-        <x-card class="lg:col-span-2">
-            <x-slot:header>
-                <div class="flex items-center justify-between w-full">
-                    <h3 class="font-bold text-gray-900 dark:text-white">Revenue Analytics</h3>
-                    <select class="text-xs border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-indigo-500 dark:text-gray-300 outline-none px-2 py-1">
-                        <option>Last 7 Days</option>
-                        <option>Last 30 Days</option>
-                    </select>
-                </div>
-            </x-slot:header>
+<x-card class="lg:col-span-2">
+    <x-slot:header>
+        <div class="flex items-center justify-between w-full gap-4 flex-wrap">
+            <h3 class="font-bold text-gray-900 dark:text-white">Analisis Peserta Ujian</h3>
+            <div class="flex gap-2 flex-wrap">
+                {{-- Filter Type --}}
+                <select id="filterType" class="text-xs border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-indigo-500 dark:text-gray-300 outline-none px-3 py-1.5">
+                    <option value="">Semua Jenis</option>
+                    @foreach($typesData as $type)
+                        <option value="{{ $type->id }}">{{ $type->name_type }}</option>
+                    @endforeach
+                </select>
 
-            <div class="h-[320px] flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-2xl bg-gray-50/50 dark:bg-gray-900/20">
-                <div class="text-center">
-                    <i class="ti ti-chart-area-line text-4xl mb-2 opacity-20"></i>
-                    <p class="text-sm font-medium">Chart Visualization Placeholder</p>
-                </div>
+                {{-- Filter Package --}}
+                <select id="filterPackage" class="text-xs border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-indigo-500 dark:text-gray-300 outline-none px-3 py-1.5">
+                    <option value="">Semua Paket</option>
+                    @foreach($packagesData as $pkg)
+                        <option value="{{ $pkg->id }}">{{ $pkg->title }}</option>
+                    @endforeach
+                </select>
+
+                {{-- Filter Period --}}
+                <select id="filterPeriod" class="text-xs border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 rounded-lg focus:ring-indigo-500 dark:text-gray-300 outline-none px-3 py-1.5">
+                    <option value="7">7 Hari Terakhir</option>
+                    <option value="14">14 Hari Terakhir</option>
+                    <option value="30">30 Hari Terakhir</option>
+                </select>
             </div>
-        </x-card>
+        </div>
+    </x-slot:header>
+
+    <div class="h-[320px] relative">
+        {{-- Loading State --}}
+        <div id="chartLoading" class="absolute inset-0 flex items-center justify-center bg-gray-50/50 dark:bg-gray-900/20 rounded-2xl hidden">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-2"></div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Memuat data...</p>
+            </div>
+        </div>
+
+        {{-- Chart Canvas --}}
+        <canvas id="participantChart"></canvas>
+    </div>
+
+    {{-- Summary Stats (berbasis nilai) --}}
+    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 grid grid-cols-3 gap-4">
+        <div class="text-center">
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Rata-rata Nilai</p>
+            <p id="avgScore" class="text-lg font-bold text-gray-900 dark:text-white">0</p>
+        </div>
+        <div class="text-center">
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Nilai Tertinggi</p>
+            <p id="maxScore" class="text-lg font-bold text-gray-900 dark:text-white">0</p>
+        </div>
+        <div class="text-center">
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Jumlah User</p>
+            <p id="totalUsers" class="text-lg font-bold text-gray-900 dark:text-white">0</p>
+        </div>
+    </div>
+</x-card>
+
 
         {{-- Recent Customers Card --}}
         <x-card title="Recent User Exam">
@@ -115,3 +158,212 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+    {{-- Chart.js CDN --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('participantChart');
+            if (!ctx) {
+                return;
+            }
+
+            const routeUrl = "{{ route('dashboard.chart-data') }}";
+
+            const filterType = document.getElementById('filterType');
+            const filterPackage = document.getElementById('filterPackage');
+            const filterPeriod = document.getElementById('filterPeriod');
+            const loadingEl = document.getElementById('chartLoading');
+
+            const avgScoreEl = document.getElementById('avgScore');
+            const maxScoreEl = document.getElementById('maxScore');
+            const totalUsersEl = document.getElementById('totalUsers');
+
+            let chartInstance = null;
+
+            function toggleLoading(show) {
+                if (!loadingEl) {
+                    return;
+                }
+
+                if (show) {
+                    loadingEl.classList.remove('hidden');
+                } else {
+                    loadingEl.classList.add('hidden');
+                }
+            }
+
+            function buildQuery(params) {
+                const query = new URLSearchParams();
+                Object.entries(params).forEach(([key, value]) => {
+                    if (value !== null && value !== undefined && value !== '') {
+                        query.append(key, value);
+                    }
+                });
+
+                const qs = query.toString();
+                return qs ? `${routeUrl}?${qs}` : routeUrl;
+            }
+
+            async function fetchChartData() {
+                toggleLoading(true);
+
+                const params = {
+                    type_id: filterType ? filterType.value : '',
+                    package_id: filterPackage ? filterPackage.value : '',
+                    period: filterPeriod ? filterPeriod.value : ''
+                };
+
+                const url = buildQuery(params);
+
+                try {
+                    const response = await fetch(url, {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Gagal mengambil data chart');
+                    }
+
+                    const chartData = await response.json();
+
+                    // Tampilkan di console untuk debugging
+                    console.log('chartData:', chartData);
+
+                    updateChart(chartData);
+                    updateSummary(chartData);
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    toggleLoading(false);
+                }
+            }
+
+            function updateChart(chartData) {
+                if (!Array.isArray(chartData)) {
+                    return;
+                }
+
+                const labels = chartData.map(item => item.label);
+                const data = chartData.map(item => item.score);
+
+                if (chartInstance) {
+                    chartInstance.data.labels = labels;
+                    chartInstance.data.datasets[0].data = data;
+                    chartInstance.update();
+                    return;
+                }
+
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Nilai Tertinggi per User',
+                                data: data,
+                                borderColor: '#4f46e5',
+                                backgroundColor: 'rgba(79, 70, 229, 0.15)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                                fill: true,
+                                pointRadius: 3,
+                                pointBackgroundColor: '#4f46e5'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    color: '#9ca3af',
+                                    maxRotation: 0,
+                                    autoSkip: true,
+                                    maxTicksLimit: 7
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: '#9ca3af',
+                                    precision: 0
+                                },
+                                grid: {
+                                    color: 'rgba(156, 163, 175, 0.2)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function updateSummary(chartData) {
+                if (!Array.isArray(chartData) || chartData.length === 0) {
+                    if (avgScoreEl) {
+                        avgScoreEl.textContent = '0';
+                    }
+                    if (maxScoreEl) {
+                        maxScoreEl.textContent = '0';
+                    }
+                    if (totalUsersEl) {
+                        totalUsersEl.textContent = '0';
+                    }
+                    return;
+                }
+
+                let totalScore = 0;
+                let maxScore = 0;
+
+                chartData.forEach(item => {
+                    const score = Number(item.score) || 0;
+                    totalScore += score;
+                    if (score > maxScore) {
+                        maxScore = score;
+                    }
+                });
+
+                const avg = totalScore / chartData.length;
+
+                if (avgScoreEl) {
+                    avgScoreEl.textContent = avg.toFixed(1);
+                }
+                if (maxScoreEl) {
+                    maxScoreEl.textContent = maxScore.toFixed(1);
+                }
+                if (totalUsersEl) {
+                    totalUsersEl.textContent = chartData.length;
+                }
+            }
+
+            if (filterType) {
+                filterType.addEventListener('change', fetchChartData);
+            }
+            if (filterPackage) {
+                filterPackage.addEventListener('change', fetchChartData);
+            }
+            if (filterPeriod) {
+                filterPeriod.addEventListener('change', fetchChartData);
+            }
+
+            // Initial load
+            fetchChartData();
+        });
+    </script>
+@endpush

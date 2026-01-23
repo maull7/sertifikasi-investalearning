@@ -29,3 +29,5 @@ interface ExamRepositoryInterface
 
     public function createDetailResult(TransQuestion $trans, int $questionId, ?string $userAnswer, ?string $correctAnswer, float $scoreObtained): void;
 }
+
+
