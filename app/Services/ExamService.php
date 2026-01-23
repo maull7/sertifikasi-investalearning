@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Exams;
+use App\Models\Exam;
 use App\Models\Package;
 use App\Models\User;
 use App\Repositories\Contracts\ExamRepositoryInterface;
@@ -14,10 +14,9 @@ class ExamService
 {
     public function __construct(
         protected ExamRepositoryInterface $examRepository
-    ) {
-    }
+    ) {}
 
-    public function ensureUserCanAccessExam(User $user, Package $package, Exams $exam): void
+    public function ensureUserCanAccessExam(User $user, Package $package, Exam $exam): void
     {
         if (!$this->examRepository->userJoinedPackage($user, $package)) {
             abort(403, 'Anda belum bergabung dengan package ini.');
@@ -28,12 +27,12 @@ class ExamService
         }
     }
 
-    public function getTotalQuestions(Exams $exam): int
+    public function getTotalQuestions(Exam $exam): int
     {
         return $this->examRepository->countQuestions($exam);
     }
 
-    public function getQuestionPage(User $user, Package $package, Exams $exam, int $page, int $perPage = 1): LengthAwarePaginator
+    public function getQuestionPage(User $user, Package $package, Exam $exam, int $page, int $perPage = 1): LengthAwarePaginator
     {
         $this->ensureUserCanAccessExam($user, $package, $exam);
 
@@ -47,7 +46,7 @@ class ExamService
      * @param  array<int, string|null>  $answers
      * @return array{score: float, correct: int, total: int, status: string}
      */
-    public function submitExam(User $user, Package $package, Exams $exam, array $answers): array
+    public function submitExam(User $user, Package $package, Exam $exam, array $answers): array
     {
         $this->ensureUserCanAccessExam($user, $package, $exam);
 
@@ -70,15 +69,15 @@ class ExamService
 
             foreach ($mappingQuestions as $index => $mapping) {
                 $page = $index + 1;
-                
+
                 // Handle both string and integer keys from frontend
                 $userAnswer = $answers[$page] ?? $answers[(string) $page] ?? null;
-                
+
                 // Normalize answer (trim and uppercase)
                 if ($userAnswer) {
                     $userAnswer = strtoupper(trim($userAnswer));
                 }
-                
+
                 $question = $mapping->questionBank;
 
                 if (!$question) {
@@ -122,5 +121,3 @@ class ExamService
         }
     }
 }
-
-

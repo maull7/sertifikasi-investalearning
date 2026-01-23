@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\Exams;
+use App\Models\Exam;
 use App\Models\Package;
 use App\Services\ExamService;
 use Illuminate\Http\JsonResponse;
@@ -15,10 +15,9 @@ class ExamController extends Controller
 {
     public function __construct(
         protected ExamService $examService
-    ) {
-    }
+    ) {}
 
-    public function show(Package $package, Exams $exam): View
+    public function show(Package $package, Exam $exam): View
     {
         $user = Auth::user();
         $this->examService->ensureUserCanAccessExam($user, $package, $exam);
@@ -28,7 +27,7 @@ class ExamController extends Controller
         return view('user.exams.show', compact('package', 'exam', 'totalQuestions'));
     }
 
-    public function submit(Request $request, Package $package, Exams $exam): JsonResponse
+    public function submit(Request $request, Package $package, Exam $exam): JsonResponse
     {
         $user = Auth::user();
 
@@ -56,7 +55,7 @@ class ExamController extends Controller
         }
     }
 
-    public function getQuestions(Request $request, Package $package, Exams $exam): JsonResponse
+    public function getQuestions(Request $request, Package $package, Exam $exam): JsonResponse
     {
         $user = Auth::user();
         $page = (int) $request->get('page', 1);
@@ -93,4 +92,3 @@ class ExamController extends Controller
         ]);
     }
 }
-

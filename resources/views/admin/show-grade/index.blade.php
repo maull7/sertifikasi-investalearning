@@ -13,7 +13,6 @@
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Riwayat Ujian</h1>
             <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Lihat riwayat ujian user</p>
         </div>
-      
     </div>
 
     {{-- Search & Filter Section --}}
@@ -88,13 +87,20 @@
                 <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
                     @forelse ($list as $data)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group">
-                            <td class="py-4 px-4">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ">
-                                    {{ $data->User->name ?? '-' }}
-                                </span>
+                            <td class="py-4 px-6">
+                                <div class="flex flex-col">
+                                    <span class="font-semibold text-sm text-gray-900 dark:text-white">
+                                        {{ $data->User->name ?? '-' }}
+                                    </span>
+                                    <span class="text-xs text-gray-400">
+                                        {{ $data->User->email ?? '' }}
+                                    </span>
+                                </div>
                             </td>
-                            <td class="py-4 px-8">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300">
+
+                            <td class="py-4 px-6">
+                                <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold
+                                    bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
                                     {{ $data->Package->title ?? '-' }}
                                 </span>
                             </td>

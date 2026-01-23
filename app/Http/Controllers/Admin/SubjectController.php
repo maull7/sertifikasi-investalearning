@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Subject;
-use App\Models\MasterTypes;
+use App\Models\MasterType;
 use Illuminate\Http\Request;
 use App\Exports\MasterSubjectExport;
 use App\Http\Controllers\Controller;
@@ -18,7 +18,7 @@ class SubjectController extends Controller
         $search = $request->query('search');
         $typeId = $request->query('type_id');
 
-        $types = MasterTypes::orderBy('name_type')->get();
+        $types = MasterType::orderBy('name_type')->get();
 
         $data = Subject::with('type')
             ->when($typeId, function ($query, $typeId) {
@@ -44,7 +44,7 @@ class SubjectController extends Controller
 
     public function create()
     {
-        $types = MasterTypes::orderBy('name_type')->get();
+        $types = MasterType::orderBy('name_type')->get();
 
         return view('admin.subject.create', [
             'types' => $types,
@@ -62,7 +62,7 @@ class SubjectController extends Controller
 
     public function edit(Subject $subject)
     {
-        $types = MasterTypes::orderBy('name_type')->get();
+        $types = MasterType::orderBy('name_type')->get();
 
         return view('admin.subject.edit', [
             'data' => $subject,
@@ -106,5 +106,3 @@ class SubjectController extends Controller
             ->with('success', 'Data master mata pelajaran berhasil diimport.');
     }
 }
-
-

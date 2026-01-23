@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Models\BankQuestions;
+use App\Models\BankQuestion;
 use App\Repositories\Contracts\BankQuestionRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -12,7 +12,7 @@ class BankQuestionRepository implements BankQuestionRepositoryInterface
 {
     protected $model;
 
-    public function __construct(BankQuestions $model)
+    public function __construct(BankQuestion $model)
     {
         $this->model = $model;
     }
@@ -60,7 +60,7 @@ class BankQuestionRepository implements BankQuestionRepositoryInterface
     public function delete(int $id): bool
     {
         $question = $this->findById($id);
-        
+
         // Delete image file if question is Image and stored in `question` field
         if (($question->question_type ?? 'Text') === 'Image' && $question->question && Storage::disk('public')->exists($question->question)) {
             Storage::disk('public')->delete($question->question);
@@ -82,4 +82,3 @@ class BankQuestionRepository implements BankQuestionRepositoryInterface
         return $this->model->insert($questions);
     }
 }
-

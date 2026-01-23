@@ -56,6 +56,6 @@ class User extends Authenticatable
 
     public function joinedPackages()
     {
-        return $this->hasMany(UserJoins::class, 'user_id');
+        return $this->hasMany(UserJoin::class, 'user_id');
     }
 }

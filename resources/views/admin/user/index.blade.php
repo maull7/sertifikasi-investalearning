@@ -20,56 +20,23 @@
     </div>
 
     {{-- Search & Filter Section --}}
-    {{-- <div class="flex flex-col lg:flex-row gap-4">
-        <form 
-            action="{{ route('show-grades.index') }}" 
-            method="GET" 
-            class="flex-1 flex flex-col md:flex-row gap-3 items-end"
-        >
-            <!-- Select -->
-            <div class="w-full md:w-64">
-                <x-select 
-                    name="package_id" 
-                    label="Filter Sesuai paket" 
-                    inline
-                    class="h-12"
-                >
-                    @foreach($packages as $data)
-                        <option value="{{ $data->id }}" {{ (int) ($packageId ?? 0) === $data->id ? 'selected' : '' }}>
-                            {{ $data->title }}
-                        </option>
-                    @endforeach
-                </x-select>
-            </div>
-
-            <!-- Select -->
-            <div class="w-full md:w-64">
-                <x-select 
-                    name="exam_id" 
-                    label="Filter Sesuai Ujian" 
-                    inline
-                    class="h-12"
-                >
-                    @foreach($exams as $data)
-                        <option value="{{ $data->id }}" {{ (int) ($examId ?? 0) === $data->id ? 'selected' : '' }}>
-                            {{ $data->title }}
-                        </option>
-                    @endforeach
-                </x-select>
-            </div>
-
-            <!-- Button -->
-            <div class="flex gap-2">
-                <x-button 
-                    type="submit" 
-                    variant="primary" 
-                    class="h-12 px-6 rounded-xl"
-                >
-                    Terapkan
-                </x-button>
-            </div>
+     <div class="flex flex-col md:flex-row gap-4">
+        <form action="{{ route('user.not.active') }}" method="GET" class="relative flex-1 group">
+            <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors"></i>
+            <input 
+                type="text" 
+                name="search" 
+                value="{{ request('search') }}" 
+                placeholder="Cari nama user..." 
+                class="w-full pl-11 pr-12 py-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all dark:text-white"
+            >
+            @if(request('search'))
+                <a href="{{ route('master-types.index') }}" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors">
+                    <i class="ti ti-x"></i>
+                </a>
+            @endif
         </form>
-    </div> --}}
+    </div>
 
     {{-- Main Data Card --}}
     <x-card :padding="false" title="Daftar Akun Peserta yang belum teraktivasi">

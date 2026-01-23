@@ -19,14 +19,10 @@ class Subject extends Model
 
     public function type(): BelongsTo
     {
-        return $this->belongsTo(MasterTypes::class, 'master_type_id');
+        return $this->belongsTo(MasterType::class, 'master_type_id');
     }
     public function materials()
     {
-        return $this->hasMany(Materials::class, 'id_subject');
+        return $this->hasMany(Material::class, 'id_subject');
     }
 }
-
-
-
-

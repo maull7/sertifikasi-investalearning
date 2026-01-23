@@ -2,8 +2,8 @@
 
 namespace App\Imports;
 
-use App\Models\BankQuestions;
-use App\Models\MasterTypes;
+use App\Models\BankQuestion;
+use App\Models\MasterType;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -26,7 +26,7 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
     public function prepareForValidation($data, $index): array
     {
         $castToStringKeys = [
-            'tipe_soal',
+            'kode_jenis',
             'question_type',
             'soal',
             'opsi_a',
@@ -55,7 +55,7 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
         $codeType = trim((string) ($row['kode_jenis'] ?? ''));
 
         // Find type by name_type (case-insensitive + trimmed)
-        $type = MasterTypes::query()
+        $type = MasterType::query()
             ->whereRaw('LOWER(code) = ?', [mb_strtolower($codeType)])
             ->first();
 
@@ -77,7 +77,7 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
             }
         }
 
-        return new BankQuestions([
+        return new BankQuestion([
             'type_id' => $type->id,
             'question_type' => $questionType,
             'question' => $questionValue,

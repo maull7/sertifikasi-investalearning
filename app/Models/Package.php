@@ -18,16 +18,16 @@ class Package extends Model
     ];
     public function materials(): HasMany
     {
-        return $this->hasMany(Materials::class, 'package_id');
+        return $this->hasMany(Material::class, 'package_id');
     }
 
     public function masterType(): BelongsTo
     {
-        return $this->belongsTo(MasterTypes::class, 'id_master_types');
+        return $this->belongsTo(MasterType::class, 'id_master_types');
     }
     public function userJoins(): HasMany
     {
-        return $this->hasMany(UserJoins::class, 'id_package');
+        return $this->hasMany(UserJoin::class, 'id_package');
     }
 
     public function users()

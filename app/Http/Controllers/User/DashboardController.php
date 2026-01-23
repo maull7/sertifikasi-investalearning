@@ -4,8 +4,8 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Package;
-use App\Models\TransQuestions;
-use App\Models\UserJoins;
+use App\Models\TransQuestion;
+use App\Models\UserJoin;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -15,11 +15,11 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         //info info
-        $totalPackages = UserJoins::where('user_id', $user->id)->count();
-        $totalExams = TransQuestions::where('id_user', $user->id)->count();
+        $totalPackages = UserJoin::where('user_id', $user->id)->count();
+        $totalExams = TransQuestion::where('id_user', $user->id)->count();
 
         //paket di ikuti
-        $packageFollow = UserJoins::where('user_id', $user->id)
+        $packageFollow = UserJoin::where('user_id', $user->id)
             ->with('package')
             ->get();
 

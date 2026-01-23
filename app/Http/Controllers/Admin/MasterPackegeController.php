@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Package;
-use App\Models\MasterTypes;
+use App\Models\MasterType;
 use Illuminate\Http\Request;
 use App\Exports\PaketTemplate;
 use App\Http\Controllers\Controller;
@@ -35,7 +35,7 @@ class MasterPackegeController extends Controller
      */
     public function create()
     {
-        $types = MasterTypes::all();
+        $types = MasterType::all();
         return view('admin.master-package.create', compact('types'));
     }
 
@@ -62,7 +62,7 @@ class MasterPackegeController extends Controller
      */
     public function edit(string $id)
     {
-        $types = MasterTypes::all();
+        $types = MasterType::all();
         $data = Package::findOrFail($id);
         return view('admin.master-package.edit', compact('data', 'types'));
     }

@@ -58,17 +58,6 @@
                             </div>
                         </div>
 
-                        {{-- Progress (optional) --}}
-                        <div class="pt-2">
-                            <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                <span>Progress</span>
-                                <span>0%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-indigo-600 h-2 rounded-full" style="width: 0%"></div>
-                            </div>
-                        </div>
-
                         {{-- Action Button --}}
                         <div class="pt-2">
                             <x-button variant="primary" href="{{ route('user.my-packages.show', $package) }}" class="w-full rounded-xl shadow-lg shadow-indigo-500/20">

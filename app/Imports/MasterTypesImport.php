@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\Models\MasterTypes;
+use App\Models\MasterType;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -22,7 +22,7 @@ class MasterTypesImport implements ToCollection, WithHeadingRow
                 continue;
             }
 
-            MasterTypes::create([
+            MasterType::create([
                 'name_type'   => $row['name_type'],
                 'code'        => $row['code'] ?? null,
                 'description' => $row['description'] ?? null,

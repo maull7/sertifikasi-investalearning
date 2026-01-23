@@ -4,7 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Package;
-use App\Models\UserJoins;
+use App\Models\UserJoin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +15,7 @@ class PackageController extends Controller
     public function index(Request $request): View
     {
         $user = Auth::user();
-        
+
         $query = Package::with(['masterType', 'materials'])
             ->where('status', 'active');
 
@@ -25,7 +25,7 @@ class PackageController extends Controller
 
         $packages = $query->paginate(12);
 
-        $joinedPackageIds = UserJoins::where('user_id', $user->id)
+        $joinedPackageIds = UserJoin::where('user_id', $user->id)
             ->pluck('id_package')
             ->toArray();
 
@@ -35,8 +35,8 @@ class PackageController extends Controller
     public function show(Package $package): View
     {
         $user = Auth::user();
-        
-        $isJoined = UserJoins::where('user_id', $user->id)
+
+        $isJoined = UserJoin::where('user_id', $user->id)
             ->where('id_package', $package->id)
             ->exists();
 
@@ -49,7 +49,7 @@ class PackageController extends Controller
     {
         $user = Auth::user();
 
-        $existingJoin = UserJoins::where('user_id', $user->id)
+        $existingJoin = UserJoin::where('user_id', $user->id)
             ->where('id_package', $package->id)
             ->first();
 
@@ -58,7 +58,7 @@ class PackageController extends Controller
                 ->with('error', 'Anda sudah bergabung dengan package ini.');
         }
 
-        UserJoins::create([
+        UserJoin::create([
             'user_id' => $user->id,
             'id_package' => $package->id,
         ]);
@@ -67,8 +67,3 @@ class PackageController extends Controller
             ->with('success', 'Berhasil bergabung dengan package!');
     }
 }
-
-
-
-
-

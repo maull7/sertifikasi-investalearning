@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Exams;
+use App\Models\Exam;
 use App\Models\Package;
 use Illuminate\Http\Request;
-use App\Models\DetailResults;
-use App\Models\TransQuestions;
+use App\Models\DetailResult;
+use App\Models\TransQuestion;
 use App\Http\Controllers\Controller;
 
 class ShowGradeController extends Controller
@@ -14,9 +14,9 @@ class ShowGradeController extends Controller
     public function index(Request $request)
     {
 
-        $exams = Exams::all();
+        $exams = Exam::all();
         $packages = Package::all();
-        $list = TransQuestions::with(['User', 'Package', 'Exam', 'Type'])
+        $list = TransQuestion::with(['User', 'Package', 'Exam', 'Type'])
             ->when($request->package_id, function ($query) use ($request) {
                 $query->where('id_package', $request->package_id);
             })
@@ -32,7 +32,7 @@ class ShowGradeController extends Controller
 
     public function detail($id)
     {
-        $historyDetail = DetailResults::with('Question', 'TransQuestion')
+        $historyDetail = DetailResult::with('Question', 'TransQuestion')
             ->where('id_trans_question', $id)
             ->paginate(10);
         return view('admin.show-grade.detail', compact('historyDetail'));

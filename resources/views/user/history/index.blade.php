@@ -25,41 +25,39 @@
     </div>
 
     {{-- Search & Filter Section --}}
-    {{-- <div class="flex flex-col lg:flex-row gap-4">
+      <div class="flex flex-col lg:flex-row gap-4">
         <form 
-            action="{{ route('bank-questions.index') }}" 
+            action="{{route('user.history-exams.index')}}" 
             method="GET" 
             class="flex-1 flex flex-col md:flex-row gap-3 items-end"
         >
-            <!-- Search -->
-            <div class="relative flex-1 group">
-                <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors"></i>
-                <input 
-                    type="text" 
-                    name="search" 
-                    value="{{ $search ?? request('search') }}" 
-                    placeholder="Cari soal..." 
-                    class="w-full h-12 pl-11 pr-12 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all dark:text-white"
+            <!-- Select -->
+            <div class="w-full md:w-64">
+                <x-select 
+                    name="package_id" 
+                    label="Filter Sesuai paket" 
+                    inline
+                    class="h-12"
                 >
-                @if(!empty($search ?? request('search')))
-                    <a href="{{ route('bank-questions.index') }}" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors">
-                        <i class="ti ti-x"></i>
-                    </a>
-                @endif
+                    @foreach($packages as $data)
+                        <option value="{{ $data->id }}" {{ (int) ($packageId ?? 0) === $data->id ? 'selected' : '' }}>
+                            {{ $data->title }}
+                        </option>
+                    @endforeach
+                </x-select>
             </div>
 
             <!-- Select -->
             <div class="w-full md:w-64">
                 <x-select 
-                    name="type_id" 
-                    label="Filter Tipe Soal" 
+                    name="exam_id" 
+                    label="Filter Sesuai Ujian" 
                     inline
                     class="h-12"
                 >
-                    <option value="">Semua Tipe</option>
-                    @foreach($types as $type)
-                        <option value="{{ $type->id }}" {{ (int) ($typeId ?? 0) === $type->id ? 'selected' : '' }}>
-                            {{ $type->name_type }}
+                    @foreach($exams as $data)
+                        <option value="{{ $data->id }}" {{ (int) ($examId ?? 0) === $data->id ? 'selected' : '' }}>
+                            {{ $data->title }}
                         </option>
                     @endforeach
                 </x-select>
@@ -76,7 +74,8 @@
                 </x-button>
             </div>
         </form>
-    </div> --}}
+    </div>
+
 
     {{-- Main Data Card --}}
     <x-card :padding="false" title="Riwayat Ujian Anda">
@@ -97,37 +96,55 @@
                 <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
                     @forelse ($history as $data)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group">
-                            <td class="py-4 px-8">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300">
+                           <td class="py-4 px-8">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                                    bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
                                     {{ $data->Package->title ?? '-' }}
                                 </span>
                             </td>
+
                           
-                            <td class="py-4 px-8 text-center">
-                                <span class="inline-flex items-center justify-center rounded-lg font-bold text-sm ">
-                                    {{ strtoupper($data->Exam->title) }}
-                                </span>
+                            <td class="py-4 px-8">
+                                <div class="flex flex-col">
+                                    <span class="font-semibold text-sm text-gray-900 dark:text-white">
+                                        {{ $data->Exam->title }}
+                                    </span>
+                                    <span class="text-xs text-gray-400">
+                                        {{ $data->created_at->format('d M Y') }}
+                                    </span>
+                                </div>
                             </td>
+
                             <td class="py-4 px-8 text-center">
-                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm">
+                                <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold
+                                    bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
                                     {{ strtoupper($data->Type->name_type) }}
                                 </span>
                             </td>
-                            <td class="py-4 px-8 text-center">
-                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm">
-                                    {{ strtoupper($data->total_questions) }}
+
+                           <td class="py-4 px-8 text-center">
+                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                    {{ $data->total_questions }}
                                 </span>
                             </td>
+
                             <td class="py-4 px-8 text-center">
-                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm">
-                                    {{ strtoupper($data->questions_answered) }}
+                                <span class="inline-flex items-center gap-1 text-sm font-semibold
+                                    text-emerald-600 dark:text-emerald-400">
+                                    {{ $data->questions_answered }}
+                                    <span class="text-xs text-gray-400">
+                                        / {{ $data->total_questions }}
+                                    </span>
                                 </span>
                             </td>
+
                             <td class="py-4 px-8 text-center">
-                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm">
-                                    {{ strtoupper($data->total_score) }}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold
+                                    bg-yellow-100 text-yellow-800 dark:bg-yellow-500/10 dark:text-yellow-300">
+                                    {{ $data->total_score }} poin
                                 </span>
                             </td>
+
                             <td class="py-4 px-8 text-center">
                                 <div class="flex items-center justify-end gap-2">
                                     <x-button variant="primary" size="sm" href="{{ route('user.history-exams.detail', $data->id) }}" class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">
