@@ -32,10 +32,10 @@ class Sidebar extends Component
                     [
                         'name' => 'Dashboard',
                         'icon' => 'smart-home',
-                        'activePattern' => 'dashboard.*',
+                        'activePattern' => 'dashboard || user.not.active',
                         'subItems' => [
                             ['name' => 'Dashboard', 'route' => 'dashboard'],
-                            ['name' => 'Activation akun', 'route' => 'user.not.active'],
+                            ['name' => 'Aktivasi akun', 'route' => 'user.not.active'],
                         ]
                     ],
                     [
@@ -62,29 +62,29 @@ class Sidebar extends Component
                 ],
             ],
             [
-                'title' => 'Exams',
+                'title' => 'Pelatihan',
                 'items' => [
                     [
-                        'name' => 'Exams',
+                        'name' => 'Pelatihan',
                         'icon' => 'ti ti-id',
                         'activePattern' => 'exams.*|bank-questions.*|mapping-questions.*',
                         'subItems' => [
-                            ['name' => 'Exams', 'route' => 'exams.index'],
-                            ['name' => 'Bank Questions', 'route' => 'bank-questions.index'],
+                            ['name' => 'Pelatihan', 'route' => 'exams.index'],
+                            ['name' => 'Bank Soal', 'route' => 'bank-questions.index'],
                             ['name' => 'Mapping Soal', 'route' => 'mapping-questions.index'],
                         ]
                     ],
                 ],
             ],
             [
-                'title' => 'Result Grade',
+                'title' => 'Hasil',
                 'items' => [
                     [
-                        'name' => 'Result Grade',
+                        'name' => 'Hasil Nilai',
                         'icon' => 'ti ti-id',
                         'activePattern' => 'show-grades.*',
                         'subItems' => [
-                            ['name' => 'Result Grade', 'route' => 'show-grades.index'],
+                            ['name' => 'Nilai', 'route' => 'show-grades.index'],
                         ]
                     ],
                 ],

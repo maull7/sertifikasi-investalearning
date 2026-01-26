@@ -176,9 +176,12 @@
                                                         @endif
                                                     </div>
                                                     @if(($q->question_type ?? 'Text') === 'Image')
-                                                        <span class="inline-flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400">
-                                                            <i class="ti ti-photo"></i> Dengan Gambar
-                                                        </span>
+                                                        <a href="{{asset('storage/' . $q->question)}}"
+                                                           class="inline-flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400"
+                                                           target="_blank"
+                                                           >
+                                                            <i class="ti ti-photo"></i> Lihat Gambar
+                                                        </a>
                                                     @endif
                                                 </div>
                                             </td>
@@ -252,10 +255,19 @@
                                                     @if(($q->question_type ?? 'Text') === 'Text')
                                                         {!! \Illuminate\Support\Str::limit(strip_tags($q->question), 120) !!}
                                                     @else
+                                                    <div class="flex flex-col gap-2">
                                                         <span class="text-xs text-gray-500 dark:text-gray-400">
                                                             Soal berupa gambar.
-                                                        </span>
+                                                        </span>   
+                                                        <a href="{{asset('storage/' . $q->question)}}"
+                                                           class="inline-flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400"
+                                                           target="_blank"
+                                                           >
+                                                            <i class="ti ti-photo"></i> Lihat Gambar
+                                                        </a>
+                                                    </div>
                                                     @endif
+
                                                 </div>
                                             </div>
                                         </td>

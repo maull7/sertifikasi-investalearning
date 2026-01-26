@@ -63,7 +63,7 @@
                     <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Ujian / Exam</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Paket / Package</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Total Soal Terpilih</th>
+                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Total Soal Terpilih</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">Aksi</th>
                     </tr>
                 </thead>
