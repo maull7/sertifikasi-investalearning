@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\DetailResult;
 use App\Models\Exam;
 use App\Models\Package;
+use App\Models\TransQuestion;
 use App\Services\ExamService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -43,6 +45,17 @@ class ExamController extends Controller
                 'exam_title' => $exam->title,
             ]);
 
+            // Jika sudah 3 kali mengerjakan, redirect ke halaman review dengan kunci jawaban
+            if ($result['show_solutions'] ?? false) {
+                return response()->json([
+                    'redirect' => route('user.exams.review', [
+                        'package' => $package->id,
+                        'exam' => $exam->id,
+                        'trans' => $result['trans_question_id'],
+                    ]),
+                ]);
+            }
+
             return response()->json([
                 'redirect' => route('user.my-packages.show', $package->id),
             ]);
@@ -63,6 +76,8 @@ class ExamController extends Controller
 
         $mappingQuestions = $this->examService->getQuestionPage($user, $package, $exam, $page, $perPage);
 
+        // Jangan kirim kunci jawaban saat mengerjakan ujian (meskipun sudah 3x)
+        // Kunci jawaban hanya muncul di halaman review setelah submit
         $questions = $mappingQuestions->map(function ($mapping) {
             $question = $mapping->questionBank;
             return [
@@ -80,6 +95,11 @@ class ExamController extends Controller
                 'option_c' => $question->option_c,
                 'option_d' => $question->option_d,
                 'type' => $question->type ? $question->type->name_type : null,
+                // Tidak kirim kunci jawaban saat mengerjakan ujian
+                'show_solutions' => false,
+                'correct_answer' => null,
+                'explanation' => null,
+                'solution' => null,
             ];
         });
 
@@ -90,5 +110,29 @@ class ExamController extends Controller
             'total' => $mappingQuestions->total(),
             'has_more' => $mappingQuestions->hasMorePages(),
         ]);
+    }
+
+    public function review(Request $request, Package $package, Exam $exam, TransQuestion $trans): View
+    {
+        $user = Auth::user();
+
+        // Pastikan trans_question milik user yang sedang login
+        if ($trans->id_user !== $user->id) {
+            abort(403, 'Anda tidak memiliki akses ke hasil ujian ini.');
+        }
+
+        // Pastikan trans_question sesuai dengan package dan exam
+        if ($trans->id_package !== $package->id || $trans->id_exam !== $exam->id) {
+            abort(404, 'Hasil ujian tidak ditemukan.');
+        }
+
+        // Ambil detail hasil dengan pagination (1 soal per halaman)
+        $detailResults = DetailResult::with('Question.type')
+            ->where('id_trans_question', $trans->id)
+            ->orderBy('id')
+            ->paginate(1)
+            ->withQueryString();
+
+        return view('user.exams.review', compact('package', 'exam', 'trans', 'detailResults'));
     }
 }

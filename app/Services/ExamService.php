@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Exam;
 use App\Models\Package;
+use App\Models\TransQuestion;
 use App\Models\User;
 use App\Repositories\Contracts\ExamRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -109,11 +110,20 @@ class ExamService
 
             DB::commit();
 
+            // Hitung jumlah attempt setelah submit (termasuk yang baru saja dibuat)
+            $attemptCount = TransQuestion::where('id_user', $user->id)
+                ->where('id_exam', $exam->id)
+                ->count();
+
+            $showSolutions = $attemptCount >= 3;
+
             return [
                 'score' => $score,
                 'correct' => $correctAnswers,
                 'total' => $totalQuestions,
                 'status' => $status,
+                'trans_question_id' => $trans->id,
+                'show_solutions' => $showSolutions,
             ];
         } catch (\Throwable $e) {
             DB::rollBack();

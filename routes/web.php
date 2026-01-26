@@ -51,6 +51,7 @@ Route::middleware('auth', 'akun-active')->group(function () {
     Route::get('user/packages/{package}/exams/{exam}', [UserExamController::class, 'show'])->name('user.exams.show');
     Route::get('user/packages/{package}/exams/{exam}/questions', [UserExamController::class, 'getQuestions'])->name('user.exams.questions');
     Route::post('user/packages/{package}/exams/{exam}/submit', [UserExamController::class, 'submit'])->name('user.exams.submit');
+    Route::get('user/packages/{package}/exams/{exam}/review/{trans}', [UserExamController::class, 'review'])->name('user.exams.review');
     // Material preview & download (accessible for users who joined the package)
     Route::get('master-materials/{id}/preview', [MasterMaterialController::class, 'serveFile'])
         ->name('master-materials.preview');

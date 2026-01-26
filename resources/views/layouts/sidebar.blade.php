@@ -59,7 +59,7 @@
                 <span class="font-bold text-lg dark:text-white leading-none">
                     In<span class="text-indigo-600 dark:text-white">ves</span>ta
                 </span>
-                <span class="text-sm font-semibold text-gray-400">LMS Investalearning</span>
+                <span class="text-sm font-semibold text-gray-400">Sertifikasi Pelatihan</span>
             </div>
         </a>
     </div>

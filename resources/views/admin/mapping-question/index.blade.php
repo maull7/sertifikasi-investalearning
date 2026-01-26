@@ -230,9 +230,14 @@
                                                 @if(($q->question_type ?? 'Text') === 'Text')
                                                     {!! \Illuminate\Support\Str::limit(strip_tags($q->question), 120) !!}
                                                 @else
+                                                <div class="flex flex-col gap-2">
                                                     <span class="text-xs text-gray-500 dark:text-gray-400">
                                                         Soal berupa gambar.
                                                     </span>
+                                                    <a href="{{asset('storage/' . $q->question)}}" target="_blank" class="text-xs text-sky-800 dark:text-gray-400 underline decoration-solid">
+                                                        Lihat soal gambar
+                                                    </a>
+                                                </div>
                                                 @endif
                                             </div>
                                         </div>
