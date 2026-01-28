@@ -21,11 +21,10 @@ class Subject extends Model
     {
         return $this->belongsTo(MasterType::class, 'master_type_id');
     }
+
     public function materials()
     {
         return $this->hasMany(Material::class, 'id_subject');
     }
 }
-
-
 

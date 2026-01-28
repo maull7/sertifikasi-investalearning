@@ -14,11 +14,11 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        //info info
+        // info info
         $totalPackages = UserJoin::where('user_id', $user->id)->count();
         $totalExams = TransQuestion::where('id_user', $user->id)->count();
 
-        //paket di ikuti
+        // paket di ikuti
         $packageFollow = UserJoin::where('user_id', $user->id)
             ->with('package')
             ->get();
@@ -32,7 +32,6 @@ class DashboardController extends Controller
         // ===== DUMMY STATS =====
         $completedMaterials = 12;
         $avgProgress = 65;
-
 
         // ===== DUMMY ACTIVE PACKAGES =====
         $activePackages = collect([
@@ -75,6 +74,4 @@ class DashboardController extends Controller
         ));
     }
 }
-
-
 

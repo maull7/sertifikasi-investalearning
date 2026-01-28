@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
+use App\Models\DetailResult;
 use App\Models\Exam;
 use App\Models\Package;
-use Illuminate\Http\Request;
-use App\Models\DetailResult;
 use App\Models\TransQuestion;
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
 class ShowGradeController extends Controller
 {
@@ -29,7 +29,7 @@ class ShowGradeController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString(); // biar pagination tetep bawa filter
-        
+
         // Chart data: hanya ditampilkan jika ada filter yang diterapkan
         $chartData = collect();
         if ($packageId || $examId) {
@@ -53,6 +53,7 @@ class ShowGradeController extends Controller
         $historyDetail = DetailResult::with('Question', 'TransQuestion')
             ->where('id_trans_question', $id)
             ->paginate(10);
+
         return view('admin.show-grade.detail', compact('historyDetail'));
     }
 }

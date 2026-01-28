@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('exams', function (Blueprint $table) {
-            $table->unsignedInteger('total_questions')
-                ->nullable()
-                ->after('passing_grade');
+        Schema::create('teachers', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('nip');
+            $table->string('email');
+            $table->timestamps();
         });
     }
 
@@ -23,9 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('exams', function (Blueprint $table) {
-            $table->dropColumn('total_questions');
-        });
+        Schema::dropIfExists('teachers');
     }
 };
-

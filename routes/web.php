@@ -1,23 +1,25 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\ExamController;
-use App\Http\Controllers\Admin\SubjectController;
-use App\Http\Controllers\User\MyPackageController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\ShowGradeController;
-use App\Http\Controllers\User\HistoryExamController;
-use App\Http\Controllers\Admin\MasterTypesController;
 use App\Http\Controllers\Admin\BankQuestionController;
+use App\Http\Controllers\Admin\CertificateController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailActivation;
-use App\Http\Controllers\Admin\MasterPackegeController;
-use App\Http\Controllers\Admin\MasterMaterialController;
+use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\MappingQuestionController;
-use App\Http\Controllers\User\ExamController as UserExamController;
-use App\Http\Controllers\User\PackageController as UserPackageController;
+use App\Http\Controllers\Admin\MasterMaterialController;
+use App\Http\Controllers\Admin\MasterPackegeController;
+use App\Http\Controllers\Admin\MasterTypesController;
+use App\Http\Controllers\Admin\ShowGradeController;
+use App\Http\Controllers\Admin\SubjectController;
+use App\Http\Controllers\Admin\TeacherController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\User\CertificateControlller;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
-
+use App\Http\Controllers\User\ExamController as UserExamController;
+use App\Http\Controllers\User\HistoryExamController;
+use App\Http\Controllers\User\MyPackageController;
+use App\Http\Controllers\User\PackageController as UserPackageController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('index');
@@ -63,6 +65,12 @@ Route::middleware('auth', 'akun-active')->group(function () {
         ->name('user.history-exams.index');
     Route::get('user/history-exams/{id}/detail', [HistoryExamController::class, 'detail'])
         ->name('user.history-exams.detail');
+
+    //Certificate User
+    Route::get('user/my-certificate', [CertificateControlller::class, 'index'])->name('user.certificate.index');
+    Route::get('user/my-certificate/{certificate}', [CertificateControlller::class, 'detail'])->name('user.certificate.show');
+    Route::get('certificates/{certificate}/download', [CertificateController::class, 'download'])
+        ->name('certificates.download');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -108,7 +116,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('bank-questions.import');
     Route::resource('bank-questions', BankQuestionController::class);
 
-
     // Show Grade routes
     Route::get('show-grades', [ShowGradeController::class, 'index'])
         ->name('show-grades.index');
@@ -119,6 +126,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('user-not-activation', [EmailActivation::class, 'index'])->name('user.not.active');
     Route::patch('users/{user}/activate', [EmailActivation::class, 'activate'])
         ->name('user.activate');
+
+    // Teacher
+    Route::resource('teacher', TeacherController::class);
+
+    // Certificates
+    Route::get('/get-package/{type}', [CertificateController::class, 'getPackage'])->name('get-package.type');
+
+    Route::resource('certificates', CertificateController::class)->only(['index', 'create', 'store', 'show']);
 });
 
 require __DIR__ . '/auth.php';

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\AktivasiAkunNotification;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class EmailActivation extends Controller
@@ -29,15 +30,14 @@ class EmailActivation extends Controller
     }
 
     // 👇 FUNGSI AKTIVASI + KIRIM EMAIL
-    public function activate(User $user)
+    public function activate(User $user): RedirectResponse
     {
-        // kirim email
-        $user->notify(new AktivasiAkunNotification());
-
-        // update status user
         $user->update([
-            'status_user' => 'Teraktivasi'
+            'status_user' => 'Teraktivasi',
         ]);
+
+        // kirim email
+        $user->notify(new AktivasiAkunNotification);
 
         return back()->with('success', 'Email aktivasi berhasil dikirim & user diaktifkan');
     }

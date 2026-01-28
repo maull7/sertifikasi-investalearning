@@ -3,7 +3,6 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\Exam;
-use App\Models\MappingQuestion;
 use App\Models\Package;
 use App\Models\TransQuestion;
 use App\Models\User;
@@ -29,6 +28,4 @@ interface ExamRepositoryInterface
 
     public function createDetailResult(TransQuestion $trans, int $questionId, ?string $userAnswer, ?string $correctAnswer, float $scoreObtained): void;
 }
-
-
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -28,7 +29,7 @@ class User extends Authenticatable
         'tanggal_lahir',
         'institusi',
         'alamat',
-        'status_user'
+        'status_user',
     ];
 
     /**
@@ -57,5 +58,15 @@ class User extends Authenticatable
     public function joinedPackages()
     {
         return $this->hasMany(UserJoin::class, 'user_id');
+    }
+
+    public function transQuestions(): HasMany
+    {
+        return $this->hasMany(TransQuestion::class, 'id_user');
+    }
+
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class, 'id_user');
     }
 }

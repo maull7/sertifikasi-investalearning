@@ -148,20 +148,14 @@ class BankQuestionController extends Controller
                 $errorMessages = [];
                 foreach ($failures as $failure) {
                     $errorMessages[] = "Baris {$failure->row()}: " . implode(', ', $failure->errors());
-                }
-
-                return redirect()->route('bank-questions.index')
+                }                return redirect()->route('bank-questions.index')
                     ->with('error', 'Import gagal dengan error: ' . implode(' | ', $errorMessages));
-            }
-
-            // Check for custom errors
+            }            // Check for custom errors
             $customErrors = $import->getErrors();
             if (!empty($customErrors)) {
                 return redirect()->route('bank-questions.index')
                     ->with('error', 'Import gagal: ' . implode(' | ', $customErrors));
-            }
-
-            return redirect()->route('bank-questions.index')
+            }            return redirect()->route('bank-questions.index')
                 ->with('success', 'Soal berhasil diimport dari Excel!');
         } catch (\Exception $e) {
             return redirect()->route('bank-questions.index')
