@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Exam;
+use App\Models\MasterType;
 use App\Models\Package;
 use App\Models\TransQuestion;
 use App\Models\UserJoin;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
@@ -21,6 +26,23 @@ class DashboardController extends Controller
         // paket di ikuti
         $packageFollow = UserJoin::where('user_id', $user->id)
             ->with('package')
+            ->get();
+
+        $types = MasterType::query()->orderBy('name_type')->get();
+
+        // daftar paket untuk filter chart (hanya paket yang diikuti user)
+        $joinedPackageIds = UserJoin::query()
+            ->where('user_id', $user->id)
+            ->pluck('id_package');
+
+        $packagesForFilter = Package::query()
+            ->whereIn('id', $joinedPackageIds)
+            ->orderBy('title')
+            ->get();
+
+        $examsForFilter = Exam::query()
+            ->whereIn('package_id', $joinedPackageIds)
+            ->orderBy('title')
             ->get();
 
         $packageActive = Package::where('status', 'active')
@@ -70,8 +92,55 @@ class DashboardController extends Controller
             'totalPackages',
             'totalExams',
             'packageFollow',
-            'packageActive'
+            'packageActive',
+            'types',
+            'packagesForFilter',
+            'examsForFilter'
         ));
+    }
+
+    public function getChartData(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+
+        $typeId = $request->integer('type_id') ?: null;
+        $packageId = $request->integer('package_id') ?: null;
+        $examId = $request->integer('exam_id') ?: null;
+        $periodDays = $request->integer('period_days') ?: null;
+
+        // keamanan: hanya izinkan paket yang memang diikuti user
+        $joinedPackageIds = UserJoin::query()
+            ->where('user_id', $user->id)
+            ->pluck('id_package')
+            ->all();
+
+        $query = TransQuestion::query()
+            ->where('id_user', $user->id)
+            ->whereIn('id_package', $joinedPackageIds)
+            ->when($typeId, fn ($q) => $q->where('id_type', $typeId))
+            ->when($packageId, fn ($q) => $q->where('id_package', $packageId))
+            ->when($examId, fn ($q) => $q->where('id_exam', $examId))
+            ->when($periodDays, function ($q) use ($periodDays) {
+                $q->where('created_at', '>=', Carbon::now()->subDays($periodDays));
+            })
+            ->orderBy('created_at')
+            ->limit(30);
+
+        $rows = $query
+            ->with(['Package', 'Type', 'Exam'])
+            ->get(['created_at', 'total_score', 'id_package', 'id_type', 'id_exam']);
+
+        $chartData = $rows->values()->map(function (TransQuestion $row, int $idx) {
+            return [
+                'label' => 'Attempt ' . ($idx + 1) . ' • ' . $row->created_at?->format('d M Y H:i'),
+                'score' => (float) $row->total_score,
+                'type' => $row->Type?->name_type ?? '-',
+                'package' => $row->Package?->title ?? '-',
+                'exam' => $row->Exam?->title ?? '-',
+            ];
+        });
+
+        return response()->json($chartData);
     }
 }
 

@@ -161,6 +161,16 @@
                         />
                     </div>
 
+                    {{-- reCAPTCHA (non-local only) --}}
+                    @if (! app()->environment('local'))
+                        <div>
+                            <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                            @error('g-recaptcha-response')
+                                <p class="mt-2 text-xs text-rose-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endif
+
                   
 
                     {{-- ACTION BUTTONS --}}
@@ -185,4 +195,7 @@
         </p>
     </div>
 </div>
+@if (! app()->environment('local'))
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+@endif
 @endsection

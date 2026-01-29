@@ -63,6 +63,43 @@
         @endforeach
     </div>
 
+    {{-- Ringkasan Ujian & User --}}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        <x-card>
+            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Pass Rate Ujian</p>
+            <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                {{ number_format($passRate ?? 0, 1) }}%
+            </p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                {{ $totalExamsPassed ?? 0 }} dari {{ $totalExamsTaken ?? 0 }} attempt dinyatakan lulus.
+            </p>
+        </x-card>
+        <x-card>
+            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">User Baru</p>
+            <div class="flex items-baseline gap-4">
+                <div>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400">7 hari terakhir</p>
+                    <p class="text-xl font-bold text-gray-900 dark:text-white">{{ $newUsers7 ?? 0 }}</p>
+                </div>
+                <div>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400">30 hari terakhir</p>
+                    <p class="text-xl font-bold text-gray-900 dark:text-white">{{ $newUsers30 ?? 0 }}</p>
+                </div>
+            </div>
+        </x-card>
+        <x-card>
+            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">User Belum Aktivasi</p>
+            <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                {{ $pendingActivation ?? 0 }}
+            </p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <a href="{{ route('user.not.active') }}" class="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
+                    Lihat daftar user belum aktif
+                </a>
+            </p>
+        </x-card>
+    </div>
+
     {{-- Charts & Activity Section --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
@@ -144,6 +181,10 @@
                             <p class="text-[10px] text-black font-bold">{{ $recent->Exam->title }}</p>
                             <p class="text-sm font-bold text-gray-900 dark:text-white">{{ $recent->total_score }}</p>
                             <p class="text-[10px] text-emerald-500 font-bold">{{ $recent->status }}</p>
+                            <a href="{{ route('show-grades.detail', $recent->id) }}"
+                               class="mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
+                                Detail
+                            </a>
                         </div>
                     </div>
                 @empty
@@ -153,6 +194,35 @@
             </div>
 
           
+        </x-card>
+
+        {{-- Recent Certificates --}}
+        <x-card title="Sertifikat Terbaru" class="mt-6">
+            <div class="space-y-4">
+                @forelse($recentCertificates ?? [] as $cert)
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                                {{ $cert->user?->name ?? 'User' }}
+                            </p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                {{ $cert->package?->title ?? '-' }} • {{ $cert->type?->name_type ?? '-' }}
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[11px] text-gray-400">
+                                {{ $cert->created_at?->format('d M Y') }}
+                            </p>
+                            <a href="{{ route('certificates.show', $cert) }}"
+                               class="mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                                Lihat
+                            </a>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada sertifikat yang dibuat.</p>
+                @endforelse
+            </div>
         </x-card>
 
     </div>

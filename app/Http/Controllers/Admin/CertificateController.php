@@ -135,6 +135,11 @@ class CertificateController extends Controller
 
     public function download(Certificate $certificate)
     {
+        $user = auth()->user();
+        if ($user && $user->role !== 'Admin' && (int) $certificate->id_user !== (int) $user->id) {
+            abort(403);
+        }
+
         $certificate->load([
             'user',
             'package.materials',
@@ -178,5 +183,16 @@ class CertificateController extends Controller
     {
         return $type->packages()
             ->get();
+    }
+
+    public function verify(Certificate $certificate): View
+    {
+        $certificate->load([
+            'user',
+            'package',
+            'type',
+        ]);
+
+        return view('certificates.verify', compact('certificate'));
     }
 }

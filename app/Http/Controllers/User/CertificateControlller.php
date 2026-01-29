@@ -18,6 +18,10 @@ class CertificateControlller extends Controller
     }
     public function detail(Certificate $certificate)
     {
+        if ((int) $certificate->id_user !== (int) Auth::id()) {
+            abort(403);
+        }
+
         $certificate->load([
             'user',
             'package.materials',

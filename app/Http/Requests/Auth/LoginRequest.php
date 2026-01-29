@@ -5,6 +5,7 @@ namespace App\Http\Requests\Auth;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -26,10 +27,16 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
         ];
+
+        if (! app()->environment('local')) {
+            $rules['g-recaptcha-response'] = ['required', 'string'];
+        }
+
+        return $rules;
     }
 
     /**
@@ -39,6 +46,10 @@ class LoginRequest extends FormRequest
      */
     public function authenticate(): void
     {
+        if (! app()->environment('local')) {
+            $this->verifyRecaptcha();
+        }
+
         $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
@@ -50,6 +61,30 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+    }
+
+    protected function verifyRecaptcha(): void
+    {
+        $token = $this->string('g-recaptcha-response');
+        $secret = config('services.recaptcha.secret_key');
+
+        if (empty($secret) || $token->isEmpty()) {
+            throw ValidationException::withMessages([
+                'g-recaptcha-response' => 'Verifikasi captcha gagal, silakan coba lagi.',
+            ]);
+        }
+
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => $secret,
+            'response' => $token->toString(),
+            'remoteip' => $this->ip(),
+        ]);
+
+        if (! $response->json('success')) {
+            throw ValidationException::withMessages([
+                'g-recaptcha-response' => 'Verifikasi captcha gagal, silakan coba lagi.',
+            ]);
+        }
     }
 
     /**

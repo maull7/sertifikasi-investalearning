@@ -41,6 +41,17 @@
             align-items: center;
         }
 
+        .qr-box {
+            text-align: right;
+            font-size: 9px;
+            color: #6b7280;
+        }
+
+        .qr-box img {
+            height: 70px;
+            width: 70px;
+        }
+
         .logo-box {
             display: flex;
             align-items: center;
@@ -306,6 +317,16 @@
                             CERT-{{ str_pad((string) $certificate->id, 6, '0', STR_PAD_LEFT) }}
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="mt-large">
+                <div class="qr-box">
+                    @php
+                        $verifyUrl = route('certificates.verify', $certificate);
+                    @endphp
+                    <div>Scan untuk verifikasi sertifikat:</div>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ urlencode($verifyUrl) }}" alt="QR Verifikasi">
                 </div>
             </div>
 
