@@ -2,11 +2,11 @@
 
 namespace App\Repositories;
 
+use App\Models\DetailResult;
 use App\Models\Exam;
 use App\Models\MappingQuestion;
 use App\Models\Package;
 use App\Models\TransQuestion;
-use App\Models\DetailResult;
 use App\Models\User;
 use App\Repositories\Contracts\ExamRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -86,6 +86,4 @@ class ExamRepository implements ExamRepositoryInterface
         ]);
     }
 }
-
-
 

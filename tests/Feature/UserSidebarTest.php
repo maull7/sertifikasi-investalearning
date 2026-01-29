@@ -23,11 +23,3 @@ class UserSidebarTest extends TestCase
     }
 }
 
-
-
-
-
-
-
-
-

@@ -13,23 +13,67 @@
     </div>
 
     {{-- Search Section --}}
-    <div class="flex flex-col md:flex-row gap-4">
-        <form action="{{ route('user.packages.index') }}" method="GET" class="relative flex-1 group">
-            <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors"></i>
-            <input 
-                type="text" 
-                name="search" 
-                value="{{ request('search') }}" 
-                placeholder="Cari package..." 
-                class="w-full pl-11 pr-12 py-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all dark:text-white"
+        <div class="flex flex-col md:flex-row gap-4">
+            <form 
+                action="{{ route('user.packages.index') }}" 
+                method="GET" 
+                class="flex flex-col md:flex-row items-stretch gap-3 w-full"
             >
-            @if(request('search'))
-                <a href="{{ route('user.packages.index') }}" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors">
-                    <i class="ti ti-x"></i>
-                </a>
-            @endif
-        </form>
-    </div>
+
+            {{-- SEARCH --}}
+                <div class="relative flex-1 group">
+                    <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors"></i>
+                    <input 
+                        type="text" 
+                        name="search" 
+                        value="{{ request('search') }}" 
+                        placeholder="Cari package..." 
+                        class="w-full pl-11 pr-12 py-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all dark:text-white h-12"
+                    >
+
+                    @if(request('search'))
+                        <a 
+                            href="{{ route('user.packages.index', request()->except('search')) }}" 
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors"
+                        >
+                            <i class="ti ti-x"></i>
+                        </a>
+                    @endif
+                </div>
+
+                {{-- SELECT --}}
+                <div class="w-full md:w-64">
+                    <x-select 
+                        name="id_type" 
+                        inline
+                        class="h-12"
+                    >
+                        <option value="">Semua Tipe</option>
+                        @foreach($types as $type)
+                            <option 
+                                value="{{ $type->id }}" 
+                                {{ (int) request('id_type') === $type->id ? 'selected' : '' }}
+                            >
+                                {{ $type->name_type }}
+                            </option>
+                        @endforeach
+                    </x-select>
+                </div>
+
+                {{-- BUTTON --}}
+                <div class="flex">
+                    <x-button 
+                        type="submit" 
+                        variant="primary" 
+                        class="h-12 px-6 rounded-xl w-full md:w-auto"
+                    >
+                        Terapkan
+                    </x-button>
+                </div>
+
+            </form>
+        </div>
+
 
     {{-- Packages Grid --}}
     @if($packages->count() > 0)
@@ -123,6 +167,9 @@
     @endif
 </div>
 @endsection
+
+
+
 
 
 

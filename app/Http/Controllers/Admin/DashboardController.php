@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Certificate;
 use App\Models\MasterType;
 use App\Models\Material;
 use App\Models\Package;
 use App\Models\TransQuestion;
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -32,11 +33,48 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Exam summary metrics
+        $totalExamsTaken = TransQuestion::count();
+        $totalExamsPassed = TransQuestion::where('status', 'lulus')->count();
+        $passRate = $totalExamsTaken > 0 ? round(($totalExamsPassed / $totalExamsTaken) * 100, 1) : 0.0;
+
+        // User growth & activation
+        $newUsers7 = User::where('role', 'User')
+            ->where('created_at', '>=', now()->subDays(7))
+            ->count();
+
+        $newUsers30 = User::where('role', 'User')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->count();
+
+        $pendingActivation = User::where('role', 'User')
+            ->where('status_user', 'Belum Teraktivasi')
+            ->count();
+
+        // Recent certificates
+        $recentCertificates = Certificate::query()
+            ->with(['user', 'package', 'type'])
+            ->latest()
+            ->take(5)
+            ->get();
+
         // Data untuk chart - Get all types and packages
         $typesData = MasterType::all();
         $packagesData = Package::all();
 
-        return view('dashboard.index', compact('data', 'recents', 'typesData', 'packagesData'));
+        return view('dashboard.index', compact(
+            'data',
+            'recents',
+            'typesData',
+            'packagesData',
+            'totalExamsTaken',
+            'totalExamsPassed',
+            'passRate',
+            'newUsers7',
+            'newUsers30',
+            'pendingActivation',
+            'recentCertificates'
+        ));
     }
 
     // API endpoint untuk data chart
