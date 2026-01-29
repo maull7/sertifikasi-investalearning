@@ -23,34 +23,33 @@
                 @method('PUT')
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="text-xs font-semibold text-gray-500 dark:text-gray-400">Nama Pengajar</label>
-                        <input type="text" name="name" value="{{ old('name', $teacher->name) }}"
-                            class="mt-2 w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
-                        @error('name')
-                            <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
-                        @enderror
-                    </div>
+                     <x-input 
+                        label="Nama Pengajar" 
+                        name="name" 
+                        placeholder="Masukkan nama pengajar" 
+                        value="{{ old('name',$teacher->name) }}"
+                        required 
+                    />
 
-                    <div>
-                        <label class="text-xs font-semibold text-gray-500 dark:text-gray-400">NIP</label>
-                        <input type="text" name="nip" value="{{ old('nip', $teacher->nip) }}"
-                            class="mt-2 w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
-                        @error('nip')
-                            <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
-                        @enderror
-                    </div>
+                     <x-input 
+                        label="NIP Pengajar" 
+                        name="nip" 
+                        placeholder="Masukkan nip pengajar" 
+                        value="{{ old('nip', $teacher->nip) }}"
+                        required 
+                    />
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="text-xs font-semibold text-gray-500 dark:text-gray-400">Email</label>
-                        <input type="email" name="email" value="{{ old('email', $teacher->email) }}"
-                            class="mt-2 w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
-                        @error('email')
-                            <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
-                        @enderror
-                    </div>
+                     <x-input 
+                        label="Email Pengajar" 
+                        type="email"
+                        name="email" 
+                        placeholder="Email nama pengajar" 
+                        value="{{ old('email', $teacher->email) }}"
+                        required 
+                    />
+                   
                 </div>
 
                 <div class="flex justify-end">
