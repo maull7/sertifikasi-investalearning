@@ -74,19 +74,22 @@
                                     <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider whitespace-nowrap">Peserta</th>
                                     <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center whitespace-nowrap">Status Ujian</th>
                                     <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center whitespace-nowrap">Sertifikat</th>
+                                    <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider whitespace-nowrap">Nomor Sertifikat</th>
+                                    <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider whitespace-nowrap">Tanggal Pelatihan</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
-                                @forelse($users as $user)
+                                @forelse($users as $index => $user)
                                     @php
                                         $attemptCount = (int) ($user->attempt_count ?? 0);
                                         $certificateCount = (int) ($user->certificate_count ?? 0);
                                         $hasAttempt = $attemptCount > 0;
                                     @endphp
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors">
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors" x-data="{ selected: false }">
                                         <td class="py-3 px-4 sm:px-6">
                                             <input type="checkbox" name="user_ids[]" value="{{ $user->id }}"
                                                 @disabled(!$hasAttempt || $certificateCount > 0)
+                                                @change="selected = $event.target.checked"
                                                 class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-40 user-checkbox">
                                         </td>
                                         <td class="py-3 px-4 sm:px-6">
@@ -121,10 +124,39 @@
                                                 </span>
                                             @endif
                                         </td>
+                                        <td class="py-3 px-4 sm:px-6">
+                                            <div x-show="selected" x-cloak>
+                                                <input type="text" 
+                                                    name="certificate_numbers[{{ $user->id }}]" 
+                                                    placeholder="Nomor Sertifikat"
+                                                    class="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                                    required>
+                                            </div>
+                                            <span x-show="!selected" class="text-xs text-gray-400">-</span>
+                                        </td>
+                                        <td class="py-3 px-4 sm:px-6">
+                                            <div x-show="selected" x-cloak class="flex flex-col gap-2">
+                                                <div>
+                                                    <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Tanggal Mulai</label>
+                                                    <input type="date" 
+                                                        name="training_date_starts[{{ $user->id }}]" 
+                                                        class="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                                        required>
+                                                </div>
+                                                <div>
+                                                    <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Tanggal Selesai</label>
+                                                    <input type="date" 
+                                                        name="training_date_ends[{{ $user->id }}]" 
+                                                        class="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                                        required>
+                                                </div>
+                                            </div>
+                                            <span x-show="!selected" class="text-xs text-gray-400">-</span>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="py-24">
+                                        <td colspan="6" class="py-24">
                                             <div class="flex flex-col items-center justify-center text-center max-w-[320px] mx-auto">
                                                 <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
                                                     <i class="ti ti-users-off text-2xl text-gray-400"></i>
@@ -149,9 +181,48 @@
                                 const checked = Array.from($el.closest('form').querySelectorAll('.user-checkbox:checked'));
                                 if (checked.length === 0) {
                                     alert('Pilih minimal satu peserta terlebih dahulu.');
-                                } else {
-                                    teacherModalOpen = true;
+                                    return;
                                 }
+                                
+                                // Validasi nomor sertifikat dan tanggal pelatihan untuk setiap peserta yang dipilih
+                                let isValid = true;
+                                let missingFields = [];
+                                
+                                checked.forEach(checkbox => {
+                                    const userId = checkbox.value;
+                                    const certNumber = $el.closest('form').querySelector(`input[name='certificate_numbers[${userId}]']`);
+                                    const trainingDateStart = $el.closest('form').querySelector(`input[name='training_date_starts[${userId}]']`);
+                                    const trainingDateEnd = $el.closest('form').querySelector(`input[name='training_date_ends[${userId}]']`);
+                                    
+                                    if (!certNumber || !certNumber.value.trim()) {
+                                        isValid = false;
+                                        missingFields.push('Nomor Sertifikat');
+                                    }
+                                    if (!trainingDateStart || !trainingDateStart.value.trim()) {
+                                        isValid = false;
+                                        missingFields.push('Tanggal Mulai Pelatihan');
+                                    }
+                                    if (!trainingDateEnd || !trainingDateEnd.value.trim()) {
+                                        isValid = false;
+                                        missingFields.push('Tanggal Selesai Pelatihan');
+                                    }
+                                    
+                                    // Validasi tanggal selesai harus setelah atau sama dengan tanggal mulai
+                                    if (trainingDateStart && trainingDateEnd && trainingDateStart.value && trainingDateEnd.value) {
+                                        if (new Date(trainingDateEnd.value) < new Date(trainingDateStart.value)) {
+                                            isValid = false;
+                                            alert(`Tanggal selesai harus setelah atau sama dengan tanggal mulai untuk peserta ${userId}.`);
+                                            return;
+                                        }
+                                    }
+                                });
+                                
+                                if (!isValid) {
+                                    alert('Mohon lengkapi Nomor Sertifikat, Tanggal Mulai, dan Tanggal Selesai Pelatihan untuk semua peserta yang dipilih.');
+                                    return;
+                                }
+                                
+                                teacherModalOpen = true;
                             ">
                             Simpan Sertifikat
                         </x-button>
