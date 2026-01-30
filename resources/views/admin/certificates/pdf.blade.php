@@ -43,12 +43,29 @@
             flex-direction: column;
         }
 
+<<<<<<< HEAD
         /* HEADER STYLES */
         .header-brand {
             display: table;
             width: 100%;
             margin-bottom: 15px;
             table-layout: fixed;
+=======
+        .qr-box {
+            text-align: right;
+            font-size: 9px;
+            color: #6b7280;
+        }
+
+        .qr-box img {
+            height: 70px;
+            width: 70px;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+>>>>>>> 273ffd0f80f68914a7a41fa0a1280da68866bd31
         }
 
         .header-left,
@@ -391,6 +408,7 @@
 
                 <div class="participant-line"></div>
 
+<<<<<<< HEAD
                 <div class="participant-desc">
                     As Participant In Examination Prepation Training of<br>
                     <strong>"{{ $certificate->type?->name_type ?? '-' }}"</strong><br>
@@ -401,6 +419,22 @@
                     @else
                         Jakarta, 12 - 14 Month Years
                     @endif
+=======
+            <div class="mt-large">
+                <div class="qr-box">
+                    @php
+                        $verifyUrl = route('certificates.verify', $certificate);
+                    @endphp
+                    <div>Scan untuk verifikasi sertifikat:</div>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ urlencode($verifyUrl) }}" alt="QR Verifikasi">
+                </div>
+            </div>
+
+            <div class="sign-row">
+                <div class="sign-col">
+                    <div class="sign-line"></div>
+                    <div class="sign-label">Tanda Tangan</div>
+>>>>>>> 273ffd0f80f68914a7a41fa0a1280da68866bd31
                 </div>
 
                 <div class="signatures">

@@ -29,9 +29,16 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'admin'])
     ->name('dashboard');
 
+// Public certificate verification
+Route::get('certificates/{certificate}/verify', [CertificateController::class, 'verify'])
+    ->name('certificates.verify');
+
 Route::get('/user/dashboard', [UserDashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('user.dashboard');
+Route::get('/user/dashboard/chart-data', [UserDashboardController::class, 'getChartData'])
+    ->middleware(['auth', 'verified'])
+    ->name('user.dashboard.chart-data');
 // Chart Data API
 Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
 
