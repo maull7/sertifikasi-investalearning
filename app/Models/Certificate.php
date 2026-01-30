@@ -15,6 +15,9 @@ class Certificate extends Model
         'id_user',
         'id_package',
         'id_master_type',
+        'certificate_number',
+        'training_date_start',
+        'training_date_end',
     ];
 
     public function user(): BelongsTo

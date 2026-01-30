@@ -98,18 +98,27 @@ class CertificateController extends Controller
         $packageId = (int) $request->validated('id_package');
         /** @var array<int, int> $userIds */
         $userIds = $request->validated('user_ids');
+        /** @var array<string|null> $certificateNumbers */
+        $certificateNumbers = $request->validated('certificate_numbers', []);
+        /** @var array<string|null> $trainingDateStarts */
+        $trainingDateStarts = $request->validated('training_date_starts', []);
+        /** @var array<string|null> $trainingDateEnds */
+        $trainingDateEnds = $request->validated('training_date_ends', []);
         /** @var array<int, int> $teacherIds */
         $teacherIds = $request->validated('teacher_ids');
 
         foreach ($userIds as $userId) {
-            $certificate = Certificate::firstOrCreate([
+            $certificate = Certificate::create([
                 'id_user' => $userId,
                 'id_package' => $packageId,
                 'id_master_type' => $typeId,
+                'certificate_number' => $certificateNumbers[$userId] ?? null,
+                'training_date_start' => $trainingDateStarts[$userId] ?? null,
+                'training_date_end' => $trainingDateEnds[$userId] ?? null,
             ]);
 
             foreach ($teacherIds as $teacherId) {
-                DetailCertificate::firstOrCreate([
+                DetailCertificate::create([
                     'id_certificate' => $certificate->id,
                     'id_teacher' => $teacherId,
                 ]);
@@ -147,14 +156,13 @@ class CertificateController extends Controller
             'teachers',
         ]);
 
-        $fileName = 'sertifikat-' . Str::slug($certificate->user?->name ?? 'peserta') . '-' . $certificate->id . '.pdf';
+        $baseName = 'sertifikat-' . Str::slug($certificate->user?->name ?? 'peserta') . '-' . $certificate->id;
+        $pngFileName = $baseName . '.png';
 
         $pdf = Pdf::loadView('admin.certificates.pdf', compact('certificate'))
-            ->setPaper('a4', 'portrait')
+            ->setPaper('a4', 'landscape')
             ->setOptions([
-                // Allow <img src="https://..."> to render in PDF.
                 'isRemoteEnabled' => true,
-                // More robust HTML parsing for modern markup.
                 'isHtml5ParserEnabled' => true,
             ]);
 
@@ -163,7 +171,6 @@ class CertificateController extends Controller
                 'follow_location' => 1,
             ],
             'ssl' => [
-                // Prevent HTTPS logo from being blocked due to SSL verification issues (common on local dev).
                 'verify_peer' => false,
                 'verify_peer_name' => false,
                 'allow_self_signed' => true,
@@ -176,7 +183,64 @@ class CertificateController extends Controller
             $pdf->getDomPDF()->setHttpContext($httpContext);
         }
 
-        return $pdf->download($fileName);
+        // Jika ekstensi Imagick tidak tersedia, fallback ke PDF
+        if (! class_exists(\Imagick::class)) {
+            return $pdf->download($baseName . '.pdf');
+        }
+
+        // Konversi PDF menjadi gambar PNG
+        $pdfContent = $pdf->output();
+        $tmpPath = storage_path('app/certificate-temp-' . $certificate->id . '-' . uniqid('', true) . '.pdf');
+        file_put_contents($tmpPath, $pdfContent);
+
+        $imagick = new \Imagick();
+        $imagick->setResolution(300, 300);
+        
+        // Baca semua halaman PDF
+        $imagick->readImage($tmpPath);
+        
+        // Jika ada lebih dari 1 halaman, gabungkan menjadi satu gambar vertikal
+        if ($imagick->getNumberImages() > 1) {
+            // Set format PNG untuk semua halaman
+            $imagick->setImageFormat('png');
+            
+            // Gabungkan semua halaman menjadi satu gambar vertikal
+            $combined = new \Imagick();
+            $combined->setResolution(300, 300);
+            
+            foreach ($imagick as $page) {
+                $page->setImageFormat('png');
+                $page->setImageCompressionQuality(100);
+                $combined->addImage($page);
+            }
+            
+            // Gabungkan semua halaman secara vertikal
+            $combined->resetIterator();
+            $finalImage = $combined->appendImages(true);
+            $finalImage->setImageFormat('png');
+            $finalImage->setImageCompressionQuality(100);
+            
+            $imageData = $finalImage->getImageBlob();
+            
+            $finalImage->clear();
+            $finalImage->destroy();
+            $combined->clear();
+            $combined->destroy();
+        } else {
+            // Hanya 1 halaman
+            $imagick->setImageFormat('png');
+            $imagick->setImageCompressionQuality(100);
+            $imageData = $imagick->getImageBlob();
+        }
+
+        $imagick->clear();
+        $imagick->destroy();
+        @unlink($tmpPath);
+
+        return response($imageData, 200, [
+            'Content-Type' => 'image/png',
+            'Content-Disposition' => 'attachment; filename="' . $pngFileName . '"',
+        ]);
     }
 
     public function getPackage(MasterType $type)
