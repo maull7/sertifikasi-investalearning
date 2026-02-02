@@ -62,7 +62,7 @@ class DashboardController extends Controller
         $typesData = MasterType::all();
         $packagesData = Package::all();
 
-        return view('dashboard.index', compact(
+        return view('admin.dashboard.index', compact(
             'data',
             'recents',
             'typesData',
