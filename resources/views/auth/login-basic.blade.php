@@ -57,7 +57,7 @@
                             required 
                         />
                         <div class="flex justify-end">
-                            <a href="#" class="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 uppercase tracking-widest transition-colors">Lupa Password?</a>
+                            <a href="{{ route('password.request') }}" class="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 uppercase tracking-widest transition-colors">Lupa Password?</a>
                         </div>
                     </div>
 

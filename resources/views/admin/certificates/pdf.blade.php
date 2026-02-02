@@ -42,32 +42,6 @@
             display: flex;
             flex-direction: column;
         }
-
-<<<<<<< HEAD
-        /* HEADER STYLES */
-        .header-brand {
-            display: table;
-            width: 100%;
-            margin-bottom: 15px;
-            table-layout: fixed;
-=======
-        .qr-box {
-            text-align: right;
-            font-size: 9px;
-            color: #6b7280;
-        }
-
-        .qr-box img {
-            height: 70px;
-            width: 70px;
-        }
-
-        .logo-box {
-            display: flex;
-            align-items: center;
->>>>>>> 273ffd0f80f68914a7a41fa0a1280da68866bd31
-        }
-
         .header-left,
         .header-center,
         .header-right {

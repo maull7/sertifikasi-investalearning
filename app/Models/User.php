@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\ResetPasswordNotification;
 
 class User extends Authenticatable
 {
@@ -68,5 +69,13 @@ class User extends Authenticatable
     public function certificates(): HasMany
     {
         return $this->hasMany(Certificate::class, 'id_user');
+    }
+
+    /**
+     * Override default password reset notification to use custom template.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

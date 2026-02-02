@@ -12,13 +12,15 @@ class Input extends Component
     public ?string $icon;
     public ?string $name;
     public ?string $type;
+    public bool $readonly;
 
-    public function __construct($label = null, $icon = null, $name = null, $type = 'text')
+    public function __construct($label = null, $icon = null, $name = null, $type = 'text', $readonly = false)
     {
         $this->label = $label;
         $this->icon = $icon;
         $this->name = $name;
         $this->type = $type;
+        $this->readonly = $readonly;
     }
 
     public function render(): View|Closure|string
