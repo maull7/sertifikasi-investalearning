@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password - InvestaLearning</title>
     <style>
         body {
@@ -29,11 +30,11 @@
         }
 
         .header {
-            padding: 24px 28px 16px 28px;
+            padding: 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: radial-gradient(circle at top left, #dbeafe, #eff6ff);
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 50%, #c7d2fe 100%);
         }
 
         .brand {
@@ -46,11 +47,11 @@
             width: 42px;
             height: 42px;
             border-radius: 18px;
-            background: #0f172a;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.35);
         }
 
         .brand-logo img {
@@ -70,34 +71,35 @@
             font-weight: 600;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: #3b82f6;
+            color: #4f46e5;
         }
 
         .chip {
-            padding: 6px 10px;
+            padding: 6px 12px;
             border-radius: 999px;
-            border: 1px solid rgba(37, 99, 235, 0.15);
-            background-color: rgba(37, 99, 235, 0.06);
+            border: 1px solid rgba(79, 70, 229, 0.25);
+            background-color: rgba(79, 70, 229, 0.12);
             font-size: 10px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: #1d4ed8;
+            letter-spacing: 0.1em;
+            color: #4338ca;
         }
 
         .body {
-            padding: 24px 28px 24px 28px;
+            padding: 24px;
         }
 
         .title {
             font-size: 18px;
             font-weight: 700;
             color: #111827;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .subtitle {
-            font-size: 13px;
+            font-size: 14px;
+            line-height: 1.6;
             color: #6b7280;
             margin-bottom: 20px;
         }
@@ -106,47 +108,47 @@
             border-radius: 18px;
             border: 1px solid #e5e7eb;
             background: linear-gradient(145deg, #f9fafb, #ffffff);
-            padding: 18px 18px 16px 18px;
-            margin-bottom: 22px;
+            padding: 20px;
+            margin-bottom: 20px;
         }
 
         .card-label {
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             color: #6b7280;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .card-email {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             color: #111827;
+            margin-bottom: 16px;
         }
 
         .btn-primary {
             display: inline-block;
-            padding: 11px 22px;
+            padding: 12px 28px;
             border-radius: 999px;
-            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
             color: #ffffff !important;
             text-decoration: none;
             font-size: 13px;
             font-weight: 600;
             letter-spacing: 0.06em;
             text-transform: uppercase;
-            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.45);
-            margin-top: 4px;
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.45);
         }
 
-        .btn-primary span {
-            display: inline-block;
-            transform: translateY(1px);
+        .btn-primary:hover {
+            opacity: 0.95;
         }
 
         .info-text {
-            font-size: 11px;
+            font-size: 12px;
+            line-height: 1.6;
             color: #6b7280;
             margin-top: 16px;
         }
@@ -158,33 +160,46 @@
         .divider {
             height: 1px;
             background-color: #e5e7eb;
-            margin: 20px 0 14px 0;
+            margin: 20px 0;
         }
 
         .secondary-title {
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             color: #6b7280;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
 
         .secondary-text {
-            font-size: 11px;
+            font-size: 12px;
+            line-height: 1.6;
             color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .secondary-text:last-of-type {
+            margin-bottom: 0;
         }
 
         .secondary-text a {
-            color: #2563eb;
-            text-decoration: underline;
+            color: #4f46e5;
+            text-decoration: none;
+            word-break: break-all;
         }
 
         .footer {
-            padding: 8px 24px 20px 24px;
+            padding: 8px 24px 24px 24px;
             text-align: center;
             font-size: 11px;
+            line-height: 1.6;
             color: #9ca3af;
+        }
+
+        .footer a {
+            color: #4f46e5;
+            text-decoration: none;
         }
     </style>
 </head>
@@ -194,32 +209,27 @@
         <div class="header">
             <div class="brand">
                 <div class="brand-logo">
-                    <img src="{{ asset('img/favicon.png') }}" alt="InvestaLearning">
+                    <img src="{{ $logoUrl ?? config('app.logo_url', 'https://srv1289380.hstgr.cloud/img/favicon.png') }}" alt="InvestaLearning" width="28" height="28">
                 </div>
                 <div>
                     <div class="brand-text-title">InvestaLearning</div>
                     <div class="brand-text-subtitle">Be Champion With Us</div>
                 </div>
             </div>
-            <div class="chip">
-                Reset Password
-            </div>
+            <div class="chip">Reset Password</div>
         </div>
 
         <div class="body">
             <div class="title">Permintaan Ubah Password</div>
             <div class="subtitle">
-                Kami menerima permintaan untuk mengubah password akun InvestaLearning Anda. Jika ini benar, silakan klik tombol di bawah
-                untuk mengatur password baru.
+                Kami menerima permintaan untuk mengubah password akun InvestaLearning Anda. Jika ini benar, silakan klik tombol di bawah untuk mengatur password baru.
             </div>
 
             <div class="card">
                 <div class="card-label">Akun yang ingin diubah</div>
                 <div class="card-email">{{ $notifiable->email }}</div>
 
-                <a href="{{ $resetUrl }}" class="btn-primary">
-                    <span>Atur Ulang Password</span>
-                </a>
+                <a href="{{ $resetUrl }}" class="btn-primary">Atur Ulang Password</a>
 
                 <div class="info-text">
                     Link ini hanya berlaku selama <strong>{{ config('auth.passwords.'.config('auth.defaults.passwords').'.expire') ?? 60 }} menit</strong>.
@@ -242,10 +252,9 @@
         </div>
 
         <div class="footer">
-            &copy; {{ date('Y') }} InvestaLearning. All rights reserved.
+            &copy; {{ date('Y') }} <a href="{{ $appUrl ?? config('app.url') }}">InvestaLearning</a>. All rights reserved.
         </div>
     </div>
 </div>
 </body>
 </html>
-

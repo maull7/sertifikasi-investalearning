@@ -14,11 +14,15 @@ class AktivasiAkunNotification extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
+        $loginUrl = url('/login');
+
         return (new MailMessage)
-            ->subject('Untuk Akun anda di website Sertifikasi Investalearning Telah Diaktifkan')
-            ->greeting('Halo '.$notifiable->name)
-            ->line('Akun Anda telah berhasil diaktivasi...')
-            ->line('Silakan login dan mulai menggunakan layanan kami....')
-            ->salutation('Terima kasih.');
+            ->subject('Akun InvestaLearning Anda Telah Diaktifkan')
+            ->view('emails.aktivasi-akun', [
+                'user' => $notifiable,
+                'loginUrl' => $loginUrl,
+                'appUrl' => config('app.url'),
+                'logoUrl' => config('app.logo_url'),
+            ]);
     }
 }
