@@ -54,6 +54,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'logo_url' => env('MAIL_LOGO_URL', 'https://srv1289380.hstgr.cloud/img/favicon.png'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

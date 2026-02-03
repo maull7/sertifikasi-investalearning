@@ -68,6 +68,8 @@ class ResetPasswordNotification extends Notification
             ->view('emails.reset-password', [
                 'resetUrl'   => $resetUrl,
                 'notifiable' => $notifiable,
+                'logoUrl'    => config('app.logo_url'),
+                'appUrl'     => config('app.url'),
             ]);
     }
 }
