@@ -5,11 +5,25 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\AktivasiAkunNotification;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class EmailActivation extends Controller
 {
+    /**
+     * Jumlah user belum teraktivasi (untuk badge real-time di sidebar).
+     */
+    public function unverifiedCount(): JsonResponse
+    {
+        $count = User::query()
+            ->where('role', 'User')
+            ->where('status_user', 'Belum Teraktivasi')
+            ->count();
+
+        return response()->json(['count' => $count]);
+    }
+
     public function index(Request $request)
     {
         $search = $request->search;

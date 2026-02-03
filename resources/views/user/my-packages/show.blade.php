@@ -101,11 +101,7 @@
                                         <i class="ti ti-eye"></i>
                                         Baca Materi
                                     </a>
-                                    <a href="{{ route('master-materials.download', $material->id) }}" 
-                                    class="inline-flex items-center gap-1 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold rounded-lg transition-colors">
-                                        <i class="ti ti-download"></i>
-                                        Download
-                                    </a>
+                                   
                                 @else
                                     <span class="text-xs text-gray-400">Tidak ada file</span>
                                 @endif

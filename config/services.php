@@ -40,4 +40,14 @@ return [
         'secret_key' => env('RECAPTCHA_SECRET_KEY'),
     ],
 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL').'/login/google/callback'),
+    ],
+
+    'wa_cs' => [
+        'number' => env('WA_CS_NUMBER', '6281234567890'),
+    ],
+
 ];

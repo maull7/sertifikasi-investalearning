@@ -2,6 +2,7 @@
 
 namespace App\View\Components;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -11,15 +12,24 @@ class Sidebar extends Component
 {
     public array $menuGroups;
 
+    public int $unverifiedCount;
+
+    public bool $isAdmin;
+
     public function __construct()
     {
         $user = Auth::user();
-        $isAdmin = $user && $user->role === 'Admin';
+        $this->isAdmin = $user && $user->role === 'Admin';
 
-        if ($isAdmin) {
+        if ($this->isAdmin) {
             $this->menuGroups = $this->getAdminMenu();
+            $this->unverifiedCount = User::query()
+                ->where('role', 'User')
+                ->where('status_user', 'Belum Teraktivasi')
+                ->count();
         } else {
             $this->menuGroups = $this->getUserMenu();
+            $this->unverifiedCount = 0;
         }
     }
 
