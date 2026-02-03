@@ -70,7 +70,7 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
 
-        return redirect()->back()->with('success', 'Berhasil melakukan aktivasi, tunggu notifikasi ke email untuk akun dapat di gunakan');
+        return redirect()->route('login')->with('success', 'Berhasil melakukan aktivasi, tunggu notifikasi ke email untuk akun dapat di gunakan');
     }
 
     protected function verifyRecaptcha(Request $request): void
