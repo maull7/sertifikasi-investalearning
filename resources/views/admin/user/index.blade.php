@@ -18,7 +18,7 @@
     </div>
 
     {{-- Search & Filter Section --}}
-    <div class="flex flex-col md:flex-row gap-4">
+     <div class="flex flex-col md:flex-row gap-4">
         <form action="{{ route('user.not.active') }}" method="GET" class="relative flex-1 group">
             <i class="ti ti-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors text-base"></i>
             <input 
@@ -55,8 +55,8 @@
                             <td class="py-3 px-4 sm:px-6">
                                 <div class="flex flex-col">
                                     <span class="font-semibold text-sm text-gray-900 dark:text-white">
-                                        {{ $data->name ?? '-' }}
-                                    </span>
+                                    {{ $data->name ?? '-' }}
+                                </span>
                                 </div>
                             </td>
                             <td class="py-3 px-4 sm:px-6">
@@ -76,17 +76,17 @@
                             </td>
                             <td class="py-3 px-4 sm:px-6 text-center">
                                 <div class="flex items-center justify-center gap-2">
-                                    <x-button 
-                                        variant="primary" 
-                                        size="sm"
-                                        @click="
-                                            modalActivation = true;
-                                            activateUrl = '{{ route('user.activate', $data->id) }}';
-                                            userName = '{{ $data->name }}';
-                                        "
+                             <x-button 
+                                variant="primary" 
+                                size="sm"
+                                @click="
+                                    modalActivation = true;
+                                    activateUrl = '{{ route('user.activate', $data->id) }}';
+                                    userName = '{{ $data->name }}';
+                                "
                                         class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">
                                         <i class="ti ti-user-check text-base"></i>
-                                    </x-button>
+                            </x-button>
                                 </div>
                             </td>
                         </tr>
@@ -114,12 +114,12 @@
                                         </p>
                                     </div>
                                     @if(request('search'))
-                                        <div class="mt-6">
+                                    <div class="mt-6">
                                             <x-button variant="secondary" href="{{ route('user.not.active') }}" class="rounded-xl">
                                                 Reset Pencarian
                                             </x-button>
                                         </div>
-                                    @endif
+                                        @endif
                                 </div>
                             </td>
                         </tr>
@@ -135,17 +135,17 @@
         @endif
     </x-card>
 
-    {{-- Activation Confirmation Modal --}}
-    <div x-show="modalActivation" 
-        class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
-        x-cloak
+  {{-- Activation Confirmation Modal --}}
+<div x-show="modalActivation" 
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+    x-cloak
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100"
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0">
-        
+    
         <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-800"
             x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 scale-95"
@@ -153,45 +153,45 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100 scale-100"
             x-transition:leave-end="opacity-0 scale-95"
-            @click.away="modalActivation = false">
+        @click.away="modalActivation = false">
 
-            <div class="p-8 text-center">
+        <div class="p-8 text-center">
                 <div class="w-20 h-20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <i class="ti ti-user-check text-4xl"></i>
-                </div>
-
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                    Aktivasi Akun?
-                </h3>
-
-                <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                    Anda akan mengaktifkan akun atas nama
-                    <span class="font-bold text-gray-900 dark:text-white" x-text="userName"></span>.
-                    Email aktivasi akan dikirim ke user.
-                </p>
+                <i class="ti ti-user-check text-4xl"></i>
             </div>
-            
-            <div class="flex gap-3 p-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800">
+
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                Aktivasi Akun?
+            </h3>
+
+            <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+                Anda akan mengaktifkan akun atas nama
+                <span class="font-bold text-gray-900 dark:text-white" x-text="userName"></span>.
+                Email aktivasi akan dikirim ke user.
+            </p>
+        </div>
+        
+        <div class="flex gap-3 p-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800">
+            <x-button 
+                variant="secondary" 
+                class="flex-1 rounded-xl"
+                @click="modalActivation = false">
+                Batal
+            </x-button>
+
+            <form :action="activateUrl" method="POST" class="flex-1">
+                @csrf
+                @method('PATCH')
                 <x-button 
-                    variant="secondary" 
-                    class="flex-1 rounded-xl"
-                    @click="modalActivation = false">
-                    Batal
-                </x-button>
-
-                <form :action="activateUrl" method="POST" class="flex-1">
-                    @csrf
-                    @method('PATCH')
-                    <x-button 
-                        variant="primary" 
-                        type="submit" 
+                    variant="primary" 
+                    type="submit" 
                         class="w-full rounded-xl">
-                        Ya, Aktifkan
-                    </x-button>
-                </form>
-            </div>
+                    Ya, Aktifkan
+                </x-button>
+            </form>
         </div>
     </div>
+</div>
 
 </div>
 @endsection

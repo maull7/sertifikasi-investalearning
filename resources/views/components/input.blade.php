@@ -3,6 +3,7 @@
     'icon' => null,
     'name' => null,
     'type' => 'text',
+    'readonly' => false,
 ])
 
 <div
@@ -34,6 +35,8 @@
             :type="inputType === 'password' && show ? 'text' : inputType"
             name="{{ $name }}"
             id="{{ $name }}"
+            @if($readonly == true) readonly @endif
+
             value="{{ old($name, $attributes->get('value')) }}"
             {{ $attributes->merge([
                 'class' => "w-full h-12 text-sm font-semibold rounded-xl
@@ -41,6 +44,7 @@
                             border border-gray-200 dark:border-gray-700
                             outline-none transition-all focus:ring-2 " .
                             ($icon ? 'pl-10 pr-12' : 'px-4 pr-12') .
+                            ($readonly ? ' cursor-not-allowed bg-gray-100 dark:bg-gray-900' : ' focus:bg-white dark:focus:bg-gray-900') .
                             ($errors->has($name)
                                 ? ' focus:ring-rose-500/30 ring-1 ring-rose-500/50'
                                 : ' focus:ring-indigo-500/30')

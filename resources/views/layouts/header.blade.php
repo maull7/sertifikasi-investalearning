@@ -85,7 +85,4 @@
             </div>
         </div>
     </div>
-
-    {{-- SEARCH MODAL OVERLAY --}}
-    
 </header>

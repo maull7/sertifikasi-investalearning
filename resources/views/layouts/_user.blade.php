@@ -141,9 +141,6 @@
                             Keluar dari Sesi
                         </button>
                     </form>
-                    <p class="text-center text-[10px] text-gray-400 mt-4 font-bold uppercase tracking-widest">
-                        Versi Aplikasi 2.4.0
-                    </p>
                 </div>
             </div>
         </div>

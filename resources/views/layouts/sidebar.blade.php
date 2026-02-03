@@ -5,12 +5,12 @@
         tooltipText: '',
         tooltipVisible: false,
         tooltipTop: 0,
+        unverifiedCount: {{ $unverifiedCount ?? 0 }},
         get expanded() {
             if (window.innerWidth < 1280) return true;
             return $store.sidebar.isExpanded;
         },
         toggleSubmenu(key) { 
-            // Jika sidebar sedang ciut, buka sidebar dulu baru buka submenu
             if(!this.expanded) {
                 $store.sidebar.toggleExpanded();
                 setTimeout(() => { this.openSubmenus[key] = true; }, 100);
@@ -24,8 +24,15 @@
                 this.tooltipVisible = true;
                 this.tooltipTop = e.currentTarget.getBoundingClientRect().top + (e.currentTarget.offsetHeight / 2);
             }
+        },
+        fetchUnverified() {
+            fetch('{{ route('admin.unverified-count') }}', { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } })
+                .then(r => r.json())
+                .then(d => { this.unverifiedCount = d.count || 0 })
+                .catch(() => {});
         }
     }"
+    x-init="$nextTick(() => { if ({{ $isAdmin ? 'true' : 'false' }} && typeof fetch !== 'undefined') { $data.fetchUnverified(); setInterval(() => $data.fetchUnverified(), 30000); } })"
     :class="{
         'w-72': expanded,
         'w-20': !expanded,
@@ -91,10 +98,21 @@
                                             expanded ? 'px-4' : 'justify-center'
                                         ]">
                                         
-                                        <i class="ti ti-{{ $item['icon'] }} text-xl shrink-0 transition-transform duration-300 group-hover:scale-110"></i>
+                                        <span class="relative shrink-0">
+                                            <i class="ti ti-{{ $item['icon'] }} text-xl transition-transform duration-300 group-hover:scale-110"></i>
+                                            @if(in_array('user.not.active', array_column($item['subItems'] ?? [], 'route')))
+                                                <span x-show="unverifiedCount > 0" x-transition
+                                                    class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-950 animate-pulse"></span>
+                                            @endif
+                                        </span>
                                         
-                                        <span x-show="expanded" x-cloak class="ml-3 font-medium text-sm grow text-left">
+                                        <span x-show="expanded" x-cloak class="ml-3 font-medium text-sm grow text-left flex items-center gap-2">
                                             {{ $item['name'] }}
+                                            @if(in_array('user.not.active', array_column($item['subItems'] ?? [], 'route')))
+                                                <span x-show="unverifiedCount > 0" x-transition
+                                                    class="min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full bg-rose-500 text-white text-[10px] font-bold animate-pulse"
+                                                    x-text="unverifiedCount"></span>
+                                            @endif
                                         </span>
 
                                         <i x-show="expanded" x-cloak
@@ -110,11 +128,18 @@
                                             @foreach ($item['subItems'] as $sub)
                                                 <li>
                                                     <a href="{{ route($sub['route']) }}" 
-                                                       class="relative flex items-center py-2 text-sm font-medium transition-colors duration-200 {{ request()->routeIs($sub['route']) ? 'text-indigo-600' : 'text-gray-400 hover:text-indigo-500' }}">
-                                                        @if(request()->routeIs($sub['route']))
-                                                            <div class="absolute left-[-14px] w-1 h-1 bg-indigo-600 rounded-full"></div>
+                                                       class="relative flex items-center justify-between gap-2 py-2 text-sm font-medium transition-colors duration-200 {{ request()->routeIs($sub['route']) ? 'text-indigo-600' : 'text-gray-400 hover:text-indigo-500' }}">
+                                                        <span class="flex items-center gap-2 min-w-0">
+                                                            @if(request()->routeIs($sub['route']))
+                                                                <div class="absolute left-[-14px] w-1 h-1 bg-indigo-600 rounded-full"></div>
+                                                            @endif
+                                                            {{ $sub['name'] }}
+                                                        </span>
+                                                        @if(($sub['route'] ?? '') === 'user.not.active')
+                                                            <span x-show="unverifiedCount > 0" x-transition
+                                                                class="shrink-0 min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full bg-rose-500 text-white text-[10px] font-bold animate-pulse"
+                                                                x-text="unverifiedCount"></span>
                                                         @endif
-                                                        {{ $sub['name'] }}
                                                     </a>
                                                 </li>
                                             @endforeach

@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
 use App\Models\Package;
 use App\Models\UserJoin;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\MasterType;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 
 class PackageController extends Controller
 {
     public function index(Request $request): View
     {
         $user = Auth::user();
+        $types = MasterType::with('subjects', 'packages')->get();
 
         $query = Package::with(['masterType', 'materials'])
             ->where('status', 'active');
@@ -22,14 +24,16 @@ class PackageController extends Controller
         if ($request->has('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
         }
-
+        if ($request->has('id_type')) {
+            $query->where('id_master_types', $request->id_type);
+        }
         $packages = $query->paginate(12);
 
         $joinedPackageIds = UserJoin::where('user_id', $user->id)
             ->pluck('id_package')
             ->toArray();
 
-        return view('user.packages.index', compact('packages', 'joinedPackageIds'));
+        return view('user.packages.index', compact('packages', 'joinedPackageIds', 'types'));
     }
 
     public function show(Package $package): View
@@ -67,6 +71,3 @@ class PackageController extends Controller
             ->with('success', 'Berhasil bergabung dengan package!');
     }
 }
-
-
-

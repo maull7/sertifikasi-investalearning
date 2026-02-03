@@ -16,18 +16,11 @@ class EnsureUserIsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || Auth::user()->role !== 'Admin') {
+        if (! Auth::check() || Auth::user()->role !== 'Admin') {
             abort(403, 'Akses ditolak. Hanya admin yang dapat mengakses halaman ini.');
         }
 
         return $next($request);
     }
 }
-
-
-
-
-
-
-
 

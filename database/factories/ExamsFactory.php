@@ -35,12 +35,3 @@ class ExamsFactory extends Factory
     }
 }
 
-
-
-
-
-
-
-
-
-

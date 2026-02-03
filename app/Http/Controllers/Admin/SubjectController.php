@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Subject;
-use App\Models\MasterType;
-use Illuminate\Http\Request;
 use App\Exports\MasterSubjectExport;
 use App\Http\Controllers\Controller;
-use App\Imports\MasterSubjectImport;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\Admin\RequestSubject;
+use App\Imports\MasterSubjectImport;
+use App\Models\MasterType;
+use App\Models\Subject;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SubjectController extends Controller
 {
@@ -26,8 +26,8 @@ class SubjectController extends Controller
             })
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('code', 'like', '%' . $search . '%');
+                    $q->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('code', 'like', '%'.$search.'%');
                 });
             })
             ->orderBy('created_at', 'desc')
@@ -87,10 +87,12 @@ class SubjectController extends Controller
             ->route('subjects.index')
             ->with('success', 'Mata pelajaran berhasil dihapus.');
     }
+
     public function TemplateExport()
     {
         return Excel::download(new MasterSubjectExport, 'template_master_mapel.xlsx');
     }
+
     public function ImportExcel(Request $request)
     {
         $request->validate([
@@ -106,6 +108,4 @@ class SubjectController extends Controller
             ->with('success', 'Data master mata pelajaran berhasil diimport.');
     }
 }
-
-
 
