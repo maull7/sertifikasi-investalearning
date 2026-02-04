@@ -234,6 +234,15 @@
                         required 
                     />
                 </div>
+                <div>
+                    <x-input 
+                        label="Opsi E" 
+                        name="option_e" 
+                        placeholder="Masukkan opsi E" 
+                        value="{{ old('option_e', $data->option_e) }}"
+                        required 
+                    />
+                </div>
 
                 {{-- Answer --}}
                 <div class="md:col-span-2">
@@ -247,6 +256,7 @@
                         <option value="b" {{ old('answer', $data->answer) == 'b' ? 'selected' : '' }}>B</option>
                         <option value="c" {{ old('answer', $data->answer) == 'c' ? 'selected' : '' }}>C</option>
                         <option value="d" {{ old('answer', $data->answer) == 'd' ? 'selected' : '' }}>D</option>
+                        <option value="e" {{ old('answer', $data->answer) == 'e' ? 'selected' : '' }}>E</option>
                     </x-select>
                 </div>
 

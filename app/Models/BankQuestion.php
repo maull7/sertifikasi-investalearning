@@ -20,6 +20,7 @@ class BankQuestion extends Model
         'option_b',
         'option_c',
         'option_d',
+        'option_e',
         'answer',
     ];
 
