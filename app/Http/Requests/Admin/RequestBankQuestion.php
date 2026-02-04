@@ -37,7 +37,8 @@ class RequestBankQuestion extends FormRequest
             'option_b' => 'required|string',
             'option_c' => 'required|string',
             'option_d' => 'required|string',
-            'answer' => 'required|in:a,b,c,d',
+            'option_e' => 'required|string',
+            'answer' => 'required|in:a,b,c,d,e',
             'solution' => 'required|string',
             'explanation' => 'required|string',
         ];
@@ -68,8 +69,9 @@ class RequestBankQuestion extends FormRequest
             'option_b.required' => 'Opsi B wajib diisi.',
             'option_c.required' => 'Opsi C wajib diisi.',
             'option_d.required' => 'Opsi D wajib diisi.',
+            'option_e.required' => 'Opsi E wajib diisi.',
             'answer.required' => 'Jawaban wajib dipilih.',
-            'answer.in' => 'Jawaban harus salah satu dari A, B, C, atau D.',
+            'answer.in' => 'Jawaban harus salah satu dari A, B, C, D, atau E.',
             'solution.required' => 'Pembahasan wajib diisi.',
             'explanation.required' => 'Penjelasan wajib diisi.',
             'question_file.image' => 'File harus berupa gambar.',
@@ -79,8 +81,3 @@ class RequestBankQuestion extends FormRequest
         ];
     }
 }
-
-
-
-
-

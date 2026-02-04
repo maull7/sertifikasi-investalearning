@@ -154,6 +154,10 @@
                                         class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">
                                         <i class="ti ti-trash text-base"></i>
                                     </x-button>
+                                    <x-button variant="primary" size="sm" type="button" href="{{route('bank-questions.show',    $value->id)}}" class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">
+                                        <i class="ti ti-eye text-base"></i>
+                                    </x-button>
+                                    
                                 </div>
                             </td>
                         </tr>

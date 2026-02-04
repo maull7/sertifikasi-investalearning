@@ -17,37 +17,40 @@ class BankQuestionsTemplateExport implements FromArray, WithHeadings, WithStyles
     {
         return [
             [
-                'Matematika Dasar', // tipe_soal (isi harus sama persis dengan master_types.name_type)
+                'IPS-01', // tipe_soal (isi harus sama persis dengan master_types.name_type)
                 'Text', // question_type (Text / Image)
                 'Apa ibukota Indonesia?', // soal
                 'Jakarta', // opsi_a
                 'Bandung', // opsi_b
                 'Surabaya', // opsi_c
                 'Medan', // opsi_d
+                'Bogor', // opsi_e
                 'a', // jawaban
                 'Jakarta adalah ibukota negara Indonesia yang terletak di Pulau Jawa.', // pembahasan
                 'Ibukota adalah kota yang menjadi pusat pemerintahan suatu negara.', // penjelasan
             ],
             [
-                'Matematika Dasar',
+                'MTK-01',
                 'Text',
                 'Berapa hasil dari 2 + 2?',
                 '3',
                 '4',
                 '5',
                 '6',
+                '10',
                 'b',
                 'Hasil penjumlahan 2 + 2 adalah 4.',
                 'Operasi penjumlahan dasar dalam matematika.',
             ],
             [
-                'Matematika Dasar',
+                'MTK-01',
                 'Image',
                 'https://example.com/soal/soal-1.png',
                 'A',
                 'B',
                 'C',
                 'D',
+                'E',
                 'a',
                 'Jawaban yang benar adalah A.',
                 'Contoh soal dengan gambar. Kolom "soal" diisi URL gambar atau path storage (contoh: questions/soal-1.png).',
@@ -68,6 +71,7 @@ class BankQuestionsTemplateExport implements FromArray, WithHeadings, WithStyles
             'opsi_b',
             'opsi_c',
             'opsi_d',
+            'opsi_e',
             'jawaban',
             'pembahasan',
             'penjelasan',
@@ -104,9 +108,10 @@ class BankQuestionsTemplateExport implements FromArray, WithHeadings, WithStyles
             'E' => 25, // opsi_b
             'F' => 25, // opsi_c
             'G' => 25, // opsi_d
-            'H' => 10, // jawaban
-            'I' => 50, // pembahasan
-            'J' => 50, // penjelasan
+            'H' => 25, // opsi_e
+            'I' => 10, // jawaban
+            'J' => 50, // pembahasan
+            'K' => 50, // penjelasan
         ];
     }
 }

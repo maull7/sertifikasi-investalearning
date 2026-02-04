@@ -123,7 +123,7 @@
                 </div>
 
                 {{-- Rich Text Editor for Question --}}
-                <div class="md:col-span-2" id="question-text-section">
+                <div class="md:col-span-2 MB-16" id="question-text-section">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                         Soal <span class="text-rose-500">*</span>
                     </label>
@@ -217,6 +217,15 @@
                         required 
                     />
                 </div>
+                <div>
+                    <x-input 
+                        label="Opsi E" 
+                        name="option_e" 
+                        placeholder="Masukkan opsi E" 
+                        value="{{ old('option_e') }}"
+                        required 
+                    />
+                </div>
 
                 {{-- Answer --}}
                 <div class="md:col-span-2">
@@ -230,6 +239,7 @@
                         <option value="b" {{ old('answer') == 'b' ? 'selected' : '' }}>B</option>
                         <option value="c" {{ old('answer') == 'c' ? 'selected' : '' }}>C</option>
                         <option value="d" {{ old('answer') == 'd' ? 'selected' : '' }}>D</option>
+                        <option value="e" {{ old('answer') == 'e' ? 'selected' : '' }}>E</option>
                     </x-select>
                 </div>
 
