@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\BankQuestion;
 use App\Models\Exam;
+use App\Models\Subject;
 use App\Models\MasterType;
-use App\Models\MappingQuestion;
+use App\Models\BankQuestion;
 use Illuminate\Http\Request;
+use App\Models\MappingQuestion;
+use App\Http\Controllers\Controller;
 
 class MappingQuestionController extends Controller
 {
@@ -15,6 +16,7 @@ class MappingQuestionController extends Controller
     {
         $examId = $request->query('exam_id');
         $typeId = $request->query('type_id');
+        $subjectId = $request->query('subject_id');
 
         $exams = Exam::with('package')
             ->orderBy('created_at', 'desc')
@@ -24,21 +26,21 @@ class MappingQuestionController extends Controller
         $types = collect();
         $questions = collect();
         $mapped = collect();
+        $subjects = collect();
 
         if ($examId) {
             $selectedExam = Exam::findOrFail($examId);
+            $subjects = Subject::orderBy('name')->get();
 
-            $types = MasterType::orderBy('name_type')->get();
-
-            $query = BankQuestion::with('type')
+            $query = BankQuestion::with('subject')
                 ->whereNotIn('id', function ($sub) use ($selectedExam) {
                     $sub->select('id_question_bank')
                         ->from('mapping_questions')
                         ->where('id_exam', $selectedExam->id);
                 });
 
-            if ($typeId) {
-                $query->where('type_id', $typeId);
+            if ($subjectId) {
+                $query->where('subject_id', $subjectId);
             }
 
             $questions = $query
@@ -47,7 +49,7 @@ class MappingQuestionController extends Controller
                 ->withQueryString();
 
             $mapped = $selectedExam->mappingQuestions()
-                ->with('questionBank.type')
+                ->with('questionBank.subject')
                 ->latest()
                 ->paginate(10, ['*'], 'mapped_page')
                 ->withQueryString();
@@ -56,29 +58,29 @@ class MappingQuestionController extends Controller
         return view('admin.mapping-question.create', [
             'exams' => $exams,
             'selectedExam' => $selectedExam,
-            'types' => $types,
             'questions' => $questions,
             'mapped' => $mapped,
             'examId' => $examId,
             'typeId' => $typeId,
+            'subjectId' => $subjectId,
+            'subjects' => $subjects,
         ]);
     }
 
     public function index(Request $request, Exam $exam)
     {
-        $typeId = $request->query('type_id');
+        $subjectId = $request->query('subject_id');
 
-        $types = MasterType::orderBy('name_type')->get();
+        $subjets = Subject::orderBy('name')->get();
 
-        $query = BankQuestion::with('type')
+        $query = BankQuestion::with('subject')
             ->whereNotIn('id', function ($sub) use ($exam) {
                 $sub->select('id_question_bank')
                     ->from('mapping_questions')
                     ->where('id_exam', $exam->id);
             });
-
-        if ($typeId) {
-            $query->where('type_id', $typeId);
+        if ($subjectId) {
+            $query->where('subject_id', $subjectId);
         }
 
         $questions = $query
@@ -87,17 +89,17 @@ class MappingQuestionController extends Controller
             ->withQueryString();
 
         $mapped = $exam->mappingQuestions()
-            ->with('questionBank.type')
+            ->with('questionBank.subject')
             ->latest()
             ->paginate(10, ['*'], 'mapped_page')
             ->withQueryString();
 
         return view('admin.mapping-question.index', [
             'exam' => $exam,
-            'types' => $types,
+            'subjets' => $subjets,
             'questions' => $questions,
             'mapped' => $mapped,
-            'typeId' => $typeId,
+            'subjectId' => $subjectId,
         ]);
     }
 
@@ -125,11 +127,11 @@ class MappingQuestionController extends Controller
     public function random(Request $request, Exam $exam)
     {
         $validated = $request->validate([
-            'type_id' => ['nullable', 'exists:master_types,id'],
+            'subject_id' => ['nullable', 'exists:subjects,id'],
             'total' => ['required', 'integer', 'min:1', 'max:1000'],
         ]);
 
-        $typeId = $validated['type_id'] ?? null;
+        $subjectId = $validated['subject_id'] ?? null;
         $total = $validated['total'];
 
         $query = BankQuestion::query()
@@ -139,8 +141,8 @@ class MappingQuestionController extends Controller
                     ->where('id_exam', $exam->id);
             });
 
-        if ($typeId) {
-            $query->where('type_id', $typeId);
+        if ($subjectId) {
+            $query->where('subject_id', $subjectId);
         }
 
         $ids = $query->inRandomOrder()->limit($total)->pluck('id');
@@ -161,7 +163,7 @@ class MappingQuestionController extends Controller
     {
         abort_unless($mapping->id_exam === $exam->id, 404);
 
-        $mapping->load('questionBank.type');
+        $mapping->load('questionBank.subject');
 
         return view('admin.mapping-question.show', [
             'exam' => $exam,

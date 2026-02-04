@@ -17,18 +17,18 @@ class BankQuestionRepository implements BankQuestionRepositoryInterface
         $this->model = $model;
     }
 
-    public function getAllWithPagination(?string $search = null, ?int $typeId = null, int $perPage = 10): LengthAwarePaginator
+    public function getAllWithPagination(?string $search = null, ?int $subjectId = null, int $perPage = 10): LengthAwarePaginator
     {
         return $this->model
-            ->with('type')
+            ->with('subject')
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('question', 'like', "%{$search}%")
                         ->orWhere('solution', 'like', "%{$search}%");
                 });
             })
-            ->when($typeId, function ($query, $typeId) {
-                $query->where('type_id', $typeId);
+            ->when($subjectId, function ($query, $subjectId) {
+                $query->where('subject_id', $subjectId);
             })
             ->orderBy('created_at', 'desc')
             ->paginate($perPage)
@@ -37,12 +37,12 @@ class BankQuestionRepository implements BankQuestionRepositoryInterface
 
     public function getAll(): Collection
     {
-        return $this->model->with('type')->get();
+        return $this->model->with('subject')->get();
     }
 
     public function findById(int $id)
     {
-        return $this->model->with('type')->findOrFail($id);
+        return $this->model->with('subject')->findOrFail($id);
     }
 
     public function create(array $data)

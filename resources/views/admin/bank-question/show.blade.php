@@ -32,11 +32,11 @@
             {{-- Tipe Soal --}}
             <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 pb-6 border-b border-gray-50 dark:border-gray-800">
                 <div class="md:w-1/3">
-                    <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tipe Soal</span>
+                    <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Mapel Soal</span>
                 </div>
                 <div class="md:w-2/3">
                     <span class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300">
-                        {{ $data->type->name_type ?? '-' }}
+                        {{ $data->subject->name ?? '-' }}
                     </span>
                 </div>
             </div>
@@ -127,6 +127,15 @@
                         </div>
                         <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $data->option_d }}</span>
                         @if(strtolower($data->answer) === 'd')
+                            <i class="ti ti-check text-green-500 ml-auto text-xl"></i>
+                        @endif
+                    </div>
+                    <div class="flex items-center gap-3 p-4 rounded-2xl {{ strtolower($data->answer) === 'e' ? 'bg-green-50 dark:bg-green-500/10 border-2 border-green-500' : 'bg-gray-50 dark:bg-gray-900/50' }}">
+                        <div class="w-10 h-10 rounded-xl {{ strtolower($data->answer) === 'e' ? 'bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300' }} flex items-center justify-center font-bold text-sm">
+                            E
+                        </div>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $data->option_e }}</span>
+                        @if(strtolower($data->answer) === 'e')
                             <i class="ti ti-check text-green-500 ml-auto text-xl"></i>
                         @endif
                     </div>

@@ -43,9 +43,9 @@
                 <p class="text-gray-900 dark:text-white">{{ $exam->package->title ?? '-' }}</p>
             </div>
             <div>
-                <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold mb-1">Tipe Soal</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold mb-1">Mapel Soal</p>
                 <p class="text-gray-900 dark:text-white">
-                    {{ $question->type->name_type ?? '-' }}
+                    {{ $question->subject->name ?? '-' }}
                 </p>
             </div>
         </div>

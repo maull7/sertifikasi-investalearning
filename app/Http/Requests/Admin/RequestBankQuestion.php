@@ -30,7 +30,7 @@ class RequestBankQuestion extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'type_id' => 'required|exists:master_types,id',
+            'subject_id' => 'required|exists:subjects,id',
             'question_type' => 'required|in:Text,Image',
             'question' => 'nullable|string|required_if:question_type,Text',
             'option_a' => 'required|string',
@@ -60,8 +60,8 @@ class RequestBankQuestion extends FormRequest
     public function messages(): array
     {
         return [
-            'type_id.required' => 'Tipe soal wajib dipilih.',
-            'type_id.exists' => 'Tipe soal tidak valid.',
+            'subject_id.required' => 'Mata pelajaran wajib dipilih.',
+            'subject_id.exists' => 'Mata pelajaran tidak valid.',
             'question_type.required' => 'Jenis soal wajib dipilih.',
             'question_type.in' => 'Jenis soal harus Text atau Image.',
             'question.required_if' => 'Soal wajib diisi jika jenis soal Text.',
