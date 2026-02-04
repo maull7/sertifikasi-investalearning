@@ -35,14 +35,12 @@ class GoogleAuthController extends Controller
             if ($user) {
                 $user->update([
                     'google_id' => $googleUser->getId(),
-                    'avatar' => $googleUser->getAvatar(),
                 ]);
             } else {
                 $user = User::query()->create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
-                    'avatar' => $googleUser->getAvatar(),
                     'password' => null,
                     'email_verified_at' => now(),
                     'role' => 'User',

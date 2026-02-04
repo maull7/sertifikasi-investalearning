@@ -63,7 +63,6 @@ class RegisteredUserController extends Controller
             'institusi' => $request->institusi,
             'alamat' => $request->alamat,
             'role' => 'User',
-            'avatar' => 'default.jpeg',
             'password' => Hash::make($request->password),
         ]);
 
