@@ -64,7 +64,7 @@ class BankQuestionsTemplateExport implements FromArray, WithHeadings, WithStyles
     public function headings(): array
     {
         return [
-            'kode_jenis',
+            'kode_mapel',
             'question_type',
             'soal',
             'opsi_a',

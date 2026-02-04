@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\BankQuestion;
 use App\Models\MasterType;
+use App\Models\Subject;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -26,7 +27,7 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
     public function prepareForValidation($data, $index): array
     {
         $castToStringKeys = [
-            'kode_jenis',
+            'kode_mapel',
             'question_type',
             'soal',
             'opsi_a',
@@ -53,15 +54,15 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
      */
     public function model(array $row)
     {
-        $codeType = trim((string) ($row['kode_jenis'] ?? ''));
+        $codeType = trim((string) ($row['kode_mapel'] ?? ''));
 
         // Find type by name_type (case-insensitive + trimmed)
-        $type = MasterType::query()
+        $subject = Subject::query()
             ->whereRaw('LOWER(code) = ?', [mb_strtolower($codeType)])
             ->first();
 
-        if (!$type) {
-            $this->errors[] = "Tipe soal '{$codeType}' tidak ditemukan pada master_types.";
+        if (!$subject) {
+            $this->errors[] = "Tipe soal '{$codeType}' tidak ditemukan pada subjects.";
             return null;
         }
 
@@ -79,7 +80,7 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
         }
 
         return new BankQuestion([
-            'type_id' => $type->id,
+            'subject_id' => $subject->id,
             'question_type' => $questionType,
             'question' => $questionValue,
             'option_a' => (string) ($row['opsi_a'] ?? ''),
@@ -144,7 +145,7 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
     public function rules(): array
     {
         return [
-            'kode_jenis' => 'required|string',
+            'kode_mapel' => 'required|string',
             'question_type' => 'required|in:Text,Image,text,image',
             'soal' => 'required|string',
             'opsi_a' => 'required|string',
@@ -164,7 +165,7 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
     public function customValidationMessages()
     {
         return [
-            'kode_jenis.required' => 'Kode Jenis wajib diisi',
+            'kode_mapel.required' => 'Kode Mapel wajib diisi',
             'question_type.required' => 'Jenis soal wajib diisi',
             'question_type.in' => 'Jenis soal harus Text atau Image',
             'soal.required' => 'Soal wajib diisi',

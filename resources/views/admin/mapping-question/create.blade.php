@@ -78,12 +78,13 @@
                             <form action="{{ route('mapping-questions.create') }}" method="GET" class="flex-1 flex flex-col md:flex-row gap-3">
                                 <input type="hidden" name="exam_id" value="{{ $selectedExam->id }}">
                                 <input type="hidden" name="mapped_page" value="{{ request('mapped_page') }}">
+                                <input type="hidden" name="subject_id" value="{{ $subjectId }}">
                                 <div class="w-full md:w-60">
-                                    <x-select name="type_id" label="Filter Tipe Soal" inline>
-                                        <option value="">Semua Tipe</option>
-                                        @foreach($types as $type)
-                                            <option value="{{ $type->id }}" {{ (int) $typeId === $type->id ? 'selected' : '' }}>
-                                                {{ $type->name_type }}
+                                    <x-select name="subject_id" label="Filter Soal Dengan Mapel" inline>
+                                        <option value="">Semua Mapel</option>
+                                        @foreach($subjects as $subject)
+                                            <option value="{{ $subject->id }}" {{ (int) $subjectId === $subject->id ? 'selected' : '' }}>
+                                                {{ $subject->name }}
                                             </option>
                                         @endforeach
                                     </x-select>
@@ -92,9 +93,12 @@
                                     <x-button type="submit" variant="primary" class="rounded-xl">
                                         Terapkan
                                     </x-button>
-                                    <a href="{{ route('mapping-questions.create', ['exam_id' => $selectedExam->id]) }}" class="text-xs text-gray-500 hover:text-rose-500">
-                                        Reset
-                                    </a>
+                                    <x-button type="button" variant="secondary" class="rounded-xl" 
+                                        onclick="window.location='{{ route('mapping-questions.create', ['exam_id' => $selectedExam->id]) }}'">
+                                        <i class="ti ti-eraser mr-1"></i> Hapus Filter
+
+                                    </x-button>
+                                  
                                 </div>
                             </form>
                         </div>
@@ -102,7 +106,7 @@
                         <div class="flex flex-col gap-3">
                             <form action="{{ route('mapping-questions.random', $selectedExam) }}" method="POST" class="flex items-end gap-2">
                                 @csrf
-                                <input type="hidden" name="type_id" value="{{ $typeId }}">
+                                <input type="hidden" name="subject_id" value="{{ $subjectId }}">
                                 <div>
                                     <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">
                                         Tambah Acak
@@ -138,7 +142,7 @@
                                 <thead>
                                     <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
                                         <th class="py-3 px-6 w-10"></th>
-                                        <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Tipe</th>
+                                        <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Mapel</th>
                                         <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Soal</th>
                                         <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Jawaban</th>
                                     </tr>
@@ -153,7 +157,7 @@
                                             <td class="py-3 px-6 align-top">
                                                 <div class="flex flex-col gap-1">
                                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300">
-                                                        {{ $q->type->name_type ?? '-' }}
+                                                        {{ $q->subject->name ?? '-' }}
                                                     </span>
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold 
                                                         {{ ($q->question_type ?? 'Text') === 'Image' 
@@ -226,7 +230,7 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
-                                    <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Tipe</th>
+                                    <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Mapel</th>
                                     <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Soal</th>
                                     <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">Aksi</th>
                                 </tr>
@@ -238,7 +242,7 @@
                                         <td class="py-3 px-6 align-top">
                                             <div class="flex flex-col gap-1">
                                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300">
-                                                    {{ $q->type->name_type ?? '-' }}
+                                                    {{ $q->subject->name ?? '-' }}
                                                 </span>
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold 
                                                     {{ ($q->question_type ?? 'Text') === 'Image' 

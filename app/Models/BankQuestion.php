@@ -11,7 +11,7 @@ class BankQuestion extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'type_id',
+        'subject_id',
         'question_type',
         'question',
         'solution',
@@ -24,9 +24,9 @@ class BankQuestion extends Model
         'answer',
     ];
 
-    public function type(): BelongsTo
+    public function subject(): BelongsTo
     {
-        return $this->belongsTo(MasterType::class, 'type_id');
+        return $this->belongsTo(Subject::class, 'subject_id');
     }
 
     public function getQuestionImageUrlAttribute(): ?string

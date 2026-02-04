@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Subject;
+use App\Models\MasterType;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Imports\BankQuestionsImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
+use App\Exports\BankQuestionsTemplateExport;
 use App\Http\Requests\Admin\RequestBankQuestion;
 use App\Repositories\Contracts\BankQuestionRepositoryInterface;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use App\Imports\BankQuestionsImport;
-use App\Exports\BankQuestionsTemplateExport;
-use App\Models\MasterType;
-use Maatwebsite\Excel\Facades\Excel;
 
 class BankQuestionController extends Controller
 {
@@ -24,23 +25,23 @@ class BankQuestionController extends Controller
     public function index(Request $request)
     {
         $search = $request->query('search');
-        $typeId = $request->query('type_id') ? (int) $request->query('type_id') : null;
+        $subjectId = $request->query('subject_id') ? (int) $request->query('subject_id') : null;
 
-        $data = $this->bankQuestionRepository->getAllWithPagination($search, $typeId);
-        $types = MasterType::orderBy('name_type')->get();
+        $data = $this->bankQuestionRepository->getAllWithPagination($search, $subjectId);
+        $subjects = Subject::orderBy('name')->get();
 
         return view('admin.bank-question.index', [
             'data' => $data,
             'search' => $search,
-            'types' => $types,
-            'typeId' => $typeId,
+            'subjects' => $subjects,
+            'subjectId' => $subjectId,
         ]);
     }
 
     public function create()
     {
-        $types = MasterType::all();
-        return view('admin.bank-question.create', compact('types'));
+        $subjects = Subject::all();
+        return view('admin.bank-question.create', compact('subjects'));
     }
 
     public function store(RequestBankQuestion $request)
@@ -73,8 +74,8 @@ class BankQuestionController extends Controller
     public function edit(string $id)
     {
         $data = $this->bankQuestionRepository->findById($id);
-        $types = MasterType::all();
-        return view('admin.bank-question.edit', compact('data', 'types'));
+        $subjects = Subject::all();
+        return view('admin.bank-question.edit', compact('data', 'subjects'));
     }
 
     public function update(RequestBankQuestion $request, string $id)

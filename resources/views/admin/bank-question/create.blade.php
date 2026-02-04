@@ -73,14 +73,14 @@
                 {{-- Type Select --}}
                 <div class="md:col-span-2">
                     <x-select 
-                        label="Tipe Soal" 
-                        name="type_id" 
+                        label="Mata Pelajaran" 
+                        name="subject_id" 
                         required
                     >
-                        <option value="">Pilih Tipe</option>
-                        @foreach($types as $type)
-                            <option value="{{ $type->id }}" {{ old('type_id') == $type->id ? 'selected' : '' }}>
-                                {{ $type->name_type }}
+                        <option value="">Pilih Mata pelajaran</option>
+                        @foreach($subjects as $subject)
+                            <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }}>
+                                {{ $subject->name }}
                             </option>
                         @endforeach
                     </x-select>
