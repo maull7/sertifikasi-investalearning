@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Ujian')
+@section('title', 'Detail Kuis')
 
 @section('content')
 <div class="max-w-5xl mx-auto space-y-8 pb-20">
@@ -8,25 +8,25 @@
     {{-- Header & Breadcrumb --}}
     <div class="flex items-center justify-between">
         <div class="space-y-1">
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Detail Ujian</h1>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Detail Kuis</h1>
             <nav class="flex items-center gap-2 text-xs font-medium text-gray-400">
-                <a href="{{ route('exams.index') }}" class="hover:text-indigo-600 transition-colors">Ujian</a>
+                <a href="{{ route('quizzes.index') }}" class="hover:text-indigo-600 transition-colors">Kuis</a>
                 <i class="ti ti-chevron-right"></i>
                 <span class="text-gray-500 dark:text-gray-500">Detail</span>
             </nav>
         </div>
         <div class="flex items-center gap-3">
-            <x-button variant="secondary" href="{{ route('exams.edit', $data->id) }}" class="rounded-xl">
+            <x-button variant="secondary" href="{{ route('quizzes.edit', $data->id) }}" class="rounded-xl">
                 <i class="ti ti-pencil mr-2"></i> Edit
             </x-button>
-            <x-button variant="secondary" href="{{ route('exams.index') }}" class="rounded-xl">
+            <x-button variant="secondary" href="{{ route('quizzes.index') }}" class="rounded-xl">
                 <i class="ti ti-arrow-left mr-2"></i> Kembali
             </x-button>
         </div>
     </div>
 
     {{-- Detail Card --}}
-    <x-card title="Informasi Ujian">
+    <x-card title="Informasi Kuis">
         <div class="space-y-6">
             
             {{-- Paket --}}
@@ -44,7 +44,7 @@
             {{-- Title --}}
             <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 pb-6 border-b border-gray-50 dark:border-gray-800">
                 <div class="md:w-1/3">
-                    <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Judul Ujian</span>
+                    <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Judul Kuis</span>
                 </div>
                 <div class="md:w-2/3">
                     <p class="text-base font-bold text-gray-900 dark:text-white">{{ $data->title }}</p>
@@ -105,6 +105,8 @@
                     </div>
                 </div>
             </div>
+
+        
 
             {{-- Timestamps --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

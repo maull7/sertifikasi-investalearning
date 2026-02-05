@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('id_exam')
                 ->constrained('exams')
                 ->cascadeOnDelete();
+
             $table->timestamps();
         });
     }
