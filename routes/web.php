@@ -1,26 +1,27 @@
 <?php
 
-use App\Http\Controllers\Admin\BankQuestionController;
-use App\Http\Controllers\Admin\CertificateController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\EmailActivation;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\ExamController;
-use App\Http\Controllers\Admin\MappingQuestionController;
-use App\Http\Controllers\Admin\MasterMaterialController;
-use App\Http\Controllers\Admin\MasterPackegeController;
-use App\Http\Controllers\Admin\MasterTypesController;
-use App\Http\Controllers\Admin\ShowGradeController;
+use App\Http\Controllers\Admin\QuizController;
+use App\Http\Controllers\Admin\EmailActivation;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\TeacherController;
-use App\Http\Controllers\ProfileCompletionController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\User\CertificateControlller;
-use App\Http\Controllers\User\DashboardController as UserDashboardController;
-use App\Http\Controllers\User\ExamController as UserExamController;
-use App\Http\Controllers\User\HistoryExamController;
 use App\Http\Controllers\User\MyPackageController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ShowGradeController;
+use App\Http\Controllers\User\HistoryExamController;
+use App\Http\Controllers\Admin\CertificateController;
+use App\Http\Controllers\Admin\MasterTypesController;
+use App\Http\Controllers\ProfileCompletionController;
+use App\Http\Controllers\User\CertificateControlller;
+use App\Http\Controllers\Admin\BankQuestionController;
+use App\Http\Controllers\Admin\MasterPackegeController;
+use App\Http\Controllers\Admin\MasterMaterialController;
+use App\Http\Controllers\Admin\MappingQuestionController;
+use App\Http\Controllers\User\ExamController as UserExamController;
 use App\Http\Controllers\User\PackageController as UserPackageController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\User\DashboardController as UserDashboardController;
 
 Route::get('/', function () {
     return view('index');
@@ -141,6 +142,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Teacher
     Route::resource('teacher', TeacherController::class);
+
+    Route::resource('quizzes', QuizController::class);
 
     // Certificates
     Route::get('/get-package/{type}', [CertificateController::class, 'getPackage'])->name('get-package.type');
