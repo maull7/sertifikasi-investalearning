@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Mapping Soal - ' . $exam->title)
+@section('title', 'Mapping Soal - ' . $mappable->title)
 
 @section('content')
 <div class="space-y-8 pb-20" 
@@ -8,7 +8,7 @@
         deleteModalOpen: false,
         deleteUrl: '',
         questionTitle: '',
-        autoCount: {{ (int) ($exam->total_questions ?? 10) }},
+        autoCount: {{ (int) ($mappable->total_questions ?? 10) }},
         confirmDelete(url, title) {
             this.deleteUrl = url;
             this.questionTitle = title;
@@ -29,10 +29,10 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
-                Mapping Soal - {{ $exam->title }}
+                Mapping Soal - {{ $mappable->title }}
             </h1>
             <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                Pilih soal dari bank soal untuk ujian ini. Bisa pilih satu-satu atau secara acak.
+                Pilih soal dari bank soal untuk {{ $mappableType === 'exam' ? 'ujian' : 'kuis' }} ini. Bisa pilih satu-satu atau secara acak.
             </p>
         </div>
         <div class="flex items-center gap-3">
@@ -49,7 +49,7 @@
                 <div class="border-b border-gray-100 dark:border-gray-800 px-6 py-4 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
                     <div class="flex-1 flex flex-col md:flex-row gap-3 md:items-center">
                         {{-- Filter Jenis Soal --}}
-                        <form action="{{ route('mapping-questions.manage', $exam) }}" method="GET" class="flex-1 flex flex-col md:flex-row gap-3">
+                        <form action="{{ $mappableType === 'exam' ? route('mapping-questions.manage', $mappable) : route('mapping-questions.quiz.manage', $mappable) }}" method="GET" class="flex-1 flex flex-col md:flex-row gap-3">
                             <input type="hidden" name="mapped_page" value="{{ request('mapped_page') }}">
                             <div class="w-full md:w-60">
                                 <x-select name="subject_id" label="Filter Mata Pelajaran" inline>
@@ -65,9 +65,8 @@
                                 <x-button type="submit" variant="primary" class="rounded-xl">
                                     Terapkan
                                 </x-button>
-                                <x-button type="button" variant="secondary" class="rounded-xl" href="{{ route('mapping-questions.manage', $exam) }}">
+                                <x-button type="button" variant="secondary" class="rounded-xl" href="{{ $mappableType === 'exam' ? route('mapping-questions.manage', $mappable) : route('mapping-questions.quiz.manage', $mappable) }}">
                                     Reset
-                                
                                 </x-button>
                               
                             </div>
@@ -75,7 +74,7 @@
                     </div>
                     {{-- Random --}}
                     <div class="flex flex-col gap-3">
-                        <form action="{{ route('mapping-questions.random', $exam) }}" method="POST" class="flex items-end gap-2">
+                        <form action="{{ $mappableType === 'exam' ? route('mapping-questions.random', $mappable) : route('mapping-questions.quiz.random', $mappable) }}" method="POST" class="flex items-end gap-2">
                             @csrf
                             <input type="hidden" name="subject_id" value="{{ $subjectId }}">
                             <div>
@@ -83,7 +82,7 @@
                                     Tambah Acak
                                 </label>
                                 <div class="flex items-center gap-2">
-                                    <input type="number" name="total" min="1" max="1000" value="{{ (int) ($exam->total_questions ?? 5) }}"
+                                    <input type="number" name="total" min="1" max="1000" value="{{ (int) ($mappable->total_questions ?? 5) }}"
                                            class="w-20 px-2 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                                     <x-button type="submit" variant="secondary" size="sm" class="rounded-lg">
                                         <i class="ti ti-dice-3 mr-1 text-sm"></i> Acak
@@ -106,7 +105,7 @@
                     </div>
                 </div>
 
-                <form action="{{ route('mapping-questions.store', $exam) }}" method="POST">
+                <form action="{{ $mappableType === 'exam' ? route('mapping-questions.store', $mappable) : route('mapping-questions.quiz.store', $mappable) }}" method="POST">
                     @csrf
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
@@ -172,7 +171,7 @@
                                     <tr>
                                         <td colspan="4" class="py-10">
                                             <p class="text-center text-sm text-gray-500 dark:text-gray-400">
-                                                Tidak ada soal yang tersedia / semua soal sudah ter-mapping ke ujian ini.
+                                                Tidak ada soal tersedia / semua sudah ter-mapping ke {{ $mappableType === 'exam' ? 'ujian' : 'kuis' }} ini.
                                             </p>
                                         </td>
                                     </tr>
@@ -189,7 +188,7 @@
 
                     <div class="px-6 py-4 border-t border-gray-50 dark:border-gray-800 flex justify-end">
                         <x-button type="submit" variant="primary" class="rounded-xl shadow-lg shadow-indigo-500/20">
-                            Tambah ke Ujian
+                            Tambah ke {{ $mappableType === 'exam' ? 'Ujian' : 'Kuis' }}
                         </x-button>
                     </div>
                 </form>
@@ -198,7 +197,7 @@
 
         {{-- Kanan: Soal yang sudah di-mapping --}}
         <div class="space-y-4">
-            <x-card :padding="false" title="Soal di Ujian Ini">
+            <x-card :padding="false" title="Soal di {{ $mappableType === 'exam' ? 'Ujian' : 'Kuis' }} Ini">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -246,11 +245,11 @@
                                     </td>
                                     <td class="py-3 px-6 align-top">
                                         <div class="flex items-center justify-end gap-2">
-                                            <x-button variant="info" size="sm" href="{{ route('mapping-questions.show', [$exam, $map]) }}" class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">
+                                            <x-button variant="info" size="sm" href="{{ $mappableType === 'exam' ? route('mapping-questions.show', [$mappable, $map]) : route('mapping-questions.quiz.show', [$mappable, $map]) }}" class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">
                                                 <i class="ti ti-eye text-base"></i>
                                             </x-button>
                                             <x-button variant="danger" size="sm" type="button"
-                                                @click="confirmDelete('{{ route('mapping-questions.destroy', [$exam, $map]) }}', '{{ \Illuminate\Support\Str::limit(strip_tags($q->question), 50) }}')"
+                                                @click="confirmDelete('{{ $mappableType === 'exam' ? route('mapping-questions.destroy', [$mappable, $map]) : route('mapping-questions.quiz.destroy', [$mappable, $map]) }}', '{{ \Illuminate\Support\Str::limit(strip_tags($q->question), 50) }}')"
                                                 class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">
                                                 <i class="ti ti-trash text-base"></i>
                                             </x-button>
@@ -261,7 +260,7 @@
                                 <tr>
                                     <td colspan="3" class="py-10">
                                         <p class="text-center text-sm text-gray-500 dark:text-gray-400">
-                                            Belum ada soal yang di-mapping ke ujian ini.
+                                            Belum ada soal yang di-mapping ke {{ $mappableType === 'exam' ? 'ujian' : 'kuis' }} ini.
                                         </p>
                                     </td>
                                 </tr>
@@ -296,9 +295,9 @@
                 <div class="w-20 h-20 bg-rose-50 dark:bg-rose-500/10 text-rose-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
                     <i class="ti ti-trash-x text-4xl"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Hapus Soal dari Ujian?</h3>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Hapus Soal?</h3>
                 <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                    Anda akan menghapus soal <span class="font-bold text-gray-900 dark:text-white" x-text="questionTitle"></span> dari ujian ini. Tindakan ini tidak dapat dibatalkan.
+                    Anda akan menghapus soal <span class="font-bold text-gray-900 dark:text-white" x-text="questionTitle"></span>. Tindakan ini tidak dapat dibatalkan.
                 </p>
             </div>
             

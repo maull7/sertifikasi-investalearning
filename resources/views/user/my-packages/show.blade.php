@@ -150,11 +150,76 @@
 
     {{-- Exams List --}}
     @php
+        $quizez = \App\Models\Quiz::where('package_id', $package->id)->get();
+    @endphp
+
+      @if($quizez->count() > 0)
+        <x-card title="Kuis / Latihan">
+            <div class="space-y-4">
+                @foreach($quizez as $quizItem)
+                    @php
+                        $totalQuestions = \App\Models\MappingQuestion::where('id_quiz', $quizItem->id)->count();
+                    @endphp
+                    <div class="flex items-center justify-between p-4 
+                        bg-gradient-to-r from-emerald-50 to-teal-50 
+                        dark:from-emerald-500/10 dark:to-teal-500/10 
+                        rounded-xl border border-emerald-100 dark:border-emerald-800"
+                    >
+
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center text-white">
+                                <i class="ti ti-brain text-xl"></i>
+                            </div>
+
+                            <div>
+                                <h4 class="font-bold text-gray-900 dark:text-white mb-1">
+                                    {{ $quizItem->title }}
+                                </h4>
+
+                                <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+                                    <span class="inline-flex items-center gap-1">
+                                        <i class="ti ti-help-circle"></i>
+                                        {{ $totalQuestions }} Soal
+                                    </span>
+
+                                    @if($quizItem->duration)
+                                        <span class="inline-flex items-center gap-1">
+                                            <i class="ti ti-clock"></i>
+                                            {{ $quizItem->duration }} Menit
+                                        </span>
+                                    @endif
+
+                                    @if($quizItem->passing_grade)
+                                        <span class="inline-flex items-center gap-1">
+                                            <i class="ti ti-target"></i>
+                                            Passing Grade: {{ $quizItem->passing_grade }}%
+                                        </span>
+                                    @endif
+                                </div>
+                                @if($quizItem->description)
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            {{ Str::limit(strip_tags($quizItem->description), 80) }}
+                                        </p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <x-button variant="secondary" 
+                            class="rounded-xl shadow-lg shadow-emerald-500/20">
+                            <i class="ti ti-arrow-right mr-2"></i> Mulai Kuis
+                        </x-button>
+                    </div>
+                @endforeach
+            </div>
+        </x-card>
+    @endif
+
+    @php
         $exams = \App\Models\Exam::where('package_id', $package->id)->get();
     @endphp
     
     @if($exams->count() > 0)
-        <x-card title="Ujian">
+        <x-card title="Try Out / Ujian">
             <div class="space-y-4">
                 @foreach($exams as $examItem)
                     @php

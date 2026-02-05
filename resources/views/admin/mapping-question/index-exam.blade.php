@@ -27,7 +27,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Mapping Soal</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Kelola data soal dan ujian Anda</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Kelola mapping soal untuk ujian dan kuis</p>
         </div>
         <div class="flex items-center gap-3">
             <x-button variant="primary" href="{{ route('mapping-questions.create') }}" icon="plus" class="rounded-xl shadow-lg shadow-indigo-500/20">
@@ -44,7 +44,7 @@
                 type="text" 
                 name="search" 
                 value="{{ $search ?? request('search') }}" 
-                placeholder="Cari ujian atau paket..." 
+                placeholder="Cari ujian, kuis, atau paket..." 
                 class="w-full pl-11 pr-12 py-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all dark:text-white"
             >
             @if(!empty($search ?? request('search')))
@@ -55,91 +55,135 @@
         </form>
     </div>
 
-    {{-- Main Data Card --}}
-    <x-card :padding="false" title="Daftar Ujian dengan Mapping Soal">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Ujian / Exam</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Paket / Package</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Total Soal Terpilih</th>
-                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
-                    @forelse ($data as $value)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group">
-                            <td class="py-4 px-8">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
-                                    {{ $value->title }}
-                                </span>
-                            </td>
-                            <td class="py-4 px-8">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
-                                    {{ $value->package->title ?? '-' }}
-                                </span>
-                            </td>
-                            <td class="py-4 px-8">
-                                @php($mappedCount = $value->mappingQuestions->count())
-                                <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-200">
-                                    {{ $mappedCount }} Soal
-                                </span>
-                            </td>
-                            
-                            <td class="py-4 px-8">
-                                <div class="flex items-center justify-end gap-2">
-                                    <x-button variant="secondary" size="sm" href="{{ route('mapping-questions.manage', $value->id) }}" class="rounded-lg px-3 py-1.5 text-xs font-semibold">
-                                        <i class="ti ti-list-details mr-1"></i> Lihat Mapping
-                                    </x-button>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="py-24">
-                                <div class="flex flex-col items-center justify-center text-center max-w-[280px] mx-auto">
-                                    <div class="space-y-1">
-                                        <h4 class="text-base font-bold text-gray-900 dark:text-white">
-                                            @if(request('search')) 
-                                                Hasil tidak ditemukan 
-                                            @else 
-                                                Belum Ada Data 
-                                            @endif
-                                        </h4>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                                            @if(request('search'))
-                                                Tidak ada hasil untuk kata kunci "{{ $search ?? request('search') }}". Coba gunakan kata kunci lain.
-                                            @else
-                                                Belum ada ujian yang memiliki mapping soal.
-                                            @endif
-                                        </p>
-                                    </div>
-                                    <div class="mt-6">
-                                        @if(!empty($search ?? request('search')))
-                                            <x-button variant="secondary"  href="{{ route('mapping-questions.index') }}">
-                                                Reset Pencarian
-                                            </x-button>
-                                        @else
-                                            <span class="text-xs text-gray-400 dark:text-gray-500">
-                                                Tambahkan mapping soal melalui menu "Tambah Mapping Soal".
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+    {{-- Tab: Ujian & Kuis --}}
+    <div x-data="{ tab: 'exam' }" class="space-y-6">
+        <div class="flex gap-2 border-b border-gray-200 dark:border-gray-700">
+            <button type="button" @click="tab = 'exam'" :class="tab === 'exam' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-400'"
+                class="px-4 py-3 text-sm font-semibold border-b-2 transition-colors">
+                <i class="ti ti-clipboard-list mr-2"></i> Ujian
+            </button>
+            <button type="button" @click="tab = 'quiz'" :class="tab === 'quiz' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-400'"
+                class="px-4 py-3 text-sm font-semibold border-b-2 transition-colors">
+                <i class="ti ti-puzzle mr-2"></i> Kuis
+            </button>
         </div>
 
-        @if($data->hasPages())
-            <div class="px-8 py-6 border-t border-gray-50 dark:border-gray-800">
-                {{ $data->links() }}
+        {{-- Tabel Ujian --}}
+        <x-card :padding="false" title="Daftar Ujian dengan Mapping Soal" x-show="tab === 'exam'" x-cloak>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
+                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Ujian / Exam</th>
+                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Paket</th>
+                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Total Soal</th>
+                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
+                        @forelse ($examsWithMapping as $value)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group">
+                                <td class="py-4 px-8">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
+                                        {{ $value->title }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-8">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ $value->package->title ?? '-' }}</span>
+                                </td>
+                                <td class="py-4 px-8">
+                                    @php($mappedCount = $value->mappingQuestions->count())
+                                    <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-200">
+                                        {{ $mappedCount }} Soal
+                                    </span>
+                                </td>
+                                <td class="py-4 px-8">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <x-button variant="secondary" size="sm" href="{{ route('mapping-questions.manage', $value) }}" class="rounded-lg px-3 py-1.5 text-xs font-semibold">
+                                            <i class="ti ti-list-details mr-1"></i> Lihat Mapping
+                                        </x-button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="py-16 text-center">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        @if($search) Tidak ada hasil untuk "{{ $search }}".
+                                        @else Belum ada ujian dengan mapping soal.
+                                        @endif
+                                    </p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-        @endif
-    </x-card>
+            @if($examsWithMapping->hasPages())
+                <div class="px-8 py-6 border-t border-gray-50 dark:border-gray-800">
+                    {{ $examsWithMapping->appends(['quiz_page' => $quizzesWithMapping->currentPage()])->links() }}
+                </div>
+            @endif
+        </x-card>
+
+        {{-- Tabel Kuis --}}
+        <x-card :padding="false" title="Daftar Kuis dengan Mapping Soal" x-show="tab === 'quiz'" x-cloak>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
+                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Kuis / Quiz</th>
+                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Paket</th>
+                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Total Soal</th>
+                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
+                        @forelse ($quizzesWithMapping as $value)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group">
+                                <td class="py-4 px-8">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                        {{ $value->title }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-8">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ $value->package->title ?? '-' }}</span>
+                                </td>
+                                <td class="py-4 px-8">
+                                    @php($mappedCount = $value->mappingQuestions->count())
+                                    <span class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-200">
+                                        {{ $mappedCount }} Soal
+                                    </span>
+                                </td>
+                                <td class="py-4 px-8">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <x-button variant="secondary" size="sm" href="{{ route('mapping-questions.quiz.manage', $value) }}" class="rounded-lg px-3 py-1.5 text-xs font-semibold">
+                                            <i class="ti ti-list-details mr-1"></i> Lihat Mapping
+                                        </x-button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="py-16 text-center">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        @if($search) Tidak ada hasil untuk "{{ $search }}".
+                                        @else Belum ada kuis dengan mapping soal.
+                                        @endif
+                                    </p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            @if($quizzesWithMapping->hasPages())
+                <div class="px-8 py-6 border-t border-gray-50 dark:border-gray-800">
+                    {{ $quizzesWithMapping->appends(['exam_page' => $examsWithMapping->currentPage()])->links() }}
+                </div>
+            @endif
+        </x-card>
+    </div>
 
     {{-- Preview Modal --}}
     <div x-show="previewModalOpen" 
