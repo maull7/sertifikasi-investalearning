@@ -18,7 +18,7 @@
     {{-- Page Header --}}
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">History Exam</h1>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Riwayat Pengerjaan</h1>
             <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Lihat riwayat ujian Anda</p>
         </div>
       
@@ -118,7 +118,7 @@
                             <td class="py-4 px-8 text-center">
                                 <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold
                                     bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                                    {{ strtoupper($data->Type->name_type) }}
+                                    {{ strtoupper($data->Package->masterType->name_type ?? '-') }}
                                 </span>
                             </td>
 

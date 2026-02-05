@@ -94,7 +94,7 @@ class ExamController extends Controller
                 'option_b' => $question->option_b,
                 'option_c' => $question->option_c,
                 'option_d' => $question->option_d,
-                'type' => $question->type ? $question->type->name_type : null,
+                'option_e' => $question->option_e,
                 // Tidak kirim kunci jawaban saat mengerjakan ujian
                 'show_solutions' => false,
                 'correct_answer' => null,
@@ -127,7 +127,7 @@ class ExamController extends Controller
         }
 
         // Ambil detail hasil dengan pagination (1 soal per halaman)
-        $detailResults = DetailResult::with('Question.type')
+        $detailResults = DetailResult::with('Question.subject')
             ->where('id_trans_question', $trans->id)
             ->orderBy('id')
             ->paginate(1)

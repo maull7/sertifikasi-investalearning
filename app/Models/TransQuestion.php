@@ -11,7 +11,6 @@ class TransQuestion extends Model
         'id_user',
         'id_package',
         'id_exam',
-        'id_type',
         'questions_answered',
         'total_questions',
         'total_score',
@@ -33,9 +32,5 @@ class TransQuestion extends Model
     public function Exam()
     {
         return $this->belongsTo(Exam::class, 'id_exam');
-    }
-    public function Type()
-    {
-        return $this->belongsTo(MasterType::class, 'id_type');
     }
 }

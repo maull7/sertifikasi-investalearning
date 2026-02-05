@@ -28,7 +28,7 @@ class DashboardController extends Controller
         ];
 
         // Recent user 
-        $recents = TransQuestion::with('User', 'Exam', 'Package', 'Type')
+        $recents = TransQuestion::with('User', 'Exam', 'Package',)
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();

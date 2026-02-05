@@ -114,7 +114,7 @@
                         <h4 class="text-xs font-semibold tracking-[0.16em] uppercase text-gray-400 dark:text-gray-500 mb-2">
                             Pilih Jawaban
                         </h4>
-                        <template x-for="(option, index) in ['A', 'B', 'C', 'D']" :key="index">
+                        <template x-for="(option, index) in ['A', 'B', 'C', 'D', 'E']" :key="index">
                             <label
                                 @click="selectedAnswer = option; saveAnswer()"
                                 class="flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all bg-white dark:bg-gray-900"

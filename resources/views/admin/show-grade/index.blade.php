@@ -123,7 +123,7 @@
                             </td>
                             <td class="py-3 px-4 sm:px-6 text-center">
                                 <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm">
-                                    {{ strtoupper($data->Type->name_type) }}
+                                    {{ strtoupper($data->package->masterType->name_type ?? '-') }}
                                 </span>
                             </td>
                             <td class="py-3 px-4 sm:px-6 text-center">
@@ -174,8 +174,6 @@
                                             <x-button variant="secondary"  href="{{ route('show-grades.index') }}">
                                                 Reset Pencarian
                                             </x-button>
-                                        
-                                           
                                         @endif
                                     </div>
                                 </div>
