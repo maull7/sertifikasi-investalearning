@@ -17,7 +17,7 @@ class HistoryExamController extends Controller
     {
         $packages = Package::all();
         $exams = Exam::all();
-        $history = TransQuestion::with('Package', 'Exam', 'Type')
+        $history = TransQuestion::with('Package', 'Exam')
             ->when($request->package_id, function ($query) use ($request) {
                 $query->where('id_package', $request->package_id);
             })

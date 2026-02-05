@@ -29,7 +29,7 @@ class ExamRepository implements ExamRepositoryInterface
     public function getQuestionsPage(Exam $exam, int $page = 1, int $perPage = 1): LengthAwarePaginator
     {
         return MappingQuestion::where('id_exam', $exam->id)
-            ->with('questionBank.type')
+            ->with('questionBank.subject')
             ->orderBy('id')
             ->paginate($perPage, ['*'], 'page', $page);
     }
@@ -86,4 +86,3 @@ class ExamRepository implements ExamRepositoryInterface
         ]);
     }
 }
-

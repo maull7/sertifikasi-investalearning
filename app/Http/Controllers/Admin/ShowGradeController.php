@@ -19,7 +19,7 @@ class ShowGradeController extends Controller
         $packageId = $request->get('package_id');
         $examId = $request->get('exam_id');
 
-        $list = TransQuestion::with(['User', 'Package', 'Exam', 'Type'])
+        $list = TransQuestion::with(['User', 'Package', 'Exam'])
             ->when($packageId, function ($query) use ($packageId) {
                 $query->where('id_package', $packageId);
             })

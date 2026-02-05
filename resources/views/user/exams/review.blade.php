@@ -115,7 +115,7 @@
                         <h4 class="text-xs font-semibold tracking-[0.16em] uppercase text-gray-400 dark:text-gray-500 mb-2">
                             Pilihan Jawaban
                         </h4>
-                        @foreach(['A', 'B', 'C', 'D'] as $option)
+                        @foreach(['A', 'B', 'C', 'D', 'E'] as $option)
                             @php
                                 $optionKey = 'option_' . strtolower($option);
                                 $optionText = $question->$optionKey ?? '';
