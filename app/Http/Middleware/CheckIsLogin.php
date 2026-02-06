@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureUserIsAdmin
+class CheckIsLogin
 {
     /**
      * Handle an incoming request.
@@ -16,10 +16,14 @@ class EnsureUserIsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! Auth::check() || Auth::user()->role !== 'Admin') {
-            abort(403, 'Akses ditolak. Hanya admin yang dapat mengakses halaman ini.');
+        if (! Auth::check()) {
+            return $next($request);
         }
 
-        return $next($request);
+        if (Auth::user()->role === 'Admin') {
+            return redirect()->route('dashboard');
+        }
+
+        return redirect()->route('user.dashboard');
     }
 }

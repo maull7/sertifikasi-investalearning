@@ -178,7 +178,7 @@
                         </div>
                         <div class="text-right">
                         
-                            <p class="text-[10px] text-black font-bold">{{ $recent->Exam->title }}</p>
+                            <p class="text-[10px] text-black font-bold">{{ $recent->Exam->title ?? $recent->quiz->title ?? 'Exam/Quiz Tidak Ditemukan' }}</p>
                             <p class="text-sm font-bold text-gray-900 dark:text-white">{{ $recent->total_score }}</p>
                             <p class="text-[10px] text-emerald-500 font-bold">{{ $recent->status }}</p>
                             <a href="{{ route('show-grades.detail', $recent->id) }}"

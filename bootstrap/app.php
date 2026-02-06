@@ -1,9 +1,10 @@
 <?php
 
+use App\Http\Middleware\CheckIsLogin;
 use Illuminate\Foundation\Application;
-use App\Http\Middleware\ActivationUserMiddleware;
-use App\Http\Middleware\EnsureProfileComplete;
 use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Middleware\EnsureProfileComplete;
+use App\Http\Middleware\ActivationUserMiddleware;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
@@ -18,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => EnsureUserIsAdmin::class,
             'akun-active' => ActivationUserMiddleware::class,
             'profile-complete' => EnsureProfileComplete::class,
+            'check-login' => CheckIsLogin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

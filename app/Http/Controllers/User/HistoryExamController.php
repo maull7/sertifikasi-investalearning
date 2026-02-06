@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Models\Exam;
 use App\Models\Package;
+use App\Models\Quiz;
 use App\Models\DetailResult;
 use Illuminate\Http\Request;
 use App\Models\TransQuestion;
@@ -17,17 +18,34 @@ class HistoryExamController extends Controller
     {
         $packages = Package::all();
         $exams = Exam::all();
-        $history = TransQuestion::with('Package', 'Exam')
-            ->when($request->package_id, function ($query) use ($request) {
-                $query->where('id_package', $request->package_id);
+        $quizzes = Quiz::all();
+        $packageId = $request->get('package_id');
+        $examId = $request->get('exam_id');
+        $quizId = $request->get('quiz_id');
+        $type = $request->get('type', '');
+
+        $history = TransQuestion::with(['Package', 'Exam', 'Quiz'])
+            ->when($packageId, function ($query) use ($packageId) {
+                $query->where('id_package', $packageId);
             })
-            ->when($request->exam_id, function ($query) use ($request) {
-                $query->where('id_exam', $request->exam_id);
+            ->when($type === 'kuis' && $quizId, function ($query) use ($quizId) {
+                $query->where('id_quiz', $quizId);
             })
-            ->where('id_user', Auth::user()->id)
+            ->when(($type === 'ujian' || $type === '') && $examId, function ($query) use ($examId) {
+                $query->where('id_exam', $examId);
+            })
+            ->when($type === 'ujian', function ($query) {
+                $query->whereNotNull('id_exam');
+            })
+            ->when($type === 'kuis', function ($query) {
+                $query->whereNotNull('id_quiz');
+            })
+            ->where('id_user', Auth::id())
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
-        return view('user.history.index', compact('history', 'packages', 'exams'));
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('user.history.index', compact('history', 'packages', 'exams', 'quizzes', 'packageId', 'examId', 'quizId', 'type'));
     }
     public function detail($id)
     {

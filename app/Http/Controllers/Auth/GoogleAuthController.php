@@ -56,10 +56,10 @@ class GoogleAuthController extends Controller
             return redirect()->route('profile.complete');
         }
 
-        if ($user->role === 'User') {
-            return redirect()->intended(route('user.dashboard', absolute: false));
+        if ($user->role === 'Admin') {
+            return redirect()->route('dashboard');
         }
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('user.dashboard', absolute: false));
     }
 }
