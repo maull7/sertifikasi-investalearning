@@ -5,6 +5,7 @@
 @section('content')
 <div class="space-y-8 pb-20" x-data="{ 
     questionTitle: '',
+    filterType: '{{ $type ?? '' }}',
 }">
 
     {{-- Page Header --}}
@@ -38,16 +39,49 @@
                 </x-select>
             </div>
 
-            <!-- Select -->
-            <div class="w-full md:w-64">
+            <div class="w-full md:w-48">
+                <x-select 
+                    name="type" 
+                    label="Tipe" 
+                    inline
+                    class="h-12"
+                    placeholder=""
+                    x-model="filterType"
+                >
+                    <option value="" {{ ($type ?? '') === '' ? 'selected' : '' }}>Semua</option>
+                    <option value="ujian" {{ ($type ?? '') === 'ujian' ? 'selected' : '' }}>Ujian</option>
+                    <option value="kuis" {{ ($type ?? '') === 'kuis' ? 'selected' : '' }}>Kuis</option>
+                </x-select>
+            </div>
+
+            {{-- Pilihan Ujian (muncul ketika Tipe Semua atau Ujian) --}}
+            <div class="w-full md:w-64" x-show="filterType !== 'kuis'" x-cloak x-transition>
                 <x-select 
                     name="exam_id" 
-                    label="Filter Sesuai Ujian" 
+                    label="Filter Ujian" 
                     inline
                     class="h-12"
                 >
+                    <option value="">-- Semua ujian --</option>
                     @foreach($exams as $data)
                         <option value="{{ $data->id }}" {{ (int) ($examId ?? 0) === $data->id ? 'selected' : '' }}>
+                            {{ $data->title }}
+                        </option>
+                    @endforeach
+                </x-select>
+            </div>
+
+            {{-- Pilihan Kuis (muncul ketika Tipe Kuis) --}}
+            <div class="w-full md:w-64" x-show="filterType === 'kuis'" x-cloak x-transition>
+                <x-select 
+                    name="quiz_id" 
+                    label="Filter Kuis" 
+                    inline
+                    class="h-12"
+                >
+                    <option value="">-- Semua kuis --</option>
+                    @foreach($quizzes as $data)
+                        <option value="{{ $data->id }}" {{ (int) ($quizId ?? 0) === $data->id ? 'selected' : '' }}>
                             {{ $data->title }}
                         </option>
                     @endforeach
@@ -118,7 +152,7 @@
                           
                             <td class="py-3 px-4 sm:px-6 text-center">
                                 <span class="inline-flex items-center justify-center rounded-lg font-bold text-sm ">
-                                    {{ strtoupper($data->Exam->title) }}
+                                    {{ strtoupper($data->Exam->title ?? $data->quiz->title ?? '-') }}
                                 </span>
                             </td>
                             <td class="py-3 px-4 sm:px-6 text-center">

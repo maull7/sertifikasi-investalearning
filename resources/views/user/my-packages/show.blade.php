@@ -204,7 +204,8 @@
                             </div>
                         </div>
 
-                        <x-button variant="secondary" 
+                        <x-button variant="secondary"
+                            href="{{ route('user.quizzes.show', ['package' => $package->id, 'quiz' => $quizItem->id]) }}"
                             class="rounded-xl shadow-lg shadow-emerald-500/20">
                             <i class="ti ti-arrow-right mr-2"></i> Mulai Kuis
                         </x-button>

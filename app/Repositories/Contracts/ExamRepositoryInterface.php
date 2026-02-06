@@ -4,6 +4,7 @@ namespace App\Repositories\Contracts;
 
 use App\Models\Exam;
 use App\Models\Package;
+use App\Models\Quiz;
 use App\Models\TransQuestion;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -18,7 +19,7 @@ interface ExamRepositoryInterface
     public function getQuestionsPage(Exam $exam, int $page = 1, int $perPage = 1): LengthAwarePaginator;
 
     /**
-     * @return Collection<int, MappingQuestions>
+     * @return \Illuminate\Support\Collection<int, \App\Models\MappingQuestion>
      */
     public function getAllMappingsWithQuestions(Exam $exam): Collection;
 
@@ -27,5 +28,16 @@ interface ExamRepositoryInterface
     public function updateTransQuestionResult(TransQuestion $trans, float $score, string $status): void;
 
     public function createDetailResult(TransQuestion $trans, int $questionId, ?string $userAnswer, ?string $correctAnswer, float $scoreObtained): void;
+
+    public function countQuestionsForQuiz(Quiz $quiz): int;
+
+    public function getQuestionsPageForQuiz(Quiz $quiz, int $page = 1, int $perPage = 1): LengthAwarePaginator;
+
+    /**
+     * @return \Illuminate\Support\Collection<int, \App\Models\MappingQuestion>
+     */
+    public function getAllMappingsWithQuestionsForQuiz(Quiz $quiz): Collection;
+
+    public function createTransQuestionForQuiz(User $user, Package $package, Quiz $quiz, int $questionsAnswered, int $totalQuestions): TransQuestion;
 }
 

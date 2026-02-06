@@ -8,6 +8,7 @@
     deleteUrl: '', 
     questionTitle: '',
     importModalOpen: false,
+    filterType: '{{ $type ?? '' }}',
     confirmDelete(url, title) {
         this.deleteUrl = url;
         this.questionTitle = title;
@@ -47,16 +48,49 @@
                 </x-select>
             </div>
 
-            <!-- Select -->
-            <div class="w-full md:w-64">
+            <div class="w-full md:w-48">
+                <x-select 
+                    name="type" 
+                    label="Tipe" 
+                    inline
+                    class="h-12"
+                    placeholder=""
+                    x-model="filterType"
+                >
+                    <option value="" {{ ($type ?? '') === '' ? 'selected' : '' }}>Semua</option>
+                    <option value="ujian" {{ ($type ?? '') === 'ujian' ? 'selected' : '' }}>Ujian</option>
+                    <option value="kuis" {{ ($type ?? '') === 'kuis' ? 'selected' : '' }}>Kuis</option>
+                </x-select>
+            </div>
+
+            {{-- Pilihan Ujian (muncul ketika Tipe Semua atau Ujian) --}}
+            <div class="w-full md:w-64" x-show="filterType !== 'kuis'" x-cloak x-transition>
                 <x-select 
                     name="exam_id" 
-                    label="Filter Sesuai Ujian" 
+                    label="Filter Ujian" 
                     inline
                     class="h-12"
                 >
+                    <option value="">-- Semua ujian --</option>
                     @foreach($exams as $data)
                         <option value="{{ $data->id }}" {{ (int) ($examId ?? 0) === $data->id ? 'selected' : '' }}>
+                            {{ $data->title }}
+                        </option>
+                    @endforeach
+                </x-select>
+            </div>
+
+            {{-- Pilihan Kuis (muncul ketika Tipe Kuis) --}}
+            <div class="w-full md:w-64" x-show="filterType === 'kuis'" x-cloak x-transition>
+                <x-select 
+                    name="quiz_id" 
+                    label="Filter Kuis" 
+                    inline
+                    class="h-12"
+                >
+                    <option value="">-- Semua kuis --</option>
+                    @foreach($quizzes as $data)
+                        <option value="{{ $data->id }}" {{ (int) ($quizId ?? 0) === $data->id ? 'selected' : '' }}>
                             {{ $data->title }}
                         </option>
                     @endforeach
@@ -107,7 +141,7 @@
                             <td class="py-4 px-8">
                                 <div class="flex flex-col">
                                     <span class="font-semibold text-sm text-gray-900 dark:text-white">
-                                        {{ $data->Exam->title }}
+                                        {{ $data->Exam->title ?? $data->Quiz->title ?? '-' }}
                                     </span>
                                     <span class="text-xs text-gray-400">
                                         {{ $data->created_at->format('d M Y') }}
@@ -174,13 +208,9 @@
                                         </p>
                                     </div>
                                     <div class="mt-6">
-                                        @if(request('search'))
-                                            <x-button variant="secondary"  href="{{ route('bank-questions.index') }}">
-                                                Reset Pencarian
-                                            </x-button>
-                                        @else
-                                            <x-button variant="secondary"  href="{{ route('bank-questions.create') }}">
-                                                <i class="ti ti-plus mr-2"></i> Tambah Sekarang
+                                        @if(request('search') || request('package_id') || request('exam_id') || request('type'))
+                                            <x-button variant="secondary" href="{{ route('user.history-exams.index') }}">
+                                                Reset Filter
                                             </x-button>
                                         @endif
                                     </div>

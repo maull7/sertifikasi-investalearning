@@ -11,26 +11,45 @@ class TransQuestion extends Model
         'id_user',
         'id_package',
         'id_exam',
+        'id_quiz',
         'questions_answered',
         'total_questions',
         'total_score',
         'status',
     ];
+
     public function detailResults()
     {
         return $this->hasMany(DetailResult::class, 'id_trans_question');
     }
-    public function User()
+
+    public function user()
     {
         return $this->belongsTo(User::class, 'id_user');
     }
-    public function Package()
+
+    public function package()
     {
         return $this->belongsTo(Package::class, 'id_package');
     }
 
-    public function Exam()
+    public function exam()
     {
         return $this->belongsTo(Exam::class, 'id_exam');
+    }
+
+    public function quiz()
+    {
+        return $this->belongsTo(Quiz::class, 'id_quiz');
+    }
+
+    public function isForExam(): bool
+    {
+        return $this->id_exam !== null;
+    }
+
+    public function isForQuiz(): bool
+    {
+        return $this->id_quiz !== null;
     }
 }

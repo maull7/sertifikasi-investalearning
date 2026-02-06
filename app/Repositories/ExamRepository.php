@@ -6,6 +6,7 @@ use App\Models\DetailResult;
 use App\Models\Exam;
 use App\Models\MappingQuestion;
 use App\Models\Package;
+use App\Models\Quiz;
 use App\Models\TransQuestion;
 use App\Models\User;
 use App\Repositories\Contracts\ExamRepositoryInterface;
@@ -52,9 +53,48 @@ class ExamRepository implements ExamRepositoryInterface
         return TransQuestion::create([
             'id_user' => $user->id,
             'id_package' => $package->id,
-            'user_id' => $user->id,
             'id_exam' => $exam->id,
-            'id_type' => $package->id_master_types,
+            'id_quiz' => null,
+            'questions_answered' => $questionsAnswered,
+            'total_questions' => $totalQuestions,
+            'total_score' => 0,
+            'status' => 'tidak lulus',
+        ]);
+    }
+
+    public function countQuestionsForQuiz(Quiz $quiz): int
+    {
+        return MappingQuestion::where('id_quiz', $quiz->id)->count();
+    }
+
+    public function getQuestionsPageForQuiz(Quiz $quiz, int $page = 1, int $perPage = 1): LengthAwarePaginator
+    {
+        return MappingQuestion::where('id_quiz', $quiz->id)
+            ->with('questionBank.subject')
+            ->orderBy('id')
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function getAllMappingsWithQuestionsForQuiz(Quiz $quiz): Collection
+    {
+        return MappingQuestion::where('id_quiz', $quiz->id)
+            ->with('questionBank')
+            ->orderBy('id')
+            ->get();
+    }
+
+    public function createTransQuestionForQuiz(
+        User $user,
+        Package $package,
+        Quiz $quiz,
+        int $questionsAnswered,
+        int $totalQuestions
+    ): TransQuestion {
+        return TransQuestion::create([
+            'id_user' => $user->id,
+            'id_package' => $package->id,
+            'id_exam' => null,
+            'id_quiz' => $quiz->id,
             'questions_answered' => $questionsAnswered,
             'total_questions' => $totalQuestions,
             'total_score' => 0,

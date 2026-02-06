@@ -20,12 +20,13 @@ use App\Http\Controllers\Admin\MasterPackegeController;
 use App\Http\Controllers\Admin\MasterMaterialController;
 use App\Http\Controllers\Admin\MappingQuestionController;
 use App\Http\Controllers\User\ExamController as UserExamController;
+use App\Http\Controllers\User\QuizController as UserQuizController;
 use App\Http\Controllers\User\PackageController as UserPackageController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 
 Route::get('/', function () {
     return view('index');
-});
+})->middleware('check-login');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'admin'])
@@ -66,6 +67,12 @@ Route::middleware('auth', 'akun-active', 'profile-complete')->group(function () 
     Route::get('user/packages/{package}/exams/{exam}/questions', [UserExamController::class, 'getQuestions'])->name('user.exams.questions');
     Route::post('user/packages/{package}/exams/{exam}/submit', [UserExamController::class, 'submit'])->name('user.exams.submit');
     Route::get('user/packages/{package}/exams/{exam}/review/{trans}', [UserExamController::class, 'review'])->name('user.exams.review');
+
+    // User Quiz routes
+    Route::get('user/packages/{package}/quizzes/{quiz}', [UserQuizController::class, 'show'])->name('user.quizzes.show');
+    Route::get('user/packages/{package}/quizzes/{quiz}/questions', [UserQuizController::class, 'getQuestions'])->name('user.quizzes.questions');
+    Route::post('user/packages/{package}/quizzes/{quiz}/submit', [UserQuizController::class, 'submit'])->name('user.quizzes.submit');
+    Route::get('user/packages/{package}/quizzes/{quiz}/review/{trans}', [UserQuizController::class, 'review'])->name('user.quizzes.review');
     // Material preview & download (accessible for users who joined the package)
     Route::get('master-materials/{id}/preview', [MasterMaterialController::class, 'serveFile'])
         ->name('master-materials.preview');
