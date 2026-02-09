@@ -6,6 +6,7 @@ use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -68,19 +69,46 @@ class LoginRequest extends FormRequest
         $token = $this->string('g-recaptcha-response');
         $secret = config('services.recaptcha.secret_key');
 
-        if (empty($secret) || $token->isEmpty()) {
+        if (empty($secret)) {
+            Log::warning('reCAPTCHA: RECAPTCHA_SECRET_KEY tidak diatur di .env (production)');
+
             throw ValidationException::withMessages([
                 'g-recaptcha-response' => 'Verifikasi captcha gagal, silakan coba lagi.',
             ]);
         }
 
-        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-            'secret' => $secret,
-            'response' => $token->toString(),
-            'remoteip' => $this->ip(),
-        ]);
+        if ($token->isEmpty()) {
+            throw ValidationException::withMessages([
+                'g-recaptcha-response' => 'Verifikasi captcha gagal, silakan coba lagi.',
+            ]);
+        }
+
+        try {
+            $response = Http::asForm()
+                ->timeout(10)
+                ->post('https://www.google.com/recaptcha/api/siteverify', [
+                    'secret' => $secret,
+                    'response' => $token->toString(),
+                    'remoteip' => $this->ip(),
+                ]);
+        } catch (\Throwable $e) {
+            Log::warning('reCAPTCHA request gagal (timeout/koneksi)', [
+                'message' => $e->getMessage(),
+                'host' => $this->getHost(),
+            ]);
+
+            throw ValidationException::withMessages([
+                'g-recaptcha-response' => 'Verifikasi captcha gagal, silakan coba lagi.',
+            ]);
+        }
 
         if (! $response->json('success')) {
+            $errorCodes = $response->json('error-codes', []);
+            Log::warning('reCAPTCHA verifikasi gagal', [
+                'error_codes' => $errorCodes,
+                'host' => $this->getHost(),
+            ]);
+
             throw ValidationException::withMessages([
                 'g-recaptcha-response' => 'Verifikasi captcha gagal, silakan coba lagi.',
             ]);
