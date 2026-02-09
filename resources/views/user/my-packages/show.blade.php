@@ -121,9 +121,14 @@
                                     $url = 'https://www.youtube.com/embed/' . ($q['v'] ?? '');
                                 }
                             @endphp
-                            <iframe id="frame-video" src="{{$url}}"  class="w-full aspect-video rounded-xl"
+                            <iframe 
+                                id="frame-video" 
+                                src="{{$url}}"  
+                                class="w-full aspect-video rounded-xl"
                                 frameborder="0"
-                                allowfullscreen></iframe>
+                                allowfullscreen
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                ></iframe>
                                 @else
                                     <span class="text-xs text-gray-400">Tidak ada file</span>
                                 @endif
