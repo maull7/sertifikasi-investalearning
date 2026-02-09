@@ -33,7 +33,7 @@ class LoginRequest extends FormRequest
             'password' => ['required', 'string'],
         ];
 
-        if (! app()->environment('local')) {
+        if ($this->recaptchaRequired()) {
             $rules['g-recaptcha-response'] = ['required', 'string'];
         }
 
@@ -47,7 +47,7 @@ class LoginRequest extends FormRequest
      */
     public function authenticate(): void
     {
-        if (! app()->environment('local')) {
+        if ($this->recaptchaRequired()) {
             $this->verifyRecaptcha();
         }
 
@@ -62,6 +62,15 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+    }
+
+    protected function recaptchaRequired(): bool
+    {
+        if (app()->environment('local')) {
+            return false;
+        }
+
+        return config('services.recaptcha.enabled', true);
     }
 
     protected function verifyRecaptcha(): void

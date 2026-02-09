@@ -267,8 +267,6 @@ function examData() {
                         }
                         if (typeof saved.timeRemaining === 'number' && saved.timeRemaining > 0) {
                             this.timeRemaining = saved.timeRemaining;
-                        } else {
-                            this.timeRemaining = {{ $exam->duration ? ($exam->duration * 60) : 0 }};
                         }
                     } catch (e) {
                         console.error('Failed to parse saved exam state', e);
@@ -284,11 +282,13 @@ function examData() {
                 }
             }
 
-            if (this.timeRemaining > 0) {
-                this.startTimer();
-            }
-
             this.loadQuestion(this.currentPage);
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible' && this.timeRemaining > 0 && !this.loading) {
+                    this.loadQuestion(this.currentPage);
+                }
+            });
         },
 
         async loadQuestion(page) {
@@ -310,7 +310,17 @@ function examData() {
                 }
 
                 const data = await response.json();
-                
+
+                if (data.timer) {
+                    this.timeRemaining = Math.max(0, data.timer.remaining_seconds);
+                    if (this.timeRemaining <= 0) {
+                        this.submitExam(true);
+                        return;
+                    }
+                    if (this.timer) clearInterval(this.timer);
+                    this.startTimer();
+                }
+
                 if (data.questions && data.questions.length > 0) {
                     this.currentQuestion = data.questions[0];
                     this.totalQuestions = data.total;

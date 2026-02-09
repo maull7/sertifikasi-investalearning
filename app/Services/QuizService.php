@@ -40,6 +40,34 @@ class QuizService
         return $this->examRepository->getQuestionsPageForQuiz($quiz, $page, $perPage);
     }
 
+    public function getOrCreateQuizAttempt(User $user, Package $package, Quiz $quiz): \App\Models\QuizAttempt
+    {
+        $this->ensureUserCanAccessQuiz($user, $package, $quiz);
+
+        return $this->examRepository->getOrCreateQuizAttempt($user, $package, $quiz);
+    }
+
+    /**
+     * @return array{remaining_seconds: int, server_timestamp: int}|null
+     */
+    public function getQuizTimer(User $user, Package $package, Quiz $quiz): ?array
+    {
+        $durationMinutes = (int) $quiz->duration;
+        if ($durationMinutes <= 0) {
+            return null;
+        }
+
+        $attempt = $this->getOrCreateQuizAttempt($user, $package, $quiz);
+        $endsAt = $attempt->started_at->copy()->addMinutes($durationMinutes);
+        $now = now();
+        $remainingSeconds = (int) max(0, $endsAt->timestamp - $now->timestamp);
+
+        return [
+            'remaining_seconds' => $remainingSeconds,
+            'server_timestamp' => $now->timestamp,
+        ];
+    }
+
     /**
      * @param  array<int, string|null>  $answers
      * @return array{score: float, correct: int, total: int, status: string, trans_question_id: int, show_solutions: bool}
@@ -101,6 +129,7 @@ class QuizService
             $status = $score >= $quiz->passing_grade ? 'lulus' : 'tidak lulus';
 
             $this->examRepository->updateTransQuestionResult($trans, $score, $status);
+            $this->examRepository->deleteQuizAttempt($user, $package, $quiz);
 
             DB::commit();
 

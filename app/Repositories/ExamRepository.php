@@ -4,9 +4,11 @@ namespace App\Repositories;
 
 use App\Models\DetailResult;
 use App\Models\Exam;
+use App\Models\ExamAttempt;
 use App\Models\MappingQuestion;
 use App\Models\Package;
 use App\Models\Quiz;
+use App\Models\QuizAttempt;
 use App\Models\TransQuestion;
 use App\Models\User;
 use App\Repositories\Contracts\ExamRepositoryInterface;
@@ -41,6 +43,26 @@ class ExamRepository implements ExamRepositoryInterface
             ->with('questionBank')
             ->orderBy('id')
             ->get();
+    }
+
+    public function getOrCreateExamAttempt(User $user, Package $package, Exam $exam): ExamAttempt
+    {
+        return ExamAttempt::firstOrCreate(
+            [
+                'user_id' => $user->id,
+                'package_id' => $package->id,
+                'exam_id' => $exam->id,
+            ],
+            ['started_at' => now()]
+        );
+    }
+
+    public function deleteExamAttempt(User $user, Package $package, Exam $exam): void
+    {
+        ExamAttempt::where('user_id', $user->id)
+            ->where('package_id', $package->id)
+            ->where('exam_id', $exam->id)
+            ->delete();
     }
 
     public function createTransQuestion(
@@ -81,6 +103,26 @@ class ExamRepository implements ExamRepositoryInterface
             ->with('questionBank')
             ->orderBy('id')
             ->get();
+    }
+
+    public function getOrCreateQuizAttempt(User $user, Package $package, Quiz $quiz): QuizAttempt
+    {
+        return QuizAttempt::firstOrCreate(
+            [
+                'user_id' => $user->id,
+                'package_id' => $package->id,
+                'quiz_id' => $quiz->id,
+            ],
+            ['started_at' => now()]
+        );
+    }
+
+    public function deleteQuizAttempt(User $user, Package $package, Quiz $quiz): void
+    {
+        QuizAttempt::where('user_id', $user->id)
+            ->where('package_id', $package->id)
+            ->where('quiz_id', $quiz->id)
+            ->delete();
     }
 
     public function createTransQuestionForQuiz(
