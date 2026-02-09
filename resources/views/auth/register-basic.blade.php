@@ -161,7 +161,15 @@
                         />
                     </div>
 
-                  
+                    {{-- reCAPTCHA (production, bila enabled dan key terisi) --}}
+                    @if (! app()->environment('local') && config('services.recaptcha.enabled', true) && config('services.recaptcha.site_key') && config('services.recaptcha.secret_key'))
+                        <div>
+                            <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                            @error('g-recaptcha-response')
+                                <p class="mt-2 text-xs text-rose-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endif
 
                     {{-- ACTION BUTTONS --}}
                     <div class="space-y-4 pt-2">
@@ -199,4 +207,7 @@
         </p>
     </div>
 </div>
+@if (! app()->environment('local') && config('services.recaptcha.enabled', true) && config('services.recaptcha.site_key'))
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+@endif
 @endsection
