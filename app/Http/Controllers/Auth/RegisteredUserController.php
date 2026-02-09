@@ -44,13 +44,13 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
 
-        if (! app()->environment('local')) {
+        if (! app()->environment('local') && config('services.recaptcha.enabled', true)) {
             $rules['g-recaptcha-response'] = ['required', 'string'];
         }
 
         $request->validate($rules);
 
-        if (! app()->environment('local')) {
+        if (! app()->environment('local') && config('services.recaptcha.enabled', true)) {
             $this->verifyRecaptcha($request);
         }
 

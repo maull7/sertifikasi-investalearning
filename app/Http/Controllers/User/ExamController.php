@@ -76,6 +76,8 @@ class ExamController extends Controller
 
         $mappingQuestions = $this->examService->getQuestionPage($user, $package, $exam, $page, $perPage);
 
+        $timer = $this->examService->getExamTimer($user, $package, $exam);
+
         // Jangan kirim kunci jawaban saat mengerjakan ujian (meskipun sudah 3x)
         // Kunci jawaban hanya muncul di halaman review setelah submit
         $questions = $mappingQuestions->map(function ($mapping) {
@@ -103,13 +105,19 @@ class ExamController extends Controller
             ];
         });
 
-        return response()->json([
+        $payload = [
             'questions' => $questions,
             'current_page' => $mappingQuestions->currentPage(),
             'last_page' => $mappingQuestions->lastPage(),
             'total' => $mappingQuestions->total(),
             'has_more' => $mappingQuestions->hasMorePages(),
-        ]);
+        ];
+
+        if ($timer !== null) {
+            $payload['timer'] = $timer;
+        }
+
+        return response()->json($payload);
     }
 
     public function review(Request $request, Package $package, Exam $exam, TransQuestion $trans): View

@@ -37,6 +37,8 @@ class QuizController extends Controller
 
         $mappingQuestions = $this->quizService->getQuestionPage($user, $package, $quiz, $page, $perPage);
 
+        $timer = $this->quizService->getQuizTimer($user, $package, $quiz);
+
         $questions = $mappingQuestions->map(function ($mapping) {
             $question = $mapping->questionBank;
 
@@ -62,13 +64,19 @@ class QuizController extends Controller
             ];
         });
 
-        return response()->json([
+        $payload = [
             'questions' => $questions,
             'current_page' => $mappingQuestions->currentPage(),
             'last_page' => $mappingQuestions->lastPage(),
             'total' => $mappingQuestions->total(),
             'has_more' => $mappingQuestions->hasMorePages(),
-        ]);
+        ];
+
+        if ($timer !== null) {
+            $payload['timer'] = $timer;
+        }
+
+        return response()->json($payload);
     }
 
     public function submit(Request $request, Package $package, Quiz $quiz): JsonResponse

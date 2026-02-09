@@ -41,6 +41,39 @@ class ExamService
     }
 
     /**
+     * Get or create exam attempt (untuk timer server-side). Panggil saat user load soal.
+     */
+    public function getOrCreateExamAttempt(User $user, Package $package, Exam $exam): \App\Models\ExamAttempt
+    {
+        $this->ensureUserCanAccessExam($user, $package, $exam);
+
+        return $this->examRepository->getOrCreateExamAttempt($user, $package, $exam);
+    }
+
+    /**
+     * Hitung sisa waktu (detik) berdasarkan started_at di server. Tetap berjalan meski device mati.
+     *
+     * @return array{remaining_seconds: int, server_timestamp: int}
+     */
+    public function getExamTimer(User $user, Package $package, Exam $exam): ?array
+    {
+        $durationMinutes = (int) $exam->duration;
+        if ($durationMinutes <= 0) {
+            return null;
+        }
+
+        $attempt = $this->getOrCreateExamAttempt($user, $package, $exam);
+        $endsAt = $attempt->started_at->copy()->addMinutes($durationMinutes);
+        $now = now();
+        $remainingSeconds = (int) max(0, $endsAt->timestamp - $now->timestamp);
+
+        return [
+            'remaining_seconds' => $remainingSeconds,
+            'server_timestamp' => $now->timestamp,
+        ];
+    }
+
+    /**
      * Menghitung nilai, menyimpan ke trans_questions & detail_results,
      * dan mengembalikan ringkasan hasil.
      *
@@ -116,6 +149,8 @@ class ExamService
                 ->count();
 
             $showSolutions = $attemptCount >= 3;
+
+            $this->examRepository->deleteExamAttempt($user, $package, $exam);
 
             return [
                 'score' => $score,

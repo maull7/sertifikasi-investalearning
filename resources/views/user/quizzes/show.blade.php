@@ -214,7 +214,6 @@ function quizData() {
                         }
                         if (saved.currentPage && Number.isInteger(saved.currentPage)) this.currentPage = saved.currentPage;
                         if (typeof saved.timeRemaining === 'number' && saved.timeRemaining > 0) this.timeRemaining = saved.timeRemaining;
-                        else this.timeRemaining = {{ $quiz->duration ? ($quiz->duration * 60) : 0 }};
                     } catch (e) {
                         this.answers = {};
                         this.currentPage = 1;
@@ -226,8 +225,13 @@ function quizData() {
                     this.timeRemaining = {{ $quiz->duration ? ($quiz->duration * 60) : 0 }};
                 }
             }
-            if (this.timeRemaining > 0) this.startTimer();
             this.loadQuestion(this.currentPage);
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible' && this.timeRemaining > 0 && !this.loading) {
+                    this.loadQuestion(this.currentPage);
+                }
+            });
         },
 
         async loadQuestion(page) {
@@ -241,6 +245,17 @@ function quizData() {
                 });
                 if (!response.ok) throw new Error('Gagal memuat soal');
                 const data = await response.json();
+
+                if (data.timer) {
+                    this.timeRemaining = Math.max(0, data.timer.remaining_seconds);
+                    if (this.timeRemaining <= 0) {
+                        this.submitQuiz(true);
+                        return;
+                    }
+                    if (this.timer) clearInterval(this.timer);
+                    this.startTimer();
+                }
+
                 if (data.questions && data.questions.length > 0) {
                     this.currentQuestion = data.questions[0];
                     this.totalQuestions = data.total;

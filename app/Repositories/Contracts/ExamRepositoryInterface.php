@@ -3,8 +3,10 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\Exam;
+use App\Models\ExamAttempt;
 use App\Models\Package;
 use App\Models\Quiz;
+use App\Models\QuizAttempt;
 use App\Models\TransQuestion;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -23,6 +25,10 @@ interface ExamRepositoryInterface
      */
     public function getAllMappingsWithQuestions(Exam $exam): Collection;
 
+    public function getOrCreateExamAttempt(User $user, Package $package, Exam $exam): ExamAttempt;
+
+    public function deleteExamAttempt(User $user, Package $package, Exam $exam): void;
+
     public function createTransQuestion(User $user, Package $package, Exam $exam, int $questionsAnswered, int $totalQuestions): TransQuestion;
 
     public function updateTransQuestionResult(TransQuestion $trans, float $score, string $status): void;
@@ -37,6 +43,10 @@ interface ExamRepositoryInterface
      * @return \Illuminate\Support\Collection<int, \App\Models\MappingQuestion>
      */
     public function getAllMappingsWithQuestionsForQuiz(Quiz $quiz): Collection;
+
+    public function getOrCreateQuizAttempt(User $user, Package $package, Quiz $quiz): QuizAttempt;
+
+    public function deleteQuizAttempt(User $user, Package $package, Quiz $quiz): void;
 
     public function createTransQuestionForQuiz(User $user, Package $package, Quiz $quiz, int $questionsAnswered, int $totalQuestions): TransQuestion;
 }
