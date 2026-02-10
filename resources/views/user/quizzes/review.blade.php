@@ -92,9 +92,21 @@
                         @endif
                     </div>
 
+                    {{-- Pilihan jawaban: minimal sampai D, maksimal sampai E — hanya opsi yang ada isinya --}}
                     <div class="space-y-3">
                         <h4 class="text-xs font-semibold tracking-[0.16em] uppercase text-gray-400 dark:text-gray-500 mb-2">Pilihan Jawaban</h4>
-                        @foreach(['A', 'B', 'C', 'D', 'E'] as $option)
+                        @php
+                            $allLetters = ['A', 'B', 'C', 'D', 'E'];
+                            $lastIndex = -1;
+                            foreach ($allLetters as $i => $letter) {
+                                $key = 'option_' . strtolower($letter);
+                                if (trim((string) ($question->$key ?? '')) !== '') {
+                                    $lastIndex = $i;
+                                }
+                            }
+                            $availableOptions = $lastIndex < 0 ? ['A', 'B', 'C', 'D'] : array_slice($allLetters, 0, $lastIndex + 1);
+                        @endphp
+                        @foreach($availableOptions as $option)
                             @php
                                 $optionKey = 'option_' . strtolower($option);
                                 $optionText = $question->$optionKey ?? '';

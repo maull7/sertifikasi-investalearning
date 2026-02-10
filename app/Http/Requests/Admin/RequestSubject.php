@@ -35,8 +35,8 @@ class RequestSubject extends FormRequest
     public function messages(): array
     {
         return [
-            'master_type_id.required' => 'Jurusan wajib dipilih.',
-            'master_type_id.exists' => 'Jurusan tidak valid.',
+            'master_type_id.required' => 'Jenis wajib dipilih.',
+            'master_type_id.exists' => 'Jenis tidak valid.',
             'name.required' => 'Nama mata pelajaran wajib diisi.',
             'name.max' => 'Nama mata pelajaran maksimal 255 karakter.',
             'code.max' => 'Kode mata pelajaran maksimal 50 karakter.',
@@ -44,5 +44,3 @@ class RequestSubject extends FormRequest
         ];
     }
 }
-
-

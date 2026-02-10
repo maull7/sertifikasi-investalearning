@@ -99,7 +99,7 @@
 
                     <div class="space-y-3">
                         <h4 class="text-xs font-semibold tracking-[0.16em] uppercase text-gray-400 dark:text-gray-500 mb-2">Pilih Jawaban</h4>
-                        <template x-for="(option, index) in ['A', 'B', 'C', 'D', 'E']" :key="index">
+                        <template x-for="(option, index) in getAvailableOptions()" :key="index">
                             <label
                                 @click="selectedAnswer = option; saveAnswer()"
                                 class="flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all bg-white dark:bg-gray-900"
@@ -306,6 +306,20 @@ function quizData() {
                 answers: this.answers,
                 timeRemaining: this.timeRemaining,
             }));
+        },
+
+        // Opsi pilihan: minimal sampai D, maksimal sampai E (hanya tampil yang ada isinya)
+        getAvailableOptions() {
+            if (!this.currentQuestion) return [];
+            const options = ['A', 'B', 'C', 'D', 'E'];
+            let lastIndex = -1;
+            for (let i = 0; i < options.length; i++) {
+                const key = 'option_' + options[i].toLowerCase();
+                const val = this.currentQuestion[key];
+                if (val != null && String(val).trim() !== '') lastIndex = i;
+            }
+            if (lastIndex < 0) return ['A', 'B', 'C', 'D'];
+            return options.slice(0, lastIndex + 1);
         },
 
         async submitQuiz(auto = false) {
