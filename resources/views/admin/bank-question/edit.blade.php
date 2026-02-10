@@ -239,8 +239,7 @@
                         label="Opsi E" 
                         name="option_e" 
                         placeholder="Masukkan opsi E" 
-                        value="{{ old('option_e', $data->option_e) }}"
-                        required 
+                        value="{{ old('option_e', $data->option_e ?? '') }}" 
                     />
                 </div>
 

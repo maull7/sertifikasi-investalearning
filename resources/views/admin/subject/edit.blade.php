@@ -41,7 +41,7 @@
                 {{-- Jenis --}}
                 <div class="md:col-span-2">
                     <x-select 
-                        label="Jurusan" 
+                        label="Jenis" 
                         name="master_type_id" 
                         required
                     >
