@@ -3,6 +3,7 @@
 namespace App\View\Components;
 
 use App\Models\User;
+use App\Models\UserJoin;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,8 @@ class Sidebar extends Component
     public array $menuGroups;
 
     public int $unverifiedCount;
+
+    public int $pendingPackageCount = 0;
 
     public bool $isAdmin;
 
@@ -27,9 +30,11 @@ class Sidebar extends Component
                 ->where('role', 'User')
                 ->where('status_user', 'Belum Teraktivasi')
                 ->count();
+            $this->pendingPackageCount = UserJoin::where('status', 'pending')->count();
         } else {
             $this->menuGroups = $this->getUserMenu();
             $this->unverifiedCount = 0;
+            $this->pendingPackageCount = 0;
         }
     }
 
@@ -42,10 +47,11 @@ class Sidebar extends Component
                     [
                         'name' => 'Dashboard',
                         'icon' => 'smart-home',
-                        'activePattern' => 'dashboard || user.not.active',
+                        'activePattern' => 'dashboard || user.not.active || approve-packages.*',
                         'subItems' => [
                             ['name' => 'Dashboard', 'route' => 'dashboard'],
                             ['name' => 'Aktivasi akun', 'route' => 'user.not.active'],
+                            ['name' => 'Persetujuan Pendaftaran Paket', 'route' => 'approve-packages.index'],
                         ],
                     ],
                     [

@@ -32,8 +32,11 @@ class PackageController extends Controller
         $joinedPackageIds = UserJoin::where('user_id', $user->id)
             ->pluck('id_package')
             ->toArray();
+        $joinedStatus = UserJoin::where('user_id', $user->id)
+            ->pluck('status', 'id_package')
+            ->toArray();
 
-        return view('user.packages.index', compact('packages', 'joinedPackageIds', 'types'));
+        return view('user.packages.index', compact('packages', 'joinedPackageIds', 'joinedStatus', 'types'));
     }
 
     public function show(Package $package): View
@@ -68,7 +71,7 @@ class PackageController extends Controller
         ]);
 
         return redirect()->route('user.my-packages.show', $package)
-            ->with('success', 'Berhasil bergabung dengan package!');
+            ->with('success', 'Berhasil Daftar ke paket ini, tunggu konfirmasi dari admin!');
     }
 
     public function landing(Request $request): View
