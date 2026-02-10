@@ -6,6 +6,7 @@
         tooltipVisible: false,
         tooltipTop: 0,
         unverifiedCount: {{ $unverifiedCount ?? 0 }},
+        pendingPackageCount: {{ $pendingPackageCount ?? 0 }},
         get expanded() {
             if (window.innerWidth < 1280) return true;
             return $store.sidebar.isExpanded;
@@ -30,9 +31,15 @@
                 .then(r => r.json())
                 .then(d => { this.unverifiedCount = d.count || 0 })
                 .catch(() => {});
+        },
+        fetchPendingPackages() {
+            fetch('{{ route('admin.pending-packages-count') }}', { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } })
+                .then(r => r.json())
+                .then(d => { this.pendingPackageCount = d.count || 0 })
+                .catch(() => {});
         }
     }"
-    x-init="$nextTick(() => { if ({{ $isAdmin ? 'true' : 'false' }} && typeof fetch !== 'undefined') { $data.fetchUnverified(); setInterval(() => $data.fetchUnverified(), 30000); } })"
+    x-init="$nextTick(() => { if ({{ $isAdmin ? 'true' : 'false' }} && typeof fetch !== 'undefined') { $data.fetchUnverified(); $data.fetchPendingPackages(); setInterval(() => { $data.fetchUnverified(); $data.fetchPendingPackages(); }, 30000); } })"
     :class="{
         'w-72': expanded,
         'w-20': !expanded,
@@ -104,6 +111,10 @@
                                                 <span x-show="unverifiedCount > 0" x-transition
                                                     class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-950 animate-pulse"></span>
                                             @endif
+                                            @if(in_array('approve-packages.index', array_column($item['subItems'] ?? [], 'route')))
+                                                <span x-show="pendingPackageCount > 0" x-transition
+                                                    class="absolute -top-1 -right-3.5 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-white dark:ring-gray-950 animate-pulse"></span>
+                                            @endif
                                         </span>
                                         
                                         <span x-show="expanded" x-cloak class="ml-3 font-medium text-sm grow text-left flex items-center gap-2">
@@ -112,6 +123,11 @@
                                                 <span x-show="unverifiedCount > 0" x-transition
                                                     class="min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full bg-rose-500 text-white text-[10px] font-bold animate-pulse"
                                                     x-text="unverifiedCount"></span>
+                                            @endif
+                                            @if(in_array('approve-packages.index', array_column($item['subItems'] ?? [], 'route')))
+                                                <span x-show="pendingPackageCount > 0" x-transition
+                                                    class="min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full bg-amber-500 text-white text-[10px] font-bold animate-pulse"
+                                                    x-text="pendingPackageCount"></span>
                                             @endif
                                         </span>
 
@@ -139,6 +155,11 @@
                                                             <span x-show="unverifiedCount > 0" x-transition
                                                                 class="shrink-0 min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full bg-rose-500 text-white text-[10px] font-bold animate-pulse"
                                                                 x-text="unverifiedCount"></span>
+                                                        @endif
+                                                        @if(($sub['route'] ?? '') === 'approve-packages.index')
+                                                            <span x-show="pendingPackageCount > 0" x-transition
+                                                                class="shrink-0 min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full bg-amber-500 text-white text-[10px] font-bold animate-pulse"
+                                                                x-text="pendingPackageCount"></span>
                                                         @endif
                                                     </a>
                                                 </li>

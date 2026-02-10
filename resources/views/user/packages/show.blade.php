@@ -62,7 +62,7 @@
                     <form action="{{ route('user.packages.join', $package) }}" method="POST" class="inline">
                         @csrf
                         <x-button variant="primary" type="submit" class="w-full md:w-auto rounded-xl shadow-lg shadow-indigo-500/20">
-                            <i class="ti ti-plus mr-2"></i> Bergabung Sekarang
+                            <i class="ti ti-plus mr-2"></i> Daftar Paket Sekarang
                         </x-button>
                     </form>
                 @endif

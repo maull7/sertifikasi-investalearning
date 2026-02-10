@@ -34,9 +34,19 @@
                                     </span>
                                 @endif
                             </div>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
-                                <i class="ti ti-check mr-1"></i> Terdaftar
-                            </span>
+                            @if ($userJoin->status === 'approved')
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                    <i class="ti ti-check mr-1"></i> Terdaftar
+                                </span>
+                            @elseif ($userJoin->status === 'rejected')
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">
+                                    <i class="ti ti-x mr-1"></i> Ditolak
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-300">
+                                    <i class="ti ti-clock mr-1"></i> Menunggu Persetujuan
+                                </span>
+                            @endif
                         </div>
 
                         {{-- Description --}}
@@ -60,9 +70,19 @@
 
                         {{-- Action Button --}}
                         <div class="pt-2">
-                            <x-button variant="primary" href="{{ route('user.my-packages.show', $package) }}" class="w-full rounded-xl shadow-lg shadow-indigo-500/20">
-                                <i class="ti ti-arrow-right mr-2"></i> Lanjutkan Belajar
-                            </x-button>
+                            @if($userJoin->status === 'approved')
+                                <x-button variant="primary" href="{{ route('user.my-packages.show', $package) }}" class="w-full rounded-xl shadow-lg shadow-indigo-500/20">
+                                    <i class="ti ti-arrow-right mr-2"></i> Lanjutkan Belajar
+                                </x-button>
+                            @elseif($userJoin->status === 'rejected')
+                                <x-button variant="danger" disabled class="w-full rounded-xl">
+                                    <i class="ti ti-x mr-2"></i> Pendaftaran Ditolak
+                                </x-button>
+                            @else
+                                <x-button variant="warning" disabled class="w-full rounded-xl">
+                                    <i class="ti ti-clock mr-2"></i> Menunggu Persetujuan
+                                </x-button>
+                            @endif
                         </div>
                     </div>
                 </x-card>

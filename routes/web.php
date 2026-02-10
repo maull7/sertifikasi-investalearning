@@ -17,6 +17,7 @@ use App\Http\Controllers\ProfileCompletionController;
 use App\Http\Controllers\User\CertificateControlller;
 use App\Http\Controllers\Admin\BankQuestionController;
 use App\Http\Controllers\Admin\MasterPackegeController;
+use App\Http\Controllers\Admin\ApprovePackageController;
 use App\Http\Controllers\Admin\MasterMaterialController;
 use App\Http\Controllers\Admin\MappingQuestionController;
 use App\Http\Controllers\User\ExamController as UserExamController;
@@ -171,6 +172,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/get-package/{type}', [CertificateController::class, 'getPackage'])->name('get-package.type');
 
     Route::resource('certificates', CertificateController::class)->only(['index', 'create', 'store', 'show']);
+
+    Route::get('admin/pending-packages-count', [ApprovePackageController::class, 'pendingCount'])
+        ->name('admin.pending-packages-count');
+    Route::get('approve-packages', [ApprovePackageController::class, 'index'])
+        ->name('approve-packages.index');
+    Route::patch('approve-packages/{userJoin}/approve', [ApprovePackageController::class, 'approve'])
+        ->name('approve-packages.approve');
+    Route::patch('approve-packages/{userJoin}/reject', [ApprovePackageController::class, 'reject'])
+        ->name('approve-packages.reject');
 });
 
 require __DIR__ . '/auth.php';
