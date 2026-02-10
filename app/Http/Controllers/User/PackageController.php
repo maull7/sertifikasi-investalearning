@@ -70,7 +70,7 @@ class PackageController extends Controller
             'id_package' => $package->id,
         ]);
 
-        return redirect()->route('user.my-packages.show', $package)
+        return redirect()->route('user.my-packages.index')
             ->with('success', 'Berhasil Daftar ke paket ini, tunggu konfirmasi dari admin!');
     }
 
