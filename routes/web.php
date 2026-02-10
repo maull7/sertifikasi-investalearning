@@ -45,13 +45,16 @@ Route::get('/user/dashboard/chart-data', [UserDashboardController::class, 'getCh
 // Chart Data API
 Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
 
-Route::middleware('auth', 'akun-active', 'profile-complete')->group(function () {
+Route::middleware('auth', 'akun-active')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/profile/complete', [ProfileCompletionController::class, 'show'])->name('profile.complete');
     Route::patch('/profile/complete', [ProfileCompletionController::class, 'update'])->name('profile.complete.update');
+
+    //landing
+    Route::get('/user/landing', [UserPackageController::class, 'landing'])->name('user.landing');
 
     // User Package routes
     Route::get('user/packages', [UserPackageController::class, 'index'])->name('user.packages.index');

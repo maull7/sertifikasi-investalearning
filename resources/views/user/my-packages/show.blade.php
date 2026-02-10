@@ -156,6 +156,12 @@
     {{-- Exams List --}}
     @php
         $quizez = \App\Models\Quiz::where('package_id', $package->id)->get();
+        $lastResultPackage = \App\Models\TransQuestion::where('id_user', auth()->id())
+                            ->whereHas('quiz', function($q) use ($package) {
+                                $q->where('package_id', $package->id);
+                            })
+                            ->latest()
+                            ->first();
     @endphp
 
       @if($quizez->count() > 0)
@@ -206,6 +212,11 @@
                                             {{ Str::limit(strip_tags($quizItem->description), 80) }}
                                         </p>
                                 @endif
+                               
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                           Nilai Terakhir Mengerjakan: {{ $lastResultPackage ? $lastResultPackage->total_score : 'Belum pernah mengikuti kuis' }}
+                                        </p>
+                            
                             </div>
                         </div>
 
