@@ -27,20 +27,34 @@ class EmailActivation extends Controller
     public function index(Request $request)
     {
         $search = $request->search;
+        $tab = $request->get('tab', 'pending'); // pending | activated | google
+        if (!in_array($tab, ['pending', 'activated', 'google'], true)) {
+            $tab = 'pending';
+        }
 
-        $list = User::where('role', 'User')
-            ->where('status_user', 'Belum Teraktivasi')
-            ->when($search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
+        $query = User::where('role', 'User');
+
+        if ($tab === 'pending') {
+            $query->where('status_user', 'Belum Teraktivasi');
+        } elseif ($tab === 'activated') {
+            $query->where('status_user', 'Teraktivasi')->orderByDesc('updated_at');
+        } else {
+            // google: registrasi pakai Google
+            $query->whereNotNull('google_id')->orderByDesc('created_at');
+        }
+
+        $list = $query
+            ->when($search, function ($q, $search) {
+                $q->where(function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%")
                         ->orWhere('phone', 'like', "%{$search}%");
                 });
             })
             ->paginate(10)
-            ->withQueryString(); // biar pagination ga ilang search
+            ->withQueryString();
 
-        return view('admin.user.index', compact('list', 'search'));
+        return view('admin.user.index', compact('list', 'search', 'tab'));
     }
 
     // 👇 FUNGSI AKTIVASI + KIRIM EMAIL
