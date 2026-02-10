@@ -70,4 +70,26 @@ class PackageController extends Controller
         return redirect()->route('user.my-packages.show', $package)
             ->with('success', 'Berhasil bergabung dengan package!');
     }
+
+    public function landing(Request $request): View
+    {
+        $user = Auth::user();
+        $types = MasterType::with('subjects', 'packages')->get();
+
+        $query = Package::with(['masterType', 'materials'])
+            ->where('status', 'active');
+
+        if ($request->has('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+        if ($request->has('id_type')) {
+            $query->where('id_master_types', $request->id_type);
+        }
+        $packages = $query->paginate(12);
+
+        $joinedPackageIds = UserJoin::where('user_id', $user->id)
+            ->pluck('id_package')
+            ->toArray();
+        return view('user.landing', compact('packages', 'joinedPackageIds', 'types'));
+    }
 }

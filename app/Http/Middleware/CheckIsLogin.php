@@ -23,7 +23,9 @@ class CheckIsLogin
         if (Auth::user()->role === 'Admin') {
             return redirect()->route('dashboard');
         }
-
+        if (Auth::user()->role === 'User' && Auth::user()->needsProfileCompletion()) {
+            return redirect()->route('user.landing');
+        }
         return redirect()->route('user.dashboard');
     }
 }
