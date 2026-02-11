@@ -70,25 +70,46 @@
         </div>
     </x-card>
 
-    {{-- Materials Preview --}}
-    @if($materials->count() > 0)
+    {{-- Materials Preview (dikelompokkan per Mata Pelajaran) --}}
+    @if($subjects->sum(fn($s) => $s->materials->count()) > 0)
         <x-card title="Materi dalam Package">
-            <div class="space-y-4">
-                @foreach($materials as $material)
-                    <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800">
-                        <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg flex items-center justify-center">
-                            <i class="{{ $material->file_icon }} text-xl {{ $material->file_type === 'pdf' ? 'text-rose-600' : 'text-blue-600' }}"></i>
+            <div class="space-y-8">
+                @foreach($subjects as $subject)
+                    @if($subject->materials->count() > 0)
+                        <div>
+                            <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+                                <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
+                                    <i class="ti ti-book text-xs"></i>
+                                </span>
+                                {{ $subject->name }}
+                                @if($subject->code)
+                                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400">({{ $subject->code }})</span>
+                                @endif
+                            </h3>
+                            <div class="space-y-3 pl-0 md:pl-5 border-l-0 md:border-l-2 border-indigo-100 dark:border-indigo-900/50">
+                                @foreach($subject->materials as $material)
+                                    <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800">
+                                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg flex items-center justify-center shrink-0">
+                                            @if($material->materi_type == 'File')
+                                                <i class="{{ $material->file_icon }} text-lg {{ $material->file_type === 'pdf' ? 'text-rose-600' : 'text-blue-600' }}"></i>
+                                            @else
+                                                <i class="ti ti-video text-lg text-indigo-600"></i>
+                                            @endif
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="font-semibold text-gray-900 dark:text-white truncate">{{ $material->title }}</h4>
+                                            @if($material->topic)
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $material->topic }}</p>
+                                            @endif
+                                        </div>
+                                        @if($material->value)
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ $material->file_size_formatted }}</span>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 dark:text-white truncate">{{ $material->title }}</h4>
-                            @if($material->subject)
-                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $material->subject->name }}</p>
-                            @endif
-                        </div>
-                        @if($material->value)
-                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ $material->file_size_formatted }}</span>
-                        @endif
-                    </div>
+                    @endif
                 @endforeach
             </div>
         </x-card>

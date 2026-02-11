@@ -11,7 +11,6 @@ class Material extends Model
     use HasFactory;
 
     protected $fillable = [
-        'package_id',
         'title',
         'description',
         'value',
@@ -28,10 +27,6 @@ class Material extends Model
         'file_size_formatted',
     ];
 
-    public function package(): BelongsTo
-    {
-        return $this->belongsTo(Package::class, 'package_id');
-    }
     public function subject(): BelongsTo
     {
         return $this->belongsTo(Subject::class, 'id_subject');

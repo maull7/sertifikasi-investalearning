@@ -46,6 +46,8 @@ Route::get('/user/dashboard/chart-data', [UserDashboardController::class, 'getCh
 // Chart Data API
 Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
 
+
+//routes user
 Route::middleware('auth', 'akun-active')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -65,6 +67,7 @@ Route::middleware('auth', 'akun-active')->group(function () {
     // My Packages routes
     Route::get('user/my-packages', [MyPackageController::class, 'index'])->name('user.my-packages.index');
     Route::get('user/my-packages/{package}', [MyPackageController::class, 'show'])->name('user.my-packages.show');
+    Route::post('user/my-packages/{material}/mark-as-read', [MyPackageController::class, 'markAsRead'])->name('user.mark-as-read');
 
     // User Exam routes
     Route::get('user/packages/{package}/exams/{exam}', [UserExamController::class, 'show'])->name('user.exams.show');
@@ -96,6 +99,8 @@ Route::middleware('auth', 'akun-active')->group(function () {
         ->name('certificates.download');
 });
 
+
+//routes admin
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('master-types/import', [MasterTypesController::class, 'ImportTemplate'])->name('master-types.import');
     Route::get('master-types/export-template', [MasterTypesController::class, 'ExportTemplate'])->name('master-types.export-template');

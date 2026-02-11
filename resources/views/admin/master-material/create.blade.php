@@ -37,21 +37,6 @@
                     </div>
                 @endif
 
-                {{-- Package Select --}}
-                <div class="md:col-span-2">
-                    <x-select 
-                        label="Paket" 
-                        name="package_id" 
-                        required
-                    >
-                        <option value="">Pilih Paket</option>
-                        @foreach($packages as $package)
-                            <option value="{{ $package->id }}" {{ old('package_id') == $package->id ? 'selected' : '' }}>
-                                {{ $package->title }}
-                            </option>
-                        @endforeach
-                    </x-select>
-                </div>
                 <div class="md:col-span-2">
                     <x-select 
                         label="Mata Pelajaran" 

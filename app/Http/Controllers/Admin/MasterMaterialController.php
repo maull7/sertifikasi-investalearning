@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\RequestMaterial;
-use App\Models\Material;
 use App\Models\Package;
 use App\Models\Subject;
+use App\Models\Material;
+use App\Models\StatusMateri;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Admin\RequestMaterial;
 
 class MasterMaterialController extends Controller
 {
@@ -19,7 +21,7 @@ class MasterMaterialController extends Controller
     {
         $search = $request->query('search');
 
-        $data = Material::with('package', 'subject')
+        $data = Material::with('subject')
             ->when($search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
@@ -36,9 +38,8 @@ class MasterMaterialController extends Controller
      */
     public function create()
     {
-        $packages = Package::where('status', 'active')->get();
         $subjects = Subject::all();
-        return view('admin.master-material.create', compact('packages', 'subjects'));
+        return view('admin.master-material.create', compact('subjects'));
     }
 
     /**
@@ -91,9 +92,8 @@ class MasterMaterialController extends Controller
     public function edit(string $id)
     {
         $data = Material::findOrFail($id);
-        $packages = Package::where('status', 'active')->get();
         $subjects = Subject::all();
-        return view('admin.master-material.edit', compact('data', 'packages', 'subjects'));
+        return view('admin.master-material.edit', compact('data', 'subjects'));
     }
 
     /**
@@ -162,7 +162,16 @@ class MasterMaterialController extends Controller
 
         $filePath = Storage::disk('public')->path($material->value);
         $mimeType = Storage::disk('public')->mimeType($material->value);
-
+        $statusMateri = StatusMateri::where('id_user', Auth::user()->id)
+            ->where('id_material', $material->id)
+            ->first();
+        if (!$statusMateri || $statusMateri->status !== 'completed') {
+            StatusMateri::create([
+                'id_user' => Auth::user()->id,
+                'id_material' => $material->id,
+                'status' => 'in_progress',
+            ]);
+        }
         return response()->file($filePath, [
             'Content-Type' => $mimeType,
             'Content-Disposition' => 'inline; filename="' . $material->file_name . '"',
