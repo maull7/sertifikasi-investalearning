@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\RequestMaterial;
-use App\Models\Material;
 use App\Models\Package;
 use App\Models\Subject;
+use App\Models\Material;
+use App\Models\StatusMateri;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Admin\RequestMaterial;
 
 class MasterMaterialController extends Controller
 {
@@ -162,7 +164,16 @@ class MasterMaterialController extends Controller
 
         $filePath = Storage::disk('public')->path($material->value);
         $mimeType = Storage::disk('public')->mimeType($material->value);
-
+        $statusMateri = StatusMateri::where('id_user', Auth::user()->id)
+            ->where('id_material', $material->id)
+            ->first();
+        if (!$statusMateri || $statusMateri->status !== 'completed') {
+            StatusMateri::create([
+                'id_user' => Auth::user()->id,
+                'id_material' => $material->id,
+                'status' => 'in_progress',
+            ]);
+        }
         return response()->file($filePath, [
             'Content-Type' => $mimeType,
             'Content-Disposition' => 'inline; filename="' . $material->file_name . '"',
