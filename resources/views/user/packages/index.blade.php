@@ -121,7 +121,7 @@
                         <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                             <div class="flex items-center gap-1">
                                 <i class="ti ti-book"></i>
-                                <span>{{ $package->materials->count() }} Materi</span>
+                                <span> {{ $package?->masterType?->subjects?->flatMap->materials?->count() ?? 0 }} Materi</span>
                             </div>
                             <div class="flex items-center gap-1">
                                 <i class="ti ti-users"></i>

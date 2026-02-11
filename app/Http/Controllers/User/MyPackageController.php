@@ -18,7 +18,7 @@ class MyPackageController extends Controller
     {
         $user = Auth::user();
         $joinedPackages = UserJoin::where('user_id', $user->id)
-            ->with(['package.masterType', 'package.materials'])
+            ->with(['package.masterType.subjects.materials'])
             ->paginate(12);
 
         return view('user.my-packages.index', compact('joinedPackages'));
@@ -36,11 +36,10 @@ class MyPackageController extends Controller
             abort(403, 'Anda belum bergabung dengan package ini.');
         }
 
-        $materials = Material::where('package_id', $package->id)
-            ->with('subject')
-            ->get();
+        $package->load(['masterType.subjects.materials' => fn ($q) => $q->with('subject')]);
+        $subjects = $package->masterType ? $package->masterType->subjects : collect();
 
-        return view('user.my-packages.show', compact('package', 'materials'));
+        return view('user.my-packages.show', compact('package', 'subjects'));
     }
     public function markAsRead(Material $material): RedirectResponse
     {

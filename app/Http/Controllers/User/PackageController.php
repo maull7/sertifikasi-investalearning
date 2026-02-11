@@ -18,7 +18,7 @@ class PackageController extends Controller
         $user = Auth::user();
         $types = MasterType::with('subjects', 'packages')->get();
 
-        $query = Package::with(['masterType', 'materials'])
+        $query = Package::with(['masterType.subjects.materials'])
             ->where('status', 'active');
 
         if ($request->has('search')) {
@@ -47,9 +47,10 @@ class PackageController extends Controller
             ->where('id_package', $package->id)
             ->exists();
 
-        $materials = $package->materials()->with('subject')->get();
+        $package->load(['masterType.subjects.materials' => fn ($q) => $q->with('subject')]);
+        $subjects = $package->masterType ? $package->masterType->subjects : collect();
 
-        return view('user.packages.show', compact('package', 'isJoined', 'materials'));
+        return view('user.packages.show', compact('package', 'isJoined', 'subjects'));
     }
 
     public function join(Package $package): RedirectResponse
@@ -79,7 +80,7 @@ class PackageController extends Controller
         $user = Auth::user();
         $types = MasterType::with('subjects', 'packages')->get();
 
-        $query = Package::with(['masterType', 'materials'])
+        $query = Package::with(['masterType.subjects.materials'])
             ->where('status', 'active');
 
         if ($request->has('search')) {

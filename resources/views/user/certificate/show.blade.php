@@ -157,7 +157,7 @@
                                         @forelse($certificate->package?->materials ?? [] as $material)
                                             <tr>
                                                 <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white align-top">
-                                                    {{ $material->index + 1 }}
+                                                    {{ $loop->iteration }}
                                                 </td>
                                                 <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white align-top">
                                                     {{ $material->subject->code }}

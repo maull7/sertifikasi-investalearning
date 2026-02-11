@@ -25,7 +25,6 @@ class RequestMaterial extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'package_id' => 'required|exists:packages,id',
             'file' => [
                 'required_if:materi_type,File',
                 'file',

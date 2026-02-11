@@ -21,7 +21,7 @@ class MasterMaterialController extends Controller
     {
         $search = $request->query('search');
 
-        $data = Material::with('package', 'subject')
+        $data = Material::with('subject')
             ->when($search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
@@ -38,9 +38,8 @@ class MasterMaterialController extends Controller
      */
     public function create()
     {
-        $packages = Package::where('status', 'active')->get();
         $subjects = Subject::all();
-        return view('admin.master-material.create', compact('packages', 'subjects'));
+        return view('admin.master-material.create', compact('subjects'));
     }
 
     /**
@@ -93,9 +92,8 @@ class MasterMaterialController extends Controller
     public function edit(string $id)
     {
         $data = Material::findOrFail($id);
-        $packages = Package::where('status', 'active')->get();
         $subjects = Subject::all();
-        return view('admin.master-material.edit', compact('data', 'packages', 'subjects'));
+        return view('admin.master-material.edit', compact('data', 'subjects'));
     }
 
     /**
