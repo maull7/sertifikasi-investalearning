@@ -47,7 +47,7 @@ class PackageController extends Controller
             ->where('id_package', $package->id)
             ->exists();
 
-        $package->load(['masterType.subjects.materials' => fn ($q) => $q->with('subject')]);
+        $package->load(['masterType.subjects.materials' => fn($q) => $q->with('subject')]);
         $subjects = $package->masterType ? $package->masterType->subjects : collect();
 
         return view('user.packages.show', compact('package', 'isJoined', 'subjects'));

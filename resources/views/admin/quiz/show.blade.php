@@ -29,14 +29,14 @@
     <x-card title="Informasi Kuis">
         <div class="space-y-6">
             
-            {{-- Paket --}}
+            {{-- Mata Pelajaran --}}
             <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 pb-6 border-b border-gray-50 dark:border-gray-800">
                 <div class="md:w-1/3">
-                    <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Paket</span>
+                    <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Mata Pelajaran</span>
                 </div>
                 <div class="md:w-2/3">
                     <span class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
-                        {{ $data->package->title ?? '-' }}
+                        {{ $data->subject->name ?? '-' }}
                     </span>
                 </div>
             </div>

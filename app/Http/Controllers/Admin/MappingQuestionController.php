@@ -20,7 +20,7 @@ class MappingQuestionController extends Controller
         $subjectId = $request->query('subject_id');
 
         $exams = Exam::with('package')->orderBy('created_at', 'desc')->get();
-        $quizzes = Quiz::with('package')->orderBy('created_at', 'desc')->get();
+        $quizzes = Quiz::with('subject')->orderBy('created_at', 'desc')->get();
 
         $selectedExam = null;
         $selectedQuiz = null;
@@ -321,16 +321,16 @@ class MappingQuestionController extends Controller
         $search = $request->query('search');
 
         $examQuery = Exam::with(['package', 'mappingQuestions'])->whereHas('mappingQuestions');
-        $quizQuery = Quiz::with(['package', 'mappingQuestions'])->whereHas('mappingQuestions');
+        $quizQuery = Quiz::with(['subject', 'mappingQuestions'])->whereHas('mappingQuestions');
 
         if ($search) {
             $examQuery->where(function ($q) use ($search) {
                 $q->where('title', 'like', '%' . $search . '%')
-                    ->orWhereHas('package', fn ($sub) => $sub->where('title', 'like', '%' . $search . '%'));
+                    ->orWhereHas('package', fn($sub) => $sub->where('title', 'like', '%' . $search . '%'));
             });
             $quizQuery->where(function ($q) use ($search) {
                 $q->where('title', 'like', '%' . $search . '%')
-                    ->orWhereHas('package', fn ($sub) => $sub->where('title', 'like', '%' . $search . '%'));
+                    ->orWhereHas('subject', fn($sub) => $sub->where('name', 'like', '%' . $search . '%'));
             });
         }
 

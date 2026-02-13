@@ -76,10 +76,10 @@ Route::middleware('auth', 'akun-active')->group(function () {
     Route::get('user/packages/{package}/exams/{exam}/review/{trans}', [UserExamController::class, 'review'])->name('user.exams.review');
 
     // User Quiz routes
-    Route::get('user/packages/{package}/quizzes/{quiz}', [UserQuizController::class, 'show'])->name('user.quizzes.show');
-    Route::get('user/packages/{package}/quizzes/{quiz}/questions', [UserQuizController::class, 'getQuestions'])->name('user.quizzes.questions');
+    Route::get('user/packages/{package}/quizzes/{quiz}/subjects/{subject}', [UserQuizController::class, 'show'])->name('user.quizzes.show');
+    Route::get('user/packages/{package}/quizzes/{quiz}/questions', [UserQuizController::class, 'getQuestionsWithSubject'])->name('user.quizzes.questions');
     Route::post('user/packages/{package}/quizzes/{quiz}/submit', [UserQuizController::class, 'submit'])->name('user.quizzes.submit');
-    Route::get('user/packages/{package}/quizzes/{quiz}/review/{trans}', [UserQuizController::class, 'review'])->name('user.quizzes.review');
+    Route::get('user/packages/{package}/quizzes/{quiz}/review/{transQuiz}', [UserQuizController::class, 'review'])->name('user.quizzes.review');
     // Material preview & download (accessible for users who joined the package)
     Route::get('master-materials/{id}/preview', [MasterMaterialController::class, 'serveFile'])
         ->name('master-materials.preview');

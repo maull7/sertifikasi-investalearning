@@ -14,12 +14,14 @@ class QuizAttempt extends Model
         'package_id',
         'quiz_id',
         'started_at',
+        'question_ids',
     ];
 
     protected function casts(): array
     {
         return [
             'started_at' => 'datetime',
+            'question_ids' => 'array',
         ];
     }
 

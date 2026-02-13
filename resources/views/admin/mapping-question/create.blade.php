@@ -52,7 +52,7 @@
                         <option value="">-- Pilih Kuis --</option>
                         @foreach($quizzes as $quiz)
                             <option value="{{ $quiz->id }}" {{ (int) ($quizId ?? 0) === $quiz->id ? 'selected' : '' }}>
-                                {{ $quiz->title }}@if($quiz->package) ({{ $quiz->package->title }})@endif
+                                {{ $quiz->title }}@if($quiz->subject) ({{ $quiz->subject->name }})@endif
                             </option>
                         @endforeach
                     </select>

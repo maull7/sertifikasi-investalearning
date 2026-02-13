@@ -17,7 +17,7 @@ class QuizController extends Controller
     {
         $search = $request->query('search');
 
-        $data = Quiz::with('package')
+        $data = Quiz::with('subject')
             ->when($search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
@@ -34,8 +34,8 @@ class QuizController extends Controller
      */
     public function create()
     {
-        $packages = DB::table('packages')->get();
-        return view('admin.quiz.create', compact('packages'));
+        $subjects = DB::table('subjects')->orderBy('name')->get();
+        return view('admin.quiz.create', compact('subjects'));
     }
 
     /**
@@ -53,7 +53,7 @@ class QuizController extends Controller
      */
     public function show(string $id)
     {
-        $data = Quiz::with('package')->findOrFail($id);
+        $data = Quiz::with('subject')->findOrFail($id);
         return view('admin.quiz.show', compact('data'));
     }
 
@@ -62,9 +62,9 @@ class QuizController extends Controller
      */
     public function edit(string $id)
     {
-        $data = Quiz::with('package')->findOrFail($id);
-        $packages = DB::table('packages')->get();
-        return view('admin.quiz.edit', compact('data', 'packages'));
+        $data = Quiz::with('subject')->findOrFail($id);
+        $subjects = DB::table('subjects')->orderBy('name')->get();
+        return view('admin.quiz.edit', compact('data', 'subjects'));
     }
 
     /**
