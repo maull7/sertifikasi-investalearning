@@ -6,67 +6,51 @@ use App\Http\Controllers\Controller;
 use App\Models\DetailResult;
 use App\Models\Exam;
 use App\Models\Package;
-use App\Models\Quiz;
 use App\Models\TransQuestion;
 use Illuminate\Http\Request;
 
 class ShowGradeController extends Controller
 {
+    /**
+     * Riwayat peserta mengerjakan ujian (exam only). Tab: pretest | posttest.
+     */
     public function index(Request $request)
     {
-        $exams = Exam::all();
-        $quizzes = Quiz::all();
         $packages = Package::all();
+        $exams = Exam::orderBy('title')->get();
 
         $packageId = $request->get('package_id');
         $examId = $request->get('exam_id');
-        $quizId = $request->get('quiz_id');
-        $type = $request->get('type', '');
+        $examType = $request->get('exam_type', 'posttest'); // tab: pretest | posttest
 
-        $list = TransQuestion::with(['User', 'Package', 'Exam', 'Quiz'])
+        $list = TransQuestion::with(['User', 'Package', 'Exam'])
+            ->whereNotNull('id_exam')
             ->when($packageId, function ($query) use ($packageId) {
                 $query->where('id_package', $packageId);
             })
-            ->when($type === 'kuis' && $quizId, function ($query) use ($quizId) {
-                $query->where('id_quiz', $quizId);
-            })
-            ->when(($type === 'ujian' || $type === '') && $examId, function ($query) use ($examId) {
+            ->when($examId, function ($query) use ($examId) {
                 $query->where('id_exam', $examId);
             })
-            ->when($type === 'ujian', function ($query) {
-                $query->whereNotNull('id_exam');
-            })
-            ->when($type === 'kuis', function ($query) {
-                $query->whereNotNull('id_quiz');
+            ->when($examType, function ($query) use ($examType) {
+                $query->whereHas('exam', fn ($q) => $q->where('type', $examType));
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
 
         $chartData = collect();
-        if ($packageId || $examId || $quizId || $type) {
+        if ($packageId || $examId) {
             $chartData = TransQuestion::with('User')
-                ->when($packageId, function ($query) use ($packageId) {
-                    $query->where('id_package', $packageId);
-                })
-                ->when($type === 'kuis' && $quizId, function ($query) use ($quizId) {
-                    $query->where('id_quiz', $quizId);
-                })
-                ->when(($type === 'ujian' || $type === '') && $examId, function ($query) use ($examId) {
-                    $query->where('id_exam', $examId);
-                })
-                ->when($type === 'ujian', function ($query) {
-                    $query->whereNotNull('id_exam');
-                })
-                ->when($type === 'kuis', function ($query) {
-                    $query->whereNotNull('id_quiz');
-                })
+                ->whereNotNull('id_exam')
+                ->when($packageId, fn ($query) => $query->where('id_package', $packageId))
+                ->when($examId, fn ($query) => $query->where('id_exam', $examId))
+                ->when($examType, fn ($query) => $query->whereHas('exam', fn ($q) => $q->where('type', $examType)))
                 ->orderByDesc('total_score')
                 ->limit(10)
                 ->get(['id_user', 'total_score']);
         }
 
-        return view('admin.show-grade.index', compact('list', 'exams', 'quizzes', 'packages', 'packageId', 'examId', 'quizId', 'type', 'chartData'));
+        return view('admin.show-grade.index', compact('list', 'exams', 'packages', 'packageId', 'examId', 'examType', 'chartData'));
     }
 
     public function detail($id)

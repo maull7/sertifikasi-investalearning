@@ -28,6 +28,19 @@ interface ExamRepositoryInterface
 
     public function getOrCreateExamAttempt(User $user, Package $package, Exam $exam): ExamAttempt;
 
+    public function getExamAttempt(User $user, Package $package, Exam $exam): ?ExamAttempt;
+
+    /**
+     * Pretest: soal dari bank per mapel paket (random). Paginate by attempt question_ids.
+     */
+    public function getQuestionsPageForExamAttempt(ExamAttempt $attempt, int $page = 1, int $perPage = 1): LengthAwarePaginator;
+
+    /**
+     * Pretest: soal untuk submit (urutan sama dengan attempt).
+     * @return \Illuminate\Support\Collection<int, object{questionBank: \App\Models\BankQuestion}>
+     */
+    public function getQuestionsForExamAttempt(ExamAttempt $attempt): Collection;
+
     public function deleteExamAttempt(User $user, Package $package, Exam $exam): void;
 
     public function createTransQuestion(User $user, Package $package, Exam $exam, int $questionsAnswered, int $totalQuestions): TransQuestion;
@@ -54,8 +67,6 @@ interface ExamRepositoryInterface
     public function getQuizAttempt(User $user, Package $package, Quiz $quiz): ?QuizAttempt;
 
     public function deleteQuizAttempt(User $user, Package $package, Quiz $quiz): void;
-
-    public function createTransQuestionForQuiz(User $user, Package $package, Quiz $quiz, int $questionsAnswered, int $totalQuestions): TransQuestion;
 
     /** Kuis: satu record per user per quiz, update or create. */
     public function updateOrCreateTransQuiz(User $user, Package $package, Quiz $quiz, int $questionsAnswered, int $totalQuestions, float $totalScore, string $status): TransQuiz;

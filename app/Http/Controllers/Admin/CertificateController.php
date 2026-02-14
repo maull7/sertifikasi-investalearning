@@ -62,14 +62,10 @@ class CertificateController extends Controller
                 })
 
                 ->withCount([
-                    'transQuestions as attempt_count' => function ($q) use ($packageId, $typeId) {
+                    'transQuestions as attempt_count' => function ($q) use ($packageId) {
 
                         if ($packageId) {
                             $q->where('id_package', $packageId);
-                        }
-
-                        if ($typeId) {
-                            $q->where('id_type', $typeId);
                         }
                     },
 

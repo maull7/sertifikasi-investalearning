@@ -28,6 +28,7 @@ class RequestExam extends FormRequest
             'duration' => 'required|integer|min:1',
             'passing_grade' => 'required|integer|min:0|max:100',
             'total_questions' => 'nullable|integer|min:1',
+            'type' => 'required|in:pretest,posttest',
         ];
     }
 
@@ -50,10 +51,8 @@ class RequestExam extends FormRequest
             'passing_grade.max' => 'Nilai kelulusan maksimal 100.',
             'total_questions.integer' => 'Jumlah soal harus berupa angka.',
             'total_questions.min' => 'Jumlah soal minimal 1.',
+            'type.required' => 'Tipe ujian wajib dipilih.',
+            'type.in' => 'Tipe ujian tidak valid. Pilih antara pretest atau posttest.',
         ];
     }
 }
-
-
-
-

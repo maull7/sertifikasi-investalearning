@@ -236,7 +236,6 @@
                 <div class="space-y-3">
                     @foreach ($quizez as $quizItem)
                         @php
-
                             $material = $quizItem->subject->materials()->first();
                             $statusMateri = \App\Models\StatusMateri::where('id_user', Auth::id())
                                 ->where('id_material', $material->id)
@@ -314,7 +313,21 @@
                                     <i class="ti ti-clipboard-check text-xl"></i>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-gray-900 dark:text-white mb-1">{{ $examItem->title }}</h4>
+                                    <div class="flex gap-2 items-center mb-2">
+                                        <h4 class="font-bold text-gray-900 dark:text-white mb-1">{{ $examItem->title }}
+                                        </h4>
+                                        @if ($examItem->type === 'pretest')
+                                            <span
+                                                class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                                                <i class="ti ti-copyleft"></i> Pretest
+                                            </span>
+                                        @else
+                                            <span
+                                                class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                                                <i class="ti ti-devices-question"></i> Posttest
+                                            </span>
+                                        @endif
+                                    </div>
                                     <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
                                         <span class="inline-flex items-center gap-1">
                                             <i class="ti ti-help-circle"></i>

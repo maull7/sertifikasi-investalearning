@@ -80,16 +80,11 @@ class DashboardController extends Controller
     // API endpoint untuk data chart
     public function getChartData(Request $request)
     {
-        $typeId = $request->get('type_id');
         $packageId = $request->get('package_id');
         $period = (int) $request->get('period', 7); // default 7 days
 
         $query = TransQuestion::with('User')
             ->where('created_at', '>=', now()->subDays($period));
-
-        if ($typeId) {
-            $query->where('id_type', $typeId);
-        }
 
         if ($packageId) {
             $query->where('id_package', $packageId);

@@ -19,7 +19,9 @@ class MappingQuestionController extends Controller
         $quizId = $request->query('quiz_id');
         $subjectId = $request->query('subject_id');
 
-        $exams = Exam::with('package')->orderBy('created_at', 'desc')->get();
+        $exams = Exam::with('package')
+            ->where('type', 'posttest')
+            ->orderBy('created_at', 'desc')->get();
         $quizzes = Quiz::with('subject')->orderBy('created_at', 'desc')->get();
 
         $selectedExam = null;

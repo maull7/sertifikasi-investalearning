@@ -14,12 +14,14 @@ class ExamAttempt extends Model
         'package_id',
         'exam_id',
         'started_at',
+        'question_ids',
     ];
 
     protected function casts(): array
     {
         return [
             'started_at' => 'datetime',
+            'question_ids' => 'array',
         ];
     }
 

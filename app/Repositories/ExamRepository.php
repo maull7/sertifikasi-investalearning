@@ -29,6 +29,9 @@ class ExamRepository implements ExamRepositoryInterface
 
     public function countQuestions(Exam $exam): int
     {
+        if ($this->isPretest($exam)) {
+            return (int) $exam->total_questions;
+        }
         return MappingQuestion::where('id_exam', $exam->id)->count();
     }
 
@@ -38,6 +41,11 @@ class ExamRepository implements ExamRepositoryInterface
             ->with('questionBank.subject')
             ->orderBy('id')
             ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    private function isPretest(Exam $exam): bool
+    {
+        return strtolower((string) ($exam->type ?? '')) === 'pretest';
     }
 
     public function getAllMappingsWithQuestions(Exam $exam): Collection
@@ -50,7 +58,7 @@ class ExamRepository implements ExamRepositoryInterface
 
     public function getOrCreateExamAttempt(User $user, Package $package, Exam $exam): ExamAttempt
     {
-        return ExamAttempt::firstOrCreate(
+        $attempt = ExamAttempt::firstOrCreate(
             [
                 'user_id' => $user->id,
                 'package_id' => $package->id,
@@ -58,6 +66,62 @@ class ExamRepository implements ExamRepositoryInterface
             ],
             ['started_at' => now()]
         );
+
+        if ($this->isPretest($exam)) {
+            $ids = $attempt->question_ids ?? [];
+            if (empty($ids)) {
+                $package->loadMissing(['masterType.subjects']);
+                $subjectIds = $package->masterType?->subjects?->pluck('id') ?? collect();
+                $limit = (int) max(1, $exam->total_questions);
+                $ids = BankQuestion::whereIn('subject_id', $subjectIds)
+                    ->inRandomOrder()
+                    ->limit($limit)
+                    ->pluck('id')
+                    ->values()
+                    ->all();
+                $attempt->update(['question_ids' => $ids]);
+            }
+        }
+
+        return $attempt->fresh();
+    }
+
+    public function getExamAttempt(User $user, Package $package, Exam $exam): ?ExamAttempt
+    {
+        return ExamAttempt::where('user_id', $user->id)
+            ->where('package_id', $package->id)
+            ->where('exam_id', $exam->id)
+            ->first();
+    }
+
+    public function getQuestionsPageForExamAttempt(ExamAttempt $attempt, int $page = 1, int $perPage = 1): LengthAwarePaginator
+    {
+        $ids = $attempt->question_ids ?? [];
+        $total = count($ids);
+        if ($total === 0) {
+            return new \Illuminate\Pagination\LengthAwarePaginator([], 0, $perPage, $page);
+        }
+        $offset = ($page - 1) * $perPage;
+        $chunk = array_slice($ids, $offset, $perPage);
+        $questions = BankQuestion::whereIn('id', $chunk)->get()->keyBy('id');
+        $ordered = collect($chunk)->map(fn ($id) => $questions->get($id))->filter()->values();
+        return new \Illuminate\Pagination\LengthAwarePaginator($ordered, $total, $perPage, $page);
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, object{questionBank: \App\Models\BankQuestion}>
+     */
+    public function getQuestionsForExamAttempt(ExamAttempt $attempt): Collection
+    {
+        $ids = $attempt->question_ids ?? [];
+        if (empty($ids)) {
+            return collect();
+        }
+        $questions = BankQuestion::whereIn('id', $ids)->get()->keyBy('id');
+        return collect($ids)->map(function ($id) use ($questions) {
+            $q = $questions->get($id);
+            return $q ? (object) ['questionBank' => $q] : null;
+        })->filter()->values();
     }
 
     public function deleteExamAttempt(User $user, Package $package, Exam $exam): void
@@ -79,7 +143,6 @@ class ExamRepository implements ExamRepositoryInterface
             'id_user' => $user->id,
             'id_package' => $package->id,
             'id_exam' => $exam->id,
-            'id_quiz' => null,
             'questions_answered' => $questionsAnswered,
             'total_questions' => $totalQuestions,
             'total_score' => 0,
@@ -193,25 +256,6 @@ class ExamRepository implements ExamRepositoryInterface
             ->where('package_id', $package->id)
             ->where('quiz_id', $quiz->id)
             ->delete();
-    }
-
-    public function createTransQuestionForQuiz(
-        User $user,
-        Package $package,
-        Quiz $quiz,
-        int $questionsAnswered,
-        int $totalQuestions
-    ): TransQuestion {
-        return TransQuestion::create([
-            'id_user' => $user->id,
-            'id_package' => $package->id,
-            'id_exam' => null,
-            'id_quiz' => $quiz->id,
-            'questions_answered' => $questionsAnswered,
-            'total_questions' => $totalQuestions,
-            'total_score' => 0,
-            'status' => 'tidak lulus',
-        ]);
     }
 
     public function updateTransQuestionResult(TransQuestion $trans, float $score, string $status): void

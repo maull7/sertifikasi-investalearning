@@ -4,7 +4,6 @@ namespace App\Http\Controllers\User;
 
 use App\Models\Exam;
 use App\Models\Package;
-use App\Models\Quiz;
 use App\Models\DetailResult;
 use Illuminate\Http\Request;
 use App\Models\TransQuestion;
@@ -18,34 +17,21 @@ class HistoryExamController extends Controller
     {
         $packages = Package::all();
         $exams = Exam::all();
-        $quizzes = Quiz::all();
         $packageId = $request->get('package_id');
         $examId = $request->get('exam_id');
-        $quizId = $request->get('quiz_id');
-        $type = $request->get('type', '');
+        $examType = $request->get('exam_type', 'posttest'); // tab: pretest | posttest
 
-        $history = TransQuestion::with(['Package', 'Exam', 'Quiz'])
-            ->when($packageId, function ($query) use ($packageId) {
-                $query->where('id_package', $packageId);
-            })
-            ->when($type === 'kuis' && $quizId, function ($query) use ($quizId) {
-                $query->where('id_quiz', $quizId);
-            })
-            ->when(($type === 'ujian' || $type === '') && $examId, function ($query) use ($examId) {
-                $query->where('id_exam', $examId);
-            })
-            ->when($type === 'ujian', function ($query) {
-                $query->whereNotNull('id_exam');
-            })
-            ->when($type === 'kuis', function ($query) {
-                $query->whereNotNull('id_quiz');
-            })
+        $history = TransQuestion::with(['Package.masterType', 'Exam'])
+            ->whereNotNull('id_exam')
+            ->whereHas('Exam', fn ($q) => $q->where('type', $examType))
+            ->when($packageId, fn ($query) => $query->where('id_package', $packageId))
+            ->when($examId, fn ($query) => $query->where('id_exam', $examId))
             ->where('id_user', Auth::id())
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
 
-        return view('user.history.index', compact('history', 'packages', 'exams', 'quizzes', 'packageId', 'examId', 'quizId', 'type'));
+        return view('user.history.index', compact('history', 'packages', 'exams', 'packageId', 'examId', 'examType'));
     }
     public function detail($id)
     {

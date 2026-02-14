@@ -117,7 +117,6 @@ class DashboardController extends Controller
         $query = TransQuestion::query()
             ->where('id_user', $user->id)
             ->whereIn('id_package', $joinedPackageIds)
-            ->when($typeId, fn ($q) => $q->where('id_type', $typeId))
             ->when($packageId, fn ($q) => $q->where('id_package', $packageId))
             ->when($examId, fn ($q) => $q->where('id_exam', $examId))
             ->when($periodDays, function ($q) use ($periodDays) {
@@ -127,14 +126,14 @@ class DashboardController extends Controller
             ->limit(30);
 
         $rows = $query
-            ->with(['Package', 'Type', 'Exam'])
-            ->get(['created_at', 'total_score', 'id_package', 'id_type', 'id_exam']);
+            ->with(['Package', 'Exam'])
+            ->get(['created_at', 'total_score', 'id_package', 'id_exam']);
 
         $chartData = $rows->values()->map(function (TransQuestion $row, int $idx) {
             return [
                 'label' => 'Attempt ' . ($idx + 1) . ' • ' . $row->created_at?->format('d M Y H:i'),
                 'score' => (float) $row->total_score,
-                'type' => $row->Type?->name_type ?? '-',
+                'type' => $row->Exam?->type ?? '-',
                 'package' => $row->Package?->title ?? '-',
                 'exam' => $row->Exam?->title ?? '-',
             ];
