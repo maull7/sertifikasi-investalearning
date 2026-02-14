@@ -22,7 +22,7 @@ class QuizRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'package_id' => 'required|exists:packages,id',
+            'subject_id' => 'required|exists:subjects,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'duration' => 'required|integer|min:1',

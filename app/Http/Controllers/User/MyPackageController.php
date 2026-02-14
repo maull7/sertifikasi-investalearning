@@ -6,7 +6,6 @@ use App\Models\Package;
 use App\Models\Material;
 use App\Models\UserJoin;
 use Illuminate\View\View;
-use App\Models\MasterType;
 use App\Models\StatusMateri;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -36,7 +35,7 @@ class MyPackageController extends Controller
             abort(403, 'Anda belum bergabung dengan package ini.');
         }
 
-        $package->load(['masterType.subjects.materials' => fn ($q) => $q->with('subject')]);
+        $package->load(['masterType.subjects' => fn($q) => $q->with(['materials' => fn($mq) => $mq->with('subject'), 'quizzes' => fn($qq) => $qq->with('subject')])]);
         $subjects = $package->masterType ? $package->masterType->subjects : collect();
 
         return view('user.my-packages.show', compact('package', 'subjects'));

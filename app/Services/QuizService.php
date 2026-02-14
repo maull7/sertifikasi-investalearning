@@ -2,14 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Package;
 use App\Models\Quiz;
-use App\Models\TransQuestion;
 use App\Models\User;
-use App\Repositories\Contracts\ExamRepositoryInterface;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Models\Package;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\Contracts\ExamRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class QuizService
 {
@@ -23,7 +22,9 @@ class QuizService
             abort(403, 'Anda belum bergabung dengan package ini.');
         }
 
-        if ($quiz->package_id !== $package->id) {
+        $package->loadMissing(['masterType.subjects']);
+        $subjectIds = $package->masterType?->subjects?->pluck('id') ?? collect();
+        if (! $subjectIds->contains($quiz->subject_id)) {
             abort(404, 'Kuis tidak ditemukan dalam package ini.');
         }
     }
@@ -36,8 +37,9 @@ class QuizService
     public function getQuestionPage(User $user, Package $package, Quiz $quiz, int $page, int $perPage = 1): LengthAwarePaginator
     {
         $this->ensureUserCanAccessQuiz($user, $package, $quiz);
+        $attempt = $this->examRepository->getOrCreateQuizAttempt($user, $package, $quiz);
 
-        return $this->examRepository->getQuestionsPageForQuiz($quiz, $page, $perPage);
+        return $this->examRepository->getQuestionsPageForQuizAttempt($attempt, $page, $perPage);
     }
 
     public function getOrCreateQuizAttempt(User $user, Package $package, Quiz $quiz): \App\Models\QuizAttempt
@@ -70,27 +72,24 @@ class QuizService
 
     /**
      * @param  array<int, string|null>  $answers
-     * @return array{score: float, correct: int, total: int, status: string, trans_question_id: int, show_solutions: bool}
+     * @return array{score: float, correct: int, total: int, status: string, trans_quiz_id: int, show_solutions: bool}
      */
     public function submitQuiz(User $user, Package $package, Quiz $quiz, array $answers): array
     {
         $this->ensureUserCanAccessQuiz($user, $package, $quiz);
 
-        $mappingQuestions = $this->examRepository->getAllMappingsWithQuestionsForQuiz($quiz);
+        $attempt = $this->examRepository->getQuizAttempt($user, $package, $quiz);
+        if (! $attempt) {
+            abort(404, 'Sesi kuis tidak ditemukan. Silakan mulai kuis dari halaman kuis.');
+        }
+
+        $mappingQuestions = $this->examRepository->getQuestionsForQuizAttempt($attempt);
         $totalQuestions = $mappingQuestions->count();
         $correctAnswers = 0;
 
         DB::beginTransaction();
 
         try {
-            $trans = $this->examRepository->createTransQuestionForQuiz(
-                $user,
-                $package,
-                $quiz,
-                questionsAnswered: count($answers),
-                totalQuestions: $totalQuestions
-            );
-
             $perQuestionScore = $totalQuestions > 0 ? 100 / $totalQuestions : 0;
 
             foreach ($mappingQuestions as $index => $mapping) {
@@ -110,14 +109,46 @@ class QuizService
                 $correctAnswer = $question->answer ? strtoupper(trim($question->answer)) : null;
                 $isCorrect = $userAnswer && $correctAnswer && $userAnswer === $correctAnswer;
 
-                $scoreObtained = $isCorrect ? $perQuestionScore : 0.0;
-
                 if ($isCorrect) {
                     $correctAnswers++;
                 }
+            }
 
-                $this->examRepository->createDetailResult(
-                    $trans,
+            $score = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 2) : 0.0;
+            $status = $score >= $quiz->passing_grade ? 'lulus' : 'tidak lulus';
+
+            $transQuiz = $this->examRepository->updateOrCreateTransQuiz(
+                $user,
+                $package,
+                $quiz,
+                questionsAnswered: count($answers),
+                totalQuestions: $totalQuestions,
+                totalScore: $score,
+                status: $status
+            );
+
+            $this->examRepository->deleteDetailResultQuizByTransQuiz($transQuiz);
+
+            foreach ($mappingQuestions as $index => $mapping) {
+                $page = $index + 1;
+                $userAnswer = $answers[$page] ?? $answers[(string) $page] ?? null;
+
+                if ($userAnswer) {
+                    $userAnswer = strtoupper(trim($userAnswer));
+                }
+
+                $question = $mapping->questionBank;
+
+                if (! $question) {
+                    continue;
+                }
+
+                $correctAnswer = $question->answer ? strtoupper(trim($question->answer)) : null;
+                $isCorrect = $userAnswer && $correctAnswer && $userAnswer === $correctAnswer;
+                $scoreObtained = $isCorrect ? $perQuestionScore : 0.0;
+
+                $this->examRepository->createDetailResultQuiz(
+                    $transQuiz,
                     $question->id,
                     $userAnswer ?? '-',
                     $correctAnswer ?? '-',
@@ -125,31 +156,30 @@ class QuizService
                 );
             }
 
-            $score = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 2) : 0.0;
-            $status = $score >= $quiz->passing_grade ? 'lulus' : 'tidak lulus';
-
-            $this->examRepository->updateTransQuestionResult($trans, $score, $status);
             $this->examRepository->deleteQuizAttempt($user, $package, $quiz);
 
             DB::commit();
-
-            $attemptCount = TransQuestion::where('id_user', $user->id)
-                ->where('id_quiz', $quiz->id)
-                ->count();
-
-            $showSolutions = $attemptCount >= 3;
 
             return [
                 'score' => $score,
                 'correct' => $correctAnswers,
                 'total' => $totalQuestions,
                 'status' => $status,
-                'trans_question_id' => $trans->id,
-                'show_solutions' => $showSolutions,
+                'trans_quiz_id' => $transQuiz->id,
             ];
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
         }
+    }
+    /**
+     * Soal kuis dari bank soal (quiz.subject_id), random per attempt.
+     */
+    public function getQuestionsWithSubject(User $user, Package $package, Quiz $quiz, int $page, int $perPage = 1): LengthAwarePaginator
+    {
+        $this->ensureUserCanAccessQuiz($user, $package, $quiz);
+        $attempt = $this->examRepository->getOrCreateQuizAttempt($user, $package, $quiz);
+
+        return $this->examRepository->getQuestionsPageForQuizAttempt($attempt, $page, $perPage);
     }
 }

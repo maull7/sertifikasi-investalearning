@@ -8,7 +8,6 @@
     deleteUrl: '', 
     questionTitle: '',
     importModalOpen: false,
-    filterType: '{{ $type ?? '' }}',
     confirmDelete(url, title) {
         this.deleteUrl = url;
         this.questionTitle = title;
@@ -20,92 +19,44 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Riwayat Pengerjaan</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Lihat riwayat ujian Anda</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Lihat riwayat ujian Anda (pretest & posttest)</p>
         </div>
-      
     </div>
 
-    {{-- Search & Filter Section --}}
-      <div class="flex flex-col lg:flex-row gap-4">
-        <form 
-            action="{{route('user.history-exams.index')}}" 
-            method="GET" 
-            class="flex-1 flex flex-col md:flex-row gap-3 items-end"
-        >
-            <!-- Select -->
+    {{-- Tab: Posttest | Pretest --}}
+    <div class="flex gap-2 border-b border-gray-200 dark:border-gray-700">
+        <a href="{{ route('user.history-exams.index', ['exam_type' => 'posttest', 'package_id' => $packageId ?? '', 'exam_id' => $examId ?? '']) }}"
+           class="px-4 py-3 text-sm font-semibold rounded-t-xl transition-colors {{ ($examType ?? 'posttest') === 'posttest' ? 'bg-indigo-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
+            Posttest
+        </a>
+        <a href="{{ route('user.history-exams.index', ['exam_type' => 'pretest', 'package_id' => $packageId ?? '', 'exam_id' => $examId ?? '']) }}"
+           class="px-4 py-3 text-sm font-semibold rounded-t-xl transition-colors {{ ($examType ?? '') === 'pretest' ? 'bg-indigo-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
+            Pretest
+        </a>
+    </div>
+
+    {{-- Filter --}}
+    <div class="flex flex-col lg:flex-row gap-4">
+        <form action="{{ route('user.history-exams.index') }}" method="GET" class="flex-1 flex flex-col md:flex-row gap-3 items-end">
+            <input type="hidden" name="exam_type" value="{{ $examType ?? 'posttest' }}">
             <div class="w-full md:w-64">
-                <x-select 
-                    name="package_id" 
-                    label="Filter Sesuai paket" 
-                    inline
-                    class="h-12"
-                >
+                <x-select name="package_id" label="Filter Sesuai paket" inline class="h-12">
+                    <option value="">-- Semua paket --</option>
                     @foreach($packages as $data)
-                        <option value="{{ $data->id }}" {{ (int) ($packageId ?? 0) === $data->id ? 'selected' : '' }}>
-                            {{ $data->title }}
-                        </option>
+                        <option value="{{ $data->id }}" {{ (int) ($packageId ?? 0) === $data->id ? 'selected' : '' }}>{{ $data->title }}</option>
                     @endforeach
                 </x-select>
             </div>
-
-            <div class="w-full md:w-48">
-                <x-select 
-                    name="type" 
-                    label="Tipe" 
-                    inline
-                    class="h-12"
-                    placeholder=""
-                    x-model="filterType"
-                >
-                    <option value="" {{ ($type ?? '') === '' ? 'selected' : '' }}>Semua</option>
-                    <option value="ujian" {{ ($type ?? '') === 'ujian' ? 'selected' : '' }}>Ujian</option>
-                    <option value="kuis" {{ ($type ?? '') === 'kuis' ? 'selected' : '' }}>Kuis</option>
-                </x-select>
-            </div>
-
-            {{-- Pilihan Ujian (muncul ketika Tipe Semua atau Ujian) --}}
-            <div class="w-full md:w-64" x-show="filterType !== 'kuis'" x-cloak x-transition>
-                <x-select 
-                    name="exam_id" 
-                    label="Filter Ujian" 
-                    inline
-                    class="h-12"
-                >
+            <div class="w-full md:w-64">
+                <x-select name="exam_id" label="Filter Ujian" inline class="h-12">
                     <option value="">-- Semua ujian --</option>
                     @foreach($exams as $data)
-                        <option value="{{ $data->id }}" {{ (int) ($examId ?? 0) === $data->id ? 'selected' : '' }}>
-                            {{ $data->title }}
-                        </option>
+                        <option value="{{ $data->id }}" {{ (int) ($examId ?? 0) === $data->id ? 'selected' : '' }}>{{ $data->title }}</option>
                     @endforeach
                 </x-select>
             </div>
-
-            {{-- Pilihan Kuis (muncul ketika Tipe Kuis) --}}
-            <div class="w-full md:w-64" x-show="filterType === 'kuis'" x-cloak x-transition>
-                <x-select 
-                    name="quiz_id" 
-                    label="Filter Kuis" 
-                    inline
-                    class="h-12"
-                >
-                    <option value="">-- Semua kuis --</option>
-                    @foreach($quizzes as $data)
-                        <option value="{{ $data->id }}" {{ (int) ($quizId ?? 0) === $data->id ? 'selected' : '' }}>
-                            {{ $data->title }}
-                        </option>
-                    @endforeach
-                </x-select>
-            </div>
-
-            <!-- Button -->
             <div class="flex gap-2">
-                <x-button 
-                    type="submit" 
-                    variant="primary" 
-                    class="h-12 px-6 rounded-xl"
-                >
-                    Terapkan
-                </x-button>
+                <x-button type="submit" variant="primary" class="h-12 px-6 rounded-xl">Terapkan</x-button>
             </div>
         </form>
     </div>
@@ -120,6 +71,7 @@
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Paket</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Ujian / Exam</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Tipe</th>
+                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Tipe Ujian</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Total Soal</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Terjawab</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">Total Poin</th>
@@ -141,7 +93,7 @@
                             <td class="py-4 px-8">
                                 <div class="flex flex-col">
                                     <span class="font-semibold text-sm text-gray-900 dark:text-white">
-                                        {{ $data->Exam->title ?? $data->Quiz->title ?? '-' }}
+                                        {{ $data->Exam->title ?? '-' }}
                                     </span>
                                     <span class="text-xs text-gray-400">
                                         {{ $data->created_at->format('d M Y') }}
@@ -154,6 +106,17 @@
                                     bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
                                     {{ strtoupper($data->Package->masterType->name_type ?? '-') }}
                                 </span>
+                            </td>
+
+                            <td class="py-4 px-8 text-center">
+                                @php $examType = $data->Exam->type ?? null; @endphp
+                                @if($examType === 'pretest')
+                                    <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold bg-sky-100 text-sky-800 dark:bg-sky-500/20 dark:text-sky-300">Pretest</span>
+                                @elseif($examType === 'posttest')
+                                    <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold bg-violet-100 text-violet-800 dark:bg-violet-500/20 dark:text-violet-300">Posttest</span>
+                                @else
+                                    <span class="text-xs text-gray-400">-</span>
+                                @endif
                             </td>
 
                            <td class="py-4 px-8 text-center">
@@ -189,7 +152,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="py-24">
+                            <td colspan="8" class="py-24">
                                 <div class="flex flex-col items-center justify-center text-center max-w-[280px] mx-auto">
                                     <div class="space-y-1">
                                         <h4 class="text-base font-bold text-gray-900 dark:text-white">
@@ -208,8 +171,8 @@
                                         </p>
                                     </div>
                                     <div class="mt-6">
-                                        @if(request('search') || request('package_id') || request('exam_id') || request('type'))
-                                            <x-button variant="secondary" href="{{ route('user.history-exams.index') }}">
+                                        @if(request('package_id') || request('exam_id'))
+                                            <x-button variant="secondary" href="{{ route('user.history-exams.index', ['exam_type' => $examType ?? 'posttest']) }}">
                                                 Reset Filter
                                             </x-button>
                                         @endif

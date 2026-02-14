@@ -133,7 +133,7 @@
                     <thead>
                         <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
                             <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Kuis / Quiz</th>
-                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Paket</th>
+                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Mata Pelajaran</th>
                             <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Total Soal</th>
                             <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">Aksi</th>
                         </tr>
@@ -147,7 +147,7 @@
                                     </span>
                                 </td>
                                 <td class="py-4 px-8">
-                                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ $value->package->title ?? '-' }}</span>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ $value->subject->name ?? '-' }}</span>
                                 </td>
                                 <td class="py-4 px-8">
                                     @php($mappedCount = $value->mappingQuestions->count())

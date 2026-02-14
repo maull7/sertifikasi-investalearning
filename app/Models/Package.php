@@ -49,4 +49,20 @@ class Package extends Model
         }
         return $masterType->subjects->flatMap(fn ($subject) => $subject->materials);
     }
+
+    /**
+     * Kuis dalam paket via relasi: Package -> masterType -> subjects -> quizzes.
+     * Sama seperti materi, kuis tidak punya id_package; tampil per mata pelajaran (subject).
+     */
+    public function getQuizzesAttribute(): Collection
+    {
+        if (! $this->relationLoaded('masterType')) {
+            $this->load(['masterType.subjects.quizzes' => fn ($q) => $q->with('subject')]);
+        }
+        $masterType = $this->masterType;
+        if (! $masterType || ! $masterType->relationLoaded('subjects')) {
+            return collect();
+        }
+        return $masterType->subjects->flatMap(fn ($subject) => $subject->quizzes);
+    }
 }

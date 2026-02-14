@@ -16,6 +16,7 @@ class Exam extends Model
         'duration',
         'passing_grade',
         'total_questions',
+        'type',
     ];
 
     public function package()

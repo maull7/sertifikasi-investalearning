@@ -33,11 +33,25 @@ class ExamService
         return $this->examRepository->countQuestions($exam);
     }
 
+    /**
+     * Pretest: soal random dari mapel paket (attempt.question_ids).
+     * Posttest: soal dari mapping_questions.
+     */
     public function getQuestionPage(User $user, Package $package, Exam $exam, int $page, int $perPage = 1): LengthAwarePaginator
     {
         $this->ensureUserCanAccessExam($user, $package, $exam);
 
+        if ($this->isPretest($exam)) {
+            $attempt = $this->examRepository->getOrCreateExamAttempt($user, $package, $exam);
+            return $this->examRepository->getQuestionsPageForExamAttempt($attempt, $page, $perPage);
+        }
+
         return $this->examRepository->getQuestionsPage($exam, $page, $perPage);
+    }
+
+    private function isPretest(Exam $exam): bool
+    {
+        return strtolower((string) ($exam->type ?? '')) === 'pretest';
     }
 
     /**
@@ -84,8 +98,19 @@ class ExamService
     {
         $this->ensureUserCanAccessExam($user, $package, $exam);
 
-        $mappingQuestions = $this->examRepository->getAllMappingsWithQuestions($exam);
-        $totalQuestions = $mappingQuestions->count();
+        $isPretest = $this->isPretest($exam);
+
+        if ($isPretest) {
+            $attempt = $this->examRepository->getExamAttempt($user, $package, $exam);
+            if (! $attempt) {
+                abort(404, 'Sesi ujian tidak ditemukan. Silakan mulai ujian dari halaman package.');
+            }
+            $questionsCollection = $this->examRepository->getQuestionsForExamAttempt($attempt);
+        } else {
+            $questionsCollection = $this->examRepository->getAllMappingsWithQuestions($exam);
+        }
+
+        $totalQuestions = $questionsCollection->count();
         $correctAnswers = 0;
 
         DB::beginTransaction();
@@ -101,26 +126,20 @@ class ExamService
 
             $perQuestionScore = $totalQuestions > 0 ? 100 / $totalQuestions : 0;
 
-            foreach ($mappingQuestions as $index => $mapping) {
+            foreach ($questionsCollection as $index => $item) {
                 $page = $index + 1;
-
-                // Handle both string and integer keys from frontend
                 $userAnswer = $answers[$page] ?? $answers[(string) $page] ?? null;
-
-                // Normalize answer (trim and uppercase)
                 if ($userAnswer) {
                     $userAnswer = strtoupper(trim($userAnswer));
                 }
 
-                $question = $mapping->questionBank;
-
-                if (!$question) {
+                $question = $isPretest ? $item->questionBank : $item->questionBank;
+                if (! $question) {
                     continue;
                 }
 
                 $correctAnswer = $question->answer ? strtoupper(trim($question->answer)) : null;
                 $isCorrect = $userAnswer && $correctAnswer && $userAnswer === $correctAnswer;
-
                 $scoreObtained = $isCorrect ? $perQuestionScore : 0.0;
 
                 if ($isCorrect) {
@@ -143,7 +162,6 @@ class ExamService
 
             DB::commit();
 
-            // Hitung jumlah attempt setelah submit (termasuk yang baru saja dibuat)
             $attemptCount = TransQuestion::where('id_user', $user->id)
                 ->where('id_exam', $exam->id)
                 ->count();

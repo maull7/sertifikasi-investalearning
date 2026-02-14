@@ -74,17 +74,14 @@ class ExamController extends Controller
         $page = (int) $request->get('page', 1);
         $perPage = 1;
 
-        $mappingQuestions = $this->examService->getQuestionPage($user, $package, $exam, $page, $perPage);
+        $questionPage = $this->examService->getQuestionPage($user, $package, $exam, $page, $perPage);
 
         $timer = $this->examService->getExamTimer($user, $package, $exam);
 
-        // Jangan kirim kunci jawaban saat mengerjakan ujian (meskipun sudah 3x)
-        // Kunci jawaban hanya muncul di halaman review setelah submit
-        $questions = $mappingQuestions->map(function ($mapping) {
-            $question = $mapping->questionBank;
+        $questions = collect($questionPage->items())->map(function ($item) {
+            $question = isset($item->questionBank) ? $item->questionBank : $item;
             return [
                 'id' => $question->id,
-                'mapping_id' => $mapping->id,
                 'question_type' => $question->question_type,
                 'question' => $question->question,
                 'question_image_url' => $question->question_type === 'Image'
@@ -97,20 +94,19 @@ class ExamController extends Controller
                 'option_c' => $question->option_c,
                 'option_d' => $question->option_d,
                 'option_e' => $question->option_e,
-                // Tidak kirim kunci jawaban saat mengerjakan ujian
                 'show_solutions' => false,
                 'correct_answer' => null,
                 'explanation' => null,
                 'solution' => null,
             ];
-        });
+        })->all();
 
         $payload = [
             'questions' => $questions,
-            'current_page' => $mappingQuestions->currentPage(),
-            'last_page' => $mappingQuestions->lastPage(),
-            'total' => $mappingQuestions->total(),
-            'has_more' => $mappingQuestions->hasMorePages(),
+            'current_page' => $questionPage->currentPage(),
+            'last_page' => $questionPage->lastPage(),
+            'total' => $questionPage->total(),
+            'has_more' => $questionPage->hasMorePages(),
         ];
 
         if ($timer !== null) {

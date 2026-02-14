@@ -27,16 +27,16 @@
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100 dark:border-gray-800">
                 <div class="text-center">
-                    <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ $trans->total_questions }}</p>
+                    <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ $transQuiz->total_questions }}</p>
                     <p class="text-xs text-gray-500 dark:text-gray-400">Total Soal</p>
                 </div>
                 <div class="text-center">
-                    <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ $trans->total_score }}</p>
+                    <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ $transQuiz->total_score }}</p>
                     <p class="text-xs text-gray-500 dark:text-gray-400">Nilai</p>
                 </div>
                 <div class="text-center">
-                    <p class="text-2xl font-bold {{ $trans->status === 'lulus' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
-                        {{ ucfirst($trans->status) }}
+                    <p class="text-2xl font-bold {{ $transQuiz->status === 'lulus' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
+                        {{ ucfirst($transQuiz->status) }}
                     </p>
                     <p class="text-xs text-gray-500 dark:text-gray-400">Status</p>
                 </div>
@@ -51,7 +51,7 @@
     <div class="space-y-6">
         @forelse($detailResults as $detail)
             @php
-                $question = $detail->Question;
+                $question = $detail->question;
                 $questionNumber = ($detailResults->currentPage() - 1) * $detailResults->perPage() + 1;
                 $isCorrect = strtoupper(trim($detail->user_answer ?? '')) === strtoupper(trim($detail->correct_answer ?? ''));
             @endphp
