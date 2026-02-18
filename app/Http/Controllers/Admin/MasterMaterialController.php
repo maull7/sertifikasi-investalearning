@@ -169,6 +169,7 @@ class MasterMaterialController extends Controller
             StatusMateri::create([
                 'id_user' => Auth::user()->id,
                 'id_material' => $material->id,
+                'id_subject' => $material->id_subject,
                 'status' => 'in_progress',
             ]);
         }
