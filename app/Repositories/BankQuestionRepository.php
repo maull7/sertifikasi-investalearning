@@ -4,8 +4,8 @@ namespace App\Repositories;
 
 use App\Models\BankQuestion;
 use App\Repositories\Contracts\BankQuestionRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 
 class BankQuestionRepository implements BankQuestionRepositoryInterface
@@ -17,9 +17,9 @@ class BankQuestionRepository implements BankQuestionRepositoryInterface
         $this->model = $model;
     }
 
-    public function getAllWithPagination(?string $search = null, ?int $subjectId = null, int $perPage = 10): LengthAwarePaginator
+    public function getAllWithPagination(?string $search = null, ?int $subjectId = null, int $perPage = 10, ?string $sortNo = null): LengthAwarePaginator
     {
-        return $this->model
+        $query = $this->model
             ->with('subject')
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
@@ -29,10 +29,15 @@ class BankQuestionRepository implements BankQuestionRepositoryInterface
             })
             ->when($subjectId, function ($query, $subjectId) {
                 $query->where('subject_id', $subjectId);
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage)
-            ->withQueryString();
+            });
+
+        if ($sortNo === 'asc' || $sortNo === 'desc') {
+            $query->orderBy('no', $sortNo);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        return $query->paginate($perPage)->withQueryString();
     }
 
     public function getAll(): Collection
@@ -54,6 +59,7 @@ class BankQuestionRepository implements BankQuestionRepositoryInterface
     {
         $question = $this->findById($id);
         $question->update($data);
+
         return $question;
     }
 

@@ -2,15 +2,15 @@
 
 namespace App\Repositories\Contracts;
 
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 interface BankQuestionRepositoryInterface
 {
     /**
      * Get all bank questions with pagination, search, and optional type filter
      */
-    public function getAllWithPagination(?string $search = null, ?int $typeId = null, int $perPage = 10): LengthAwarePaginator;
+    public function getAllWithPagination(?string $search = null, ?int $typeId = null, int $perPage = 10, ?string $sortNo = null): LengthAwarePaginator;
 
     /**
      * Get all bank questions without pagination
@@ -47,4 +47,3 @@ interface BankQuestionRepositoryInterface
      */
     public function bulkInsert(array $questions): bool;
 }
-

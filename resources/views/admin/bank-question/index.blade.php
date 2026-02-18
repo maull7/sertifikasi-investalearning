@@ -93,6 +93,23 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
+                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
+                                <div class="flex flex-col gap-2">
+                                    <span>No</span>
+                                    <div class="flex gap-1">
+                                        <a href="{{ request()->fullUrlWithQuery(['sort_no' => 'asc']) }}"
+                                            class="inline-flex items-center justify-center w-6 h-6 rounded text-[10px] transition-colors {{ ($sortNo ?? '') === 'asc' ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600' }}"
+                                            title="Urutkan Naik">
+                                            <i class="ti ti-arrow-up"></i>
+                                        </a>
+                                        <a href="{{ request()->fullUrlWithQuery(['sort_no' => 'desc']) }}"
+                                            class="inline-flex items-center justify-center w-6 h-6 rounded text-[10px] transition-colors {{ ($sortNo ?? '') === 'desc' ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600' }}"
+                                            title="Urutkan Turun">
+                                            <i class="ti ti-arrow-down"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </th>
                             <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Mapel</th>
                             <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Soal</th>
                             <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">
@@ -104,6 +121,11 @@
                     <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
                         @forelse ($data as $value)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group">
+                                <td class="py-4 px-8">
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        {{ $value->no ?? '-' }}
+                                    </span>
+                                </td>
                                 <td class="py-4 px-8">
                                     <span
                                         class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300">
@@ -172,7 +194,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="py-24">
+                                <td colspan="5" class="py-24">
                                     <div
                                         class="flex flex-col items-center justify-center text-center max-w-[280px] mx-auto">
                                         <div class="space-y-1">

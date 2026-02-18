@@ -11,6 +11,7 @@ class BankQuestion extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'no',
         'subject_id',
         'question_type',
         'question',

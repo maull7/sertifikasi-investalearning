@@ -12,7 +12,6 @@ class MappingQuestion extends Model
     protected $fillable = [
         'id_question_bank',
         'id_exam',
-        'id_quiz',
     ];
 
     public function questionBank(): BelongsTo
@@ -23,20 +22,5 @@ class MappingQuestion extends Model
     public function exam(): BelongsTo
     {
         return $this->belongsTo(Exam::class, 'id_exam');
-    }
-
-    public function quiz(): BelongsTo
-    {
-        return $this->belongsTo(Quiz::class, 'id_quiz');
-    }
-
-    public function isForExam(): bool
-    {
-        return $this->id_exam !== null;
-    }
-
-    public function isForQuiz(): bool
-    {
-        return $this->id_quiz !== null;
     }
 }
