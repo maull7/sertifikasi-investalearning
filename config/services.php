@@ -51,4 +51,8 @@ return [
         'number' => env('WA_CS_NUMBER', '6281234567890'),
     ],
 
+    'youtube' => [
+        'video_id' => env('YOUTUBE_VIDEO_ID', 'dQw4w9WgXcQ'),
+    ],
+
 ];

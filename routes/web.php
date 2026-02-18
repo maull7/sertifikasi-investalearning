@@ -1,33 +1,32 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\ExamController;
-use App\Http\Controllers\Admin\QuizController;
+use App\Http\Controllers\Admin\ApprovePackageController;
+use App\Http\Controllers\Admin\BankQuestionController;
+use App\Http\Controllers\Admin\CertificateController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailActivation;
+use App\Http\Controllers\Admin\ExamController;
+use App\Http\Controllers\Admin\MappingQuestionController;
+use App\Http\Controllers\Admin\MasterMaterialController;
+use App\Http\Controllers\Admin\MasterPackegeController;
+use App\Http\Controllers\Admin\MasterTypesController;
+use App\Http\Controllers\Admin\QuizController;
+use App\Http\Controllers\Admin\ShowGradeController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\TeacherController;
-use App\Http\Controllers\User\MyPackageController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\ShowGradeController;
-use App\Http\Controllers\User\HistoryExamController;
-use App\Http\Controllers\Admin\CertificateController;
-use App\Http\Controllers\Admin\MasterTypesController;
+use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ProfileCompletionController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\CertificateControlller;
-use App\Http\Controllers\Admin\BankQuestionController;
-use App\Http\Controllers\Admin\MasterPackegeController;
-use App\Http\Controllers\Admin\ApprovePackageController;
-use App\Http\Controllers\Admin\MasterMaterialController;
-use App\Http\Controllers\Admin\MappingQuestionController;
-use App\Http\Controllers\User\ExamController as UserExamController;
-use App\Http\Controllers\User\QuizController as UserQuizController;
-use App\Http\Controllers\User\PackageController as UserPackageController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
+use App\Http\Controllers\User\ExamController as UserExamController;
+use App\Http\Controllers\User\HistoryExamController;
+use App\Http\Controllers\User\MyPackageController;
+use App\Http\Controllers\User\PackageController as UserPackageController;
+use App\Http\Controllers\User\QuizController as UserQuizController;
+use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('index');
-})->middleware('check-login');
+Route::get('/', [IndexController::class, 'index'])->name('home')->middleware('check-login');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'admin'])
@@ -46,8 +45,7 @@ Route::get('/user/dashboard/chart-data', [UserDashboardController::class, 'getCh
 // Chart Data API
 Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
 
-
-//routes user
+// routes user
 Route::middleware('auth', 'akun-active')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -56,7 +54,7 @@ Route::middleware('auth', 'akun-active')->group(function () {
     Route::get('/profile/complete', [ProfileCompletionController::class, 'show'])->name('profile.complete');
     Route::patch('/profile/complete', [ProfileCompletionController::class, 'update'])->name('profile.complete.update');
 
-    //landing
+    // landing
     Route::get('/user/landing', [UserPackageController::class, 'landing'])->name('user.landing');
 
     // User Package routes
@@ -92,15 +90,14 @@ Route::middleware('auth', 'akun-active')->group(function () {
     Route::get('user/history-exams/{id}/detail', [HistoryExamController::class, 'detail'])
         ->name('user.history-exams.detail');
 
-    //Certificate User
+    // Certificate User
     Route::get('user/my-certificate', [CertificateControlller::class, 'index'])->name('user.certificate.index');
     Route::get('user/my-certificate/{certificate}', [CertificateControlller::class, 'detail'])->name('user.certificate.show');
     Route::get('certificates/{certificate}/download', [CertificateController::class, 'download'])
         ->name('certificates.download');
 });
 
-
-//routes admin
+// routes admin
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('master-types/import', [MasterTypesController::class, 'ImportTemplate'])->name('master-types.import');
     Route::get('master-types/export-template', [MasterTypesController::class, 'ExportTemplate'])->name('master-types.export-template');
@@ -188,4 +185,4 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('approve-packages.reject');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
