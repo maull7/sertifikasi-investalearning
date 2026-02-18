@@ -107,6 +107,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('master-packages.import');
     Route::get('master-packages/download-template', [MasterPackegeController::class, 'DownloadTemplate'])
         ->name('master-packages.download-template');
+    Route::patch('master-packages/{package}/toggle-active', [MasterPackegeController::class, 'toggleActive'])
+        ->name('master-packages.toggle-active');
     Route::resource('master-packages', MasterPackegeController::class);
 
     Route::resource('master-materials', MasterMaterialController::class);
@@ -185,4 +187,4 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('approve-packages.reject');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

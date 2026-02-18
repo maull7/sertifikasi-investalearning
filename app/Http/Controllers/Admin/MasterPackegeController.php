@@ -112,4 +112,11 @@ class MasterPackegeController extends Controller
             return redirect()->back()->withErrors($errorMessages);
         }
     }
+    public function toggleActive(Package $package)
+    {
+        $package->status = $package->status === 'active' ? 'inactive' : 'active';
+        $package->save();
+        $msg = $package->status === 'active' ? 'aktifkan' : 'nonaktifkan';
+        return redirect()->route('master-packages.index')->with('success', "Paket berhasil {$msg}.");
+    }
 }
