@@ -43,23 +43,25 @@
                 </div>
 
                 {{-- Package Stats --}}
+                @php
+                    $totalMateri = $subjects->sum(fn($s) => $s->materials->count());
+                    $totalDibaca = collect($subjectProgress)->sum('read');
+                @endphp
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100 dark:border-gray-800">
                     <div class="text-center">
-                        <p class="text-2xl font-bold text-indigo-600">{{ $subjects->sum(fn($s) => $s->materials->count()) }}
-                        </p>
+                        <p class="text-2xl font-bold text-indigo-600">{{ $totalMateri }}</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">Total Materi</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold text-emerald-600">{{ $package->userJoins->count() }}</p>
+                        <p class="text-2xl font-bold text-emerald-600">{{ $totalDibaca }}/{{ $totalMateri }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Materi Dibaca</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-violet-600">{{ $package->userJoins->count() }}</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">Total Peserta</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold text-violet-600">
-                            {{ $package->status === 'active' ? 'Aktif' : 'Tidak Aktif' }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Status</p>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-2xl font-bold text-rose-600">{{ $package->created_at->format('M Y') }}</p>
+                        <p class="text-2xl font-bold text-slate-600 dark:text-slate-300">{{ $package->created_at->format('M Y') }}</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">Dibuat</p>
                     </div>
                 </div>
@@ -72,19 +74,33 @@
                 <div class="space-y-8">
                     @foreach ($subjects as $subject)
                         @if ($subject->materials->count() > 0)
-                            {{-- Header Mata Pelajaran --}}
+                            @php
+                                $progress = $subjectProgress[$subject->id] ?? ['total' => 0, 'read' => 0, 'can_do_quiz' => false];
+                                $pct = $progress['total'] > 0 ? round(($progress['read'] / $progress['total']) * 100) : 0;
+                            @endphp
+                            {{-- Header Mata Pelajaran + Progress --}}
                             <div class="border-b border-gray-200 dark:border-gray-700 pb-3">
-                                <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <span
-                                        class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
-                                        <i class="ti ti-book text-sm"></i>
-                                    </span>
-                                    {{ $subject->name }}
-                                    @if ($subject->code)
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
                                         <span
-                                            class="text-xs font-medium text-gray-500 dark:text-gray-400">({{ $subject->code }})</span>
-                                    @endif
-                                </h3>
+                                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
+                                            <i class="ti ti-book text-sm"></i>
+                                        </span>
+                                        {{ $subject->name }}
+                                        @if ($subject->code)
+                                            <span
+                                                class="text-xs font-medium text-gray-500 dark:text-gray-400">({{ $subject->code }})</span>
+                                        @endif
+                                    </h3>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                                            {{ $progress['read'] }}/{{ $progress['total'] }} materi dibaca
+                                        </span>
+                                        <div class="w-24 h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden" title="{{ $pct }}%">
+                                            <div class="h-full rounded-full bg-indigo-600 transition-all duration-300" style="width: {{ $pct }}%"></div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-10">
                                     {{ $subject->materials->count() }} materi</p>
                             </div>
@@ -236,22 +252,21 @@
                 <div class="space-y-3">
                     @foreach ($quizez as $quizItem)
                         @php
-                            $material = $quizItem->subject->materials()->first();
-                            $statusMateri = \App\Models\StatusMateri::where('id_user', Auth::id())
-                                ->where('id_material', $material->id)
-                                ->first();
+                            $subjectId = $quizItem->subject->id ?? null;
+                            $progress = $subjectId ? ($subjectProgress[$subjectId] ?? ['total' => 0, 'read' => 0, 'can_do_quiz' => false]) : ['total' => 0, 'read' => 0, 'can_do_quiz' => true];
+                            $canDoQuiz = $progress['can_do_quiz'];
                         @endphp
                         <div
-                            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border {{ $statusMateri && $statusMateri->status !== 'completed' ? 'border-rose-100 dark:border-rose-800/50 bg-gradient-to-r from-gray-50/80 to-gray-50/80 dark:from-gray-500/5 dark:to-gray-500/5' : 'border-emerald-100 dark:border-emerald-800/50 bg-gradient-to-r from-emerald-50/80 to-teal-50/80 dark:from-emerald-500/5 dark:to-teal-500/5 hover:from-emerald-50 dark:hover:from-emerald-500/10 transition-colors' }}">
-                            <div class="flex gap-4 min-w-0 flex-1 ">
+                            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border {{ !$canDoQuiz ? 'border-amber-200 dark:border-amber-800/50 bg-amber-50/50 dark:bg-amber-500/5' : 'border-emerald-100 dark:border-emerald-800/50 bg-emerald-50/30 dark:bg-emerald-500/5 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10 transition-colors' }}">
+                            <div class="flex gap-4 min-w-0 flex-1">
                                 <div
-                                    class="w-11 h-11 rounded-xl bg-emerald-600 flex items-center justify-center text-white shrink-0">
+                                    class="w-11 h-11 rounded-xl {{ $canDoQuiz ? 'bg-emerald-600' : 'bg-amber-500' }} flex items-center justify-center text-white shrink-0">
                                     <i class="ti ti-puzzle text-lg"></i>
                                 </div>
-                                <div class="min-w-0">
+                                <div class="min-w-0 flex-1">
                                     <div class="flex flex-wrap items-center gap-2 mb-1">
                                         <span
-                                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+                                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold {{ $canDoQuiz ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' : 'bg-amber-500/10 text-amber-700 dark:text-amber-300' }}">
                                             {{ $quizItem->subject->name ?? 'Kuis' }}
                                         </span>
                                     </div>
@@ -273,13 +288,19 @@
                                         Nilai terakhir:
                                         <strong>{{ $quizScores->get($quizItem->id) ? number_format($quizScores->get($quizItem->id)->total_score, 1) : '-' }}</strong>
                                     </p>
+                                    @if (!$canDoQuiz && $progress['total'] > 0)
+                                        <p class="text-xs text-amber-700 dark:text-amber-400 mt-2 flex items-center gap-1">
+                                            <i class="ti ti-info-circle"></i>
+                                            Progress materi: {{ $progress['read'] }}/{{ $progress['total'] }} — selesaikan semua materi mapel ini untuk membuka kuis.
+                                        </p>
+                                    @endif
                                 </div>
                             </div>
-                            @if ($statusMateri && $statusMateri->status !== 'completed')
+                            @if (!$canDoQuiz)
                                 <span
-                                    class="inline-flex items-center gap-1 px-3 py-2 bg-rose-100 text-rose-700 text-xs font-semibold rounded-lg shrink-0">
-                                    <i class="ti ti-alert-circle"></i>
-                                    Selesaikan materi terlebih dahulu
+                                    class="inline-flex items-center gap-1 px-3 py-2 bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-semibold rounded-xl shrink-0">
+                                    <i class="ti ti-lock"></i>
+                                    Selesaikan semua materi mapel ini
                                 </span>
                             @else
                                 <x-button variant="success"
@@ -288,7 +309,6 @@
                                     <i class="ti ti-arrow-right mr-2"></i> Mulai Kuis
                                 </x-button>
                             @endif
-
                         </div>
                     @endforeach
                 </div>
@@ -380,7 +400,7 @@
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Tandai Telah Dibaca</h3>
                     <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                        Anda akan menandai materi <span x-text="materialName"></span> sebagai telah dibaca. Tindakan ini
+                        Anda akan menandai materi <strong x-text="materi"></strong> sebagai telah dibaca. Tindakan ini
                         tidak dapat dibatalkan.
                     </p>
                 </div>

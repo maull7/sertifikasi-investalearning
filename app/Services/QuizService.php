@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Quiz;
-use App\Models\User;
 use App\Models\Package;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
+use App\Models\Quiz;
+use App\Models\StatusMateri;
+use App\Models\User;
 use App\Repositories\Contracts\ExamRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class QuizService
 {
@@ -26,6 +26,19 @@ class QuizService
         $subjectIds = $package->masterType?->subjects?->pluck('id') ?? collect();
         if (! $subjectIds->contains($quiz->subject_id)) {
             abort(404, 'Kuis tidak ditemukan dalam package ini.');
+        }
+
+        $quiz->loadMissing('subject.materials');
+        $subject = $quiz->subject;
+        if ($subject && $subject->materials->isNotEmpty()) {
+            $materialIds = $subject->materials->pluck('id');
+            $completedCount = StatusMateri::where('id_user', $user->id)
+                ->whereIn('id_material', $materialIds)
+                ->where('status', 'completed')
+                ->count();
+            if ($completedCount < $materialIds->count()) {
+                abort(403, 'Selesaikan semua materi mata pelajaran '.$subject->name.' terlebih dahulu sebelum mengerjakan kuis.');
+            }
         }
     }
 
@@ -172,6 +185,7 @@ class QuizService
             throw $e;
         }
     }
+
     /**
      * Soal kuis dari bank soal (quiz.subject_id), random per attempt.
      */

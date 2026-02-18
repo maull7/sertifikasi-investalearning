@@ -31,4 +31,8 @@ class Subject extends Model
     {
         return $this->hasMany(Quiz::class, 'subject_id');
     }
+    public function statusMateris(): HasMany
+    {
+        return $this->hasMany(StatusMateri::class, 'id_subject');
+    }
 }

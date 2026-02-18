@@ -13,6 +13,7 @@ class StatusMateri extends Model
         'id_user',
         'id_material',
         'status',
+        'id_subject',
     ];
 
     public function user(): BelongsTo
@@ -22,5 +23,9 @@ class StatusMateri extends Model
     public function material(): BelongsTo
     {
         return $this->belongsTo(Material::class, 'id_material');
+    }
+    public function subject(): BelongsTo
+    {
+        return $this->belongsTo(Subject::class, 'id_subject');
     }
 }
