@@ -92,7 +92,7 @@
                                 </span>
                             </td>
                             <td class="py-4 px-8 text-center">
-                                @php($total = $value->total_questions ?? $value->mappingQuestions()->count())
+                                @php($total = $value->total_questions ?? 0)
                                 <span class="inline-flex items-center justify-center px-3 py-1 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs font-semibold">
                                     {{ $total }} Soal
                                 </span>

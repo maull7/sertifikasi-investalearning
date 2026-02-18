@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Subject;
-use App\Models\MasterType;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Imports\BankQuestionsImport;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Storage;
 use App\Exports\BankQuestionsTemplateExport;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RequestBankQuestion;
+use App\Imports\BankQuestionsImport;
+use App\Models\BankQuestion;
+use App\Models\Subject;
 use App\Repositories\Contracts\BankQuestionRepositoryInterface;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BankQuestionController extends Controller
 {
@@ -26,8 +26,9 @@ class BankQuestionController extends Controller
     {
         $search = $request->query('search');
         $subjectId = $request->query('subject_id') ? (int) $request->query('subject_id') : null;
+        $sortNo = $request->query('sort_no');
 
-        $data = $this->bankQuestionRepository->getAllWithPagination($search, $subjectId);
+        $data = $this->bankQuestionRepository->getAllWithPagination($search, $subjectId, 10, $sortNo);
         $subjects = Subject::orderBy('name')->get();
 
         return view('admin.bank-question.index', [
@@ -35,12 +36,14 @@ class BankQuestionController extends Controller
             'search' => $search,
             'subjects' => $subjects,
             'subjectId' => $subjectId,
+            'sortNo' => $sortNo,
         ]);
     }
 
     public function create()
     {
         $subjects = Subject::all();
+
         return view('admin.bank-question.create', compact('subjects'));
     }
 
@@ -56,18 +59,22 @@ class BankQuestionController extends Controller
         // Handle image upload (stored into `question` as path)
         if ($request->hasFile('question_file')) {
             $file = $request->file('question_file');
-            $fileName = time() . '_' . $file->getClientOriginalName();
+            $fileName = time().'_'.$file->getClientOriginalName();
             $filePath = $file->storeAs('questions', $fileName, 'public');
             $data['question'] = $filePath;
         }
 
+        $lastNomor = BankQuestion::where('subject_id', $data['subject_id'])->max('no');
+        $data['no'] = $lastNomor ? $lastNomor + 1 : 1;
         $this->bankQuestionRepository->create($data);
+
         return redirect()->route('bank-questions.index')->with('success', 'Soal berhasil ditambahkan.');
     }
 
     public function show(string $id)
     {
         $data = $this->bankQuestionRepository->findById($id);
+
         return view('admin.bank-question.show', compact('data'));
     }
 
@@ -75,6 +82,7 @@ class BankQuestionController extends Controller
     {
         $data = $this->bankQuestionRepository->findById($id);
         $subjects = Subject::all();
+
         return view('admin.bank-question.edit', compact('data', 'subjects'));
     }
 
@@ -95,7 +103,7 @@ class BankQuestionController extends Controller
             }
 
             $file = $request->file('question_file');
-            $fileName = time() . '_' . $file->getClientOriginalName();
+            $fileName = time().'_'.$file->getClientOriginalName();
             $filePath = $file->storeAs('questions', $fileName, 'public');
             $data['question'] = $filePath;
         }
@@ -106,14 +114,15 @@ class BankQuestionController extends Controller
                 Storage::disk('public')->delete($question->question);
             }
         }
-
         $this->bankQuestionRepository->update($id, $data);
+
         return redirect()->route('bank-questions.index')->with('success', 'Soal berhasil diperbarui.');
     }
 
     public function destroy(string $id)
     {
         $this->bankQuestionRepository->delete($id);
+
         return redirect()->route('bank-questions.index')->with('success', 'Soal berhasil dihapus.');
     }
 
@@ -139,7 +148,7 @@ class BankQuestionController extends Controller
         ]);
 
         try {
-            $import = new BankQuestionsImport();
+            $import = new BankQuestionsImport;
             Excel::import($import, $request->file('file'));
 
             // Check for failures
@@ -148,21 +157,23 @@ class BankQuestionController extends Controller
             if ($failures->isNotEmpty()) {
                 $errorMessages = [];
                 foreach ($failures as $failure) {
-                    $errorMessages[] = "Baris {$failure->row()}: " . implode(', ', $failure->errors());
+                    $errorMessages[] = "Baris {$failure->row()}: ".implode(', ', $failure->errors());
                 }
+
                 return redirect()->route('bank-questions.index')
-                    ->with('error', 'Import gagal dengan error: ' . implode(' | ', $errorMessages));
+                    ->with('error', 'Import gagal dengan error: '.implode(' | ', $errorMessages));
             }            // Check for custom errors
             $customErrors = $import->getErrors();
-            if (!empty($customErrors)) {
+            if (! empty($customErrors)) {
                 return redirect()->route('bank-questions.index')
-                    ->with('error', 'Import gagal: ' . implode(' | ', $customErrors));
+                    ->with('error', 'Import gagal: '.implode(' | ', $customErrors));
             }
+
             return redirect()->route('bank-questions.index')
                 ->with('success', 'Soal berhasil diimport dari Excel!');
         } catch (\Exception $e) {
             return redirect()->route('bank-questions.index')
-                ->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+                ->with('error', 'Terjadi kesalahan saat import: '.$e->getMessage());
         }
     }
 }

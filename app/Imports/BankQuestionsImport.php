@@ -65,12 +65,16 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
             $this->errors[] = "Tipe soal '{$codeType}' tidak ditemukan pada subjects.";
             return null;
         }
+        $lastNumber = BankQuestion::where('subject_id', $subject->id)
+            ->max('no');
+
+        $nextNumber = $lastNumber ? $lastNumber + 1 : 1;
 
         $questionType = ($row['question_type'] ?? 'Text');
         $questionType = ucfirst(strtolower(trim((string) $questionType)));
         $questionValue = (string) ($row['soal'] ?? '');
 
-        // For Image: allow URL or storage path in "soal"
+        // For Image: allow xURL or storage path in "soal"
         if ($questionType === 'Image') {
             $questionValue = $this->resolveImageToStoragePath($questionValue);
             if ($questionValue === null) {
@@ -80,6 +84,7 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
         }
 
         return new BankQuestion([
+            'no' => $nextNumber,
             'subject_id' => $subject->id,
             'question_type' => $questionType,
             'question' => $questionValue,

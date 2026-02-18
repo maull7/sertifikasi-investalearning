@@ -10,26 +10,22 @@
         <div class="space-y-1">
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Detail Soal</h1>
             <nav class="flex items-center gap-2 text-xs font-medium text-gray-400">
-                @if($mappableType === 'exam')
-                    <a href="{{ route('exams.index') }}" class="hover:text-indigo-600 transition-colors">Ujian</a>
-                @else
-                    <a href="{{ route('quizzes.index') }}" class="hover:text-indigo-600 transition-colors">Kuis</a>
-                @endif
+                <a href="{{ route('exams.index') }}" class="hover:text-indigo-600 transition-colors">Ujian</a>
                 <i class="ti ti-chevron-right"></i>
-                <a href="{{ $mappableType === 'exam' ? route('mapping-questions.manage', $mappable) : route('mapping-questions.quiz.manage', $mappable) }}" class="hover:text-indigo-600 transition-colors">Mapping Soal</a>
+                <a href="{{ route('mapping-questions.manage', $mappable) }}" class="hover:text-indigo-600 transition-colors">Mapping Soal</a>
                 <i class="ti ti-chevron-right"></i>
                 <span class="text-gray-500 dark:text-gray-500">Detail</span>
             </nav>
         </div>
         <div class="flex items-center gap-3">
-            <form action="{{ $mappableType === 'exam' ? route('mapping-questions.destroy', [$mappable, $mapping]) : route('mapping-questions.quiz.destroy', [$mappable, $mapping]) }}" method="POST" onsubmit="return confirm('Hapus soal ini?')">
+            <form action="{{ route('mapping-questions.destroy', [$mappable, $mapping]) }}" method="POST" onsubmit="return confirm('Hapus soal ini?')">
                 @csrf
                 @method('DELETE')
                 <x-button variant="danger" class="rounded-xl">
-                    <i class="ti ti-trash mr-2"></i> Hapus dari {{ $mappableType === 'exam' ? 'Ujian' : 'Kuis' }}
+                    <i class="ti ti-trash mr-2"></i> Hapus dari Ujian
                 </x-button>
             </form>
-            <x-button variant="secondary" href="{{ $mappableType === 'exam' ? route('mapping-questions.manage', $mappable) : route('mapping-questions.quiz.manage', $mappable) }}" class="rounded-xl">
+            <x-button variant="secondary" href="{{ route('mapping-questions.manage', $mappable) }}" class="rounded-xl">
                 <i class="ti ti-arrow-left mr-2"></i> Kembali
             </x-button>
         </div>
@@ -39,7 +35,7 @@
     <x-card>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
-                <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold mb-1">{{ $mappableType === 'exam' ? 'Ujian' : 'Kuis' }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold mb-1">Ujian</p>
                 <p class="text-gray-900 dark:text-white font-semibold">{{ $mappable->title }}</p>
             </div>
             <div>

@@ -32,7 +32,7 @@ class MyPackageController extends Controller
             ->where('id_package', $package->id)
             ->first();
 
-        if (! $userJoin) {
+        if (!$userJoin) {
             abort(403, 'Anda belum bergabung dengan package ini.');
         }
 

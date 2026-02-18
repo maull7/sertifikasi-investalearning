@@ -136,18 +136,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('exams/{exam}/mapping-questions/{mapping}', [MappingQuestionController::class, 'destroy'])
         ->name('mapping-questions.destroy');
 
-    // Mapping Soal - Kuis
-    Route::get('quizzes/{quiz}/mapping-questions', [MappingQuestionController::class, 'indexForQuiz'])
-        ->name('mapping-questions.quiz.manage');
-    Route::post('quizzes/{quiz}/mapping-questions', [MappingQuestionController::class, 'storeForQuiz'])
-        ->name('mapping-questions.quiz.store');
-    Route::post('quizzes/{quiz}/mapping-questions/random', [MappingQuestionController::class, 'randomForQuiz'])
-        ->name('mapping-questions.quiz.random');
-    Route::get('quizzes/{quiz}/mapping-questions/{mapping}', [MappingQuestionController::class, 'showForQuiz'])
-        ->name('mapping-questions.quiz.show');
-    Route::delete('quizzes/{quiz}/mapping-questions/{mapping}', [MappingQuestionController::class, 'destroyForQuiz'])
-        ->name('mapping-questions.quiz.destroy');
-
     // Bank Question routes
     Route::get('bank-questions/download-template', [BankQuestionController::class, 'downloadTemplate'])
         ->name('bank-questions.download-template');
