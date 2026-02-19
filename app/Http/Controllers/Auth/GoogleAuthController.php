@@ -53,7 +53,7 @@ class GoogleAuthController extends Controller
         Auth::login($user, true);
 
         if ($user->role === 'User' && $user->needsProfileCompletion()) {
-            return redirect()->route('user.landing');
+            return redirect()->route('profile.complete');
         }
 
         if ($user->role === 'Admin') {

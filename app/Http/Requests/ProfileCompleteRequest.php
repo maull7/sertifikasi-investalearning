@@ -20,6 +20,7 @@ class ProfileCompleteRequest extends FormRequest
             'tanggal_lahir' => ['nullable', 'date'],
             'institusi' => ['nullable', 'string', 'max:255'],
             'alamat' => ['required', 'string', 'max:500'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
     }
 
