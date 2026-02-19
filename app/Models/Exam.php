@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Exam extends Model
@@ -11,6 +12,7 @@ class Exam extends Model
     use HasFactory;
     protected $fillable = [
         'package_id',
+        'subject_id',
         'title',
         'description',
         'duration',
@@ -26,5 +28,9 @@ class Exam extends Model
     public function mappingQuestions(): HasMany
     {
         return $this->hasMany(MappingQuestion::class, 'id_exam');
+    }
+    public function subject(): BelongsTo
+    {
+        return $this->belongsTo(Subject::class);
     }
 }

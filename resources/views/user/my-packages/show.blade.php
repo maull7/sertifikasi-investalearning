@@ -61,7 +61,8 @@
                         <p class="text-xs text-gray-500 dark:text-gray-400">Total Peserta</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-2xl font-bold text-slate-600 dark:text-slate-300">{{ $package->created_at->format('M Y') }}</p>
+                        <p class="text-2xl font-bold text-slate-600 dark:text-slate-300">
+                            {{ $package->created_at->format('M Y') }}</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">Dibuat</p>
                     </div>
                 </div>
@@ -75,8 +76,13 @@
                     @foreach ($subjects as $subject)
                         @if ($subject->materials->count() > 0)
                             @php
-                                $progress = $subjectProgress[$subject->id] ?? ['total' => 0, 'read' => 0, 'can_do_quiz' => false];
-                                $pct = $progress['total'] > 0 ? round(($progress['read'] / $progress['total']) * 100) : 0;
+                                $progress = $subjectProgress[$subject->id] ?? [
+                                    'total' => 0,
+                                    'read' => 0,
+                                    'can_do_quiz' => false,
+                                ];
+                                $pct =
+                                    $progress['total'] > 0 ? round(($progress['read'] / $progress['total']) * 100) : 0;
                             @endphp
                             {{-- Header Mata Pelajaran + Progress --}}
                             <div class="border-b border-gray-200 dark:border-gray-700 pb-3">
@@ -96,8 +102,10 @@
                                         <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
                                             {{ $progress['read'] }}/{{ $progress['total'] }} materi dibaca
                                         </span>
-                                        <div class="w-24 h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden" title="{{ $pct }}%">
-                                            <div class="h-full rounded-full bg-indigo-600 transition-all duration-300" style="width: {{ $pct }}%"></div>
+                                        <div class="w-24 h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"
+                                            title="{{ $pct }}%">
+                                            <div class="h-full rounded-full bg-indigo-600 transition-all duration-300"
+                                                style="width: {{ $pct }}%"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -253,7 +261,9 @@
                     @foreach ($quizez as $quizItem)
                         @php
                             $subjectId = $quizItem->subject->id ?? null;
-                            $progress = $subjectId ? ($subjectProgress[$subjectId] ?? ['total' => 0, 'read' => 0, 'can_do_quiz' => false]) : ['total' => 0, 'read' => 0, 'can_do_quiz' => true];
+                            $progress = $subjectId
+                                ? $subjectProgress[$subjectId] ?? ['total' => 0, 'read' => 0, 'can_do_quiz' => false]
+                                : ['total' => 0, 'read' => 0, 'can_do_quiz' => true];
                             $canDoQuiz = $progress['can_do_quiz'];
                         @endphp
                         <div
@@ -291,7 +301,8 @@
                                     @if (!$canDoQuiz && $progress['total'] > 0)
                                         <p class="text-xs text-amber-700 dark:text-amber-400 mt-2 flex items-center gap-1">
                                             <i class="ti ti-info-circle"></i>
-                                            Progress materi: {{ $progress['read'] }}/{{ $progress['total'] }} — selesaikan semua materi mapel ini untuk membuka kuis.
+                                            Progress materi: {{ $progress['read'] }}/{{ $progress['total'] }} — selesaikan
+                                            semua materi mapel ini untuk membuka kuis.
                                         </p>
                                     @endif
                                 </div>
@@ -329,7 +340,8 @@
                         <div
                             class="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-500/10 dark:to-violet-500/10 rounded-xl border border-indigo-100 dark:border-indigo-800">
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white">
+                                <div
+                                    class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white">
                                     <i class="ti ti-clipboard-check text-xl"></i>
                                 </div>
                                 <div>
@@ -341,6 +353,10 @@
                                                 class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
                                                 <i class="ti ti-copyleft"></i> Pretest
                                             </span>
+                                            <span
+                                                class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                                                <i class="ti ti-school"></i> {{ $examItem->subject->name ?? 'Umum' }}
+                                            </span>
                                         @else
                                             <span
                                                 class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
@@ -351,7 +367,8 @@
                                     <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
                                         <span class="inline-flex items-center gap-1">
                                             <i class="ti ti-help-circle"></i>
-                                            {{ $totalQuestions }} Soal
+                                            {{ $examItem->type === 'pretest' ? $examItem->total_questions : $totalQuestions }}
+                                            Soal
                                         </span>
                                         @if ($examItem->duration)
                                             <span class="inline-flex items-center gap-1">

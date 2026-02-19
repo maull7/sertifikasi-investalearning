@@ -69,16 +69,31 @@ class ExamRepository implements ExamRepositoryInterface
 
         if ($this->isPretest($exam)) {
             $ids = $attempt->question_ids ?? [];
+
             if (empty($ids)) {
                 $package->loadMissing(['masterType.subjects']);
-                $subjectIds = $package->masterType?->subjects?->pluck('id') ?? collect();
+
+                $subjectIds = $exam->subject_id
+                    ? collect([$exam->subject_id])
+                    : $package->masterType?->subjects?->pluck('id') ?? collect();
+
                 $limit = (int) max(1, $exam->total_questions);
-                $ids = BankQuestion::whereIn('subject_id', $subjectIds)
+
+                $query = BankQuestion::query();
+
+                if ($subjectIds->count() === 1) {
+                    $query->where('subject_id', $subjectIds->first());
+                } else {
+                    $query->whereIn('subject_id', $subjectIds);
+                }
+
+                $ids = $query
                     ->inRandomOrder()
                     ->limit($limit)
                     ->pluck('id')
                     ->values()
                     ->all();
+
                 $attempt->update(['question_ids' => $ids]);
             }
         }
@@ -104,7 +119,7 @@ class ExamRepository implements ExamRepositoryInterface
         $offset = ($page - 1) * $perPage;
         $chunk = array_slice($ids, $offset, $perPage);
         $questions = BankQuestion::whereIn('id', $chunk)->get()->keyBy('id');
-        $ordered = collect($chunk)->map(fn ($id) => $questions->get($id))->filter()->values();
+        $ordered = collect($chunk)->map(fn($id) => $questions->get($id))->filter()->values();
         return new \Illuminate\Pagination\LengthAwarePaginator($ordered, $total, $perPage, $page);
     }
 
@@ -165,7 +180,7 @@ class ExamRepository implements ExamRepositoryInterface
         $offset = ($page - 1) * $perPage;
         $chunk = array_slice($ids, $offset, $perPage);
         $questions = BankQuestion::whereIn('id', $chunk)->get()->keyBy('id');
-        $ordered = collect($chunk)->map(fn ($id) => $questions->get($id))->filter()->values();
+        $ordered = collect($chunk)->map(fn($id) => $questions->get($id))->filter()->values();
         return new \Illuminate\Pagination\LengthAwarePaginator($ordered, $total, $perPage, $page);
     }
 
