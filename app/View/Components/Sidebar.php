@@ -74,6 +74,7 @@ class Sidebar extends Component
                             ['name' => 'Master Paket', 'route' => 'master-packages.index'],
                             ['name' => 'Master Materi', 'route' => 'master-materials.index'],
                             ['name' => 'Data Pengajar', 'route' => 'teacher.index'],
+                            ['name' => 'Data Buku', 'route' => 'books.index'],
                         ],
                     ],
                 ],
@@ -90,6 +91,19 @@ class Sidebar extends Component
                             ['name' => 'Kuis / Latihan', 'route' => 'quizzes.index'],
                             ['name' => 'Bank Soal', 'route' => 'bank-questions.index'],
                             ['name' => 'Mapping Soal', 'route' => 'mapping-questions.index'],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'title' => 'Monitor',
+                'items' => [
+                    [
+                        'name' => 'Monitor Peserta',
+                        'icon' => 'ti ti-chart-line',
+                        'activePattern' => 'monitor-participants.*',
+                        'subItems' => [
+                            ['name' => 'Monitor Peserta', 'route' => 'monitor-participants.index'],
                         ],
                     ],
                 ],

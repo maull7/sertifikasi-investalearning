@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ApprovePackageController;
 use App\Http\Controllers\Admin\BankQuestionController;
+use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailActivation;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Admin\MappingQuestionController;
 use App\Http\Controllers\Admin\MasterMaterialController;
 use App\Http\Controllers\Admin\MasterPackegeController;
 use App\Http\Controllers\Admin\MasterTypesController;
+use App\Http\Controllers\Admin\ParticipantMonitorController;
 use App\Http\Controllers\Admin\QuizController;
 use App\Http\Controllers\Admin\ShowGradeController;
 use App\Http\Controllers\Admin\SubjectController;
@@ -169,10 +171,27 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('admin.pending-packages-count');
     Route::get('approve-packages', [ApprovePackageController::class, 'index'])
         ->name('approve-packages.index');
+    Route::get('approve-packages/packages/{package}', [ApprovePackageController::class, 'showPackage'])
+        ->name('approve-packages.package.show');
     Route::patch('approve-packages/{userJoin}/approve', [ApprovePackageController::class, 'approve'])
         ->name('approve-packages.approve');
     Route::patch('approve-packages/{userJoin}/reject', [ApprovePackageController::class, 'reject'])
         ->name('approve-packages.reject');
+
+    // Monitor Peserta
+    Route::get('monitor-participants', [ParticipantMonitorController::class, 'index'])
+        ->name('monitor-participants.index');
+    Route::get('monitor-participants/package/{package}', [ParticipantMonitorController::class, 'participants'])
+        ->name('monitor-participants.package');
+    Route::get('monitor-participants/package/{package}/export', [ParticipantMonitorController::class, 'exportPackage'])
+        ->name('monitor-participants.package.export');
+    Route::get('monitor-participants/{userJoin}/tryout/{transQuestion}', [ParticipantMonitorController::class, 'tryoutDetail'])
+        ->name('monitor-participants.tryout-detail');
+    Route::get('monitor-participants/{userJoin}/export', [ParticipantMonitorController::class, 'exportParticipant'])
+        ->name('monitor-participants.export');
+    Route::get('monitor-participants/{userJoin}', [ParticipantMonitorController::class, 'show'])
+        ->name('monitor-participants.show');
+    Route::resource('books', BookController::class);
 });
 
 require __DIR__ . '/auth.php';

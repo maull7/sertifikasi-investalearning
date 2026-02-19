@@ -40,7 +40,7 @@ class User extends Authenticatable
     public function needsProfileCompletion(): bool
     {
         return $this->google_id !== null
-            && (trim((string) $this->phone) === '' || trim((string) $this->alamat) === '');
+            && (trim((string) $this->phone) === '' || trim((string) $this->alamat) === '' || trim((string) $this->password) === '');
     }
 
     /**
