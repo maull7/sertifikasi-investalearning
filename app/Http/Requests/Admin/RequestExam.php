@@ -23,6 +23,7 @@ class RequestExam extends FormRequest
     {
         return [
             'package_id' => 'required|exists:packages,id',
+            'subject_id' => 'nullable|exists:subjects,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'duration' => 'required|integer|min:1',

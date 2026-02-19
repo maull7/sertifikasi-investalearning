@@ -92,6 +92,16 @@
 
                     {{-- Total Questions --}}
                     <div>
+                        <x-select label="Mata Pelajaran" name="subject_id" required>
+                            @foreach ($subjects as $subject)
+                                <option value="{{ $subject->id }}"
+                                    {{ old('subject_id') == $subject->id ? 'selected' : '' }}>
+                                    {{ $subject->name }}
+                                </option>
+                            @endforeach
+                        </x-select>
+                    </div>
+                    <div>
                         <x-input label="Jumlah Soal Ujian (Opsional)" name="total_questions" type="number" min="1"
                             placeholder="Contoh: 50" value="{{ old('total_questions') }}" />
                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">

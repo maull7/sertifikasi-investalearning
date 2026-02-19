@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RequestExam;
 use App\Models\Exam;
 use App\Models\Package;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 
 class ExamController extends Controller
@@ -29,7 +30,8 @@ class ExamController extends Controller
     public function create()
     {
         $packages = Package::all();
-        return view('admin.exam.create', compact('packages'));
+        $subjects = Subject::all();
+        return view('admin.exam.create', compact('packages', 'subjects'));
     }
 
     public function store(RequestExam $request)
@@ -48,7 +50,8 @@ class ExamController extends Controller
     {
         $data = Exam::with('package')->findOrFail($id);
         $packages = Package::all();
-        return view('admin.exam.edit', compact('data', 'packages'));
+        $subjects = Subject::all();
+        return view('admin.exam.edit', compact('data', 'packages', 'subjects'));
     }
 
     public function update(RequestExam $request, string $id)

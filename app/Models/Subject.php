@@ -35,4 +35,8 @@ class Subject extends Model
     {
         return $this->hasMany(StatusMateri::class, 'id_subject');
     }
+    public function exams(): HasMany
+    {
+        return $this->hasMany(Exam::class, 'subject_id');
+    }
 }
