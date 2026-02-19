@@ -325,6 +325,8 @@
                         class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Beranda</a>
                     <a href="#courses"
                         class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Kelas</a>
+                    <a href="#books"
+                        class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Buku</a>
                     <a href="#video"
                         class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Video</a>
                     <a href="#about"
@@ -350,6 +352,7 @@
             class="md:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-2">
             <a href="#home" class="block py-2 text-sm font-medium text-slate-600">Beranda</a>
             <a href="#courses" class="block py-2 text-sm font-medium text-slate-600">Kelas</a>
+            <a href="#books" class="block py-2 text-sm font-medium text-slate-600">Buku</a>
             <a href="#video" class="block py-2 text-sm font-medium text-slate-600">Video</a>
             <a href="#about" class="block py-2 text-sm font-medium text-slate-600">Tentang</a>
             <a href="#contact" class="block py-2 text-sm font-medium text-slate-600">Kontak</a>
@@ -527,6 +530,69 @@
                     </div>
                 </div>
             @endforeach
+        </div>
+    </section>
+
+    {{-- section buku --}}
+    <section id="books" class="relative py-16 sm:py-20 md:py-24 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 md:mb-16 animate-slide-up">
+                <p class="text-sm font-semibold text-indigo-600 uppercase tracking-wider mb-2">Buku Tersedia</p>
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+                    <span class="gradient-text">Buku</span> Tersedia
+                </h2>
+
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                @forelse ($books as $item)
+                    <div class="group relative rounded-2xl overflow-hidden shadow-lg">
+
+                        {{-- Cover Full --}}
+                        <div class="relative h-80">
+                            @if ($item->cover_image)
+                                <img src="{{ asset('storage/' . $item->cover_image) }}" alt="{{ $item->title }}"
+                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                            @else
+                                <div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+                                    Tidak ada cover
+                                </div>
+                            @endif
+
+                            {{-- Overlay --}}
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent 
+                        opacity-0 group-hover:opacity-100 transition duration-500 flex items-end">
+
+                                <div
+                                    class="p-6 text-white translate-y-6 group-hover:translate-y-0 transition duration-500">
+
+                                    <p class="text-xs uppercase tracking-wider text-indigo-300 mb-2">
+                                        {{ $item->author ?? 'Unknown Author' }}
+                                    </p>
+
+                                    <h3 class="text-xl font-bold mb-2">
+                                        {{ $item->title }}
+                                    </h3>
+
+                                    @if ($item->description)
+                                        <p class="text-sm text-gray-200 line-clamp-3">
+                                            {{ Str::limit(strip_tags($item->description), 120) }}
+                                        </p>
+                                    @endif
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                @empty
+                    <div class="col-span-full text-center py-12 text-gray-500">
+                        Belum ada buku tersedia.
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
         </div>
     </section>
 

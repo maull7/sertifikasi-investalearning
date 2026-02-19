@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ApprovePackageController;
 use App\Http\Controllers\Admin\BankQuestionController;
+use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailActivation;
@@ -190,6 +191,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('monitor-participants.export');
     Route::get('monitor-participants/{userJoin}', [ParticipantMonitorController::class, 'show'])
         ->name('monitor-participants.show');
+    Route::resource('books', BookController::class);
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
