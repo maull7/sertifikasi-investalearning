@@ -95,6 +95,19 @@ class Sidebar extends Component
                 ],
             ],
             [
+                'title' => 'Monitor',
+                'items' => [
+                    [
+                        'name' => 'Monitor Peserta',
+                        'icon' => 'ti ti-chart-line',
+                        'activePattern' => 'monitor-participants.*',
+                        'subItems' => [
+                            ['name' => 'Monitor Peserta', 'route' => 'monitor-participants.index'],
+                        ],
+                    ],
+                ],
+            ],
+            [
                 'title' => 'Hasil',
                 'items' => [
                     [
