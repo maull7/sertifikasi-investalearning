@@ -43,7 +43,7 @@
                     </label>
                     <input type="file" name="cover_image" accept=".jpg,.jpeg,.png"
                         class="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Format: JPG, JPEG, PNG. Maksimal 10MB.</p>
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Format: JPG, JPEG, PNG. Maksimal 5MB.</p>
                     @error('cover_image')
                         <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
                     @enderror

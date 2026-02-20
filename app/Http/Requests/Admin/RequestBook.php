@@ -25,7 +25,7 @@ class RequestBook extends FormRequest
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ];
     }
 }
