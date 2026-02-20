@@ -39,7 +39,7 @@
                 .catch(() => {});
         }
     }"
-    x-init="$nextTick(() => { if ({{ $isAdmin ? 'true' : 'false' }} && typeof fetch !== 'undefined') { $data.fetchUnverified(); $data.fetchPendingPackages(); setInterval(() => { $data.fetchUnverified(); $data.fetchPendingPackages(); }, 30000); } })"
+    x-init="$nextTick(() => { if ({{ ($isStaff ?? false) ? 'true' : 'false' }} && typeof fetch !== 'undefined') { $data.fetchUnverified(); $data.fetchPendingPackages(); setInterval(() => { $data.fetchUnverified(); $data.fetchPendingPackages(); }, 30000); } })"
     :class="{
         'w-72': expanded,
         'w-20': !expanded,

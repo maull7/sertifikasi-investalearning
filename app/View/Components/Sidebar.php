@@ -19,13 +19,16 @@ class Sidebar extends Component
 
     public bool $isAdmin;
 
+    public bool $isStaff;
+
     public function __construct()
     {
         $user = Auth::user();
         $this->isAdmin = $user && $user->role === 'Admin';
+        $this->isStaff = $user && in_array($user->role, ['Admin', 'Petugas'], true);
 
-        if ($this->isAdmin) {
-            $this->menuGroups = $this->getAdminMenu();
+        if ($this->isStaff) {
+            $this->menuGroups = $this->getStaffMenu($this->isAdmin);
             $this->unverifiedCount = User::query()
                 ->where('role', 'User')
                 ->where('status_user', 'Belum Teraktivasi')
@@ -38,9 +41,12 @@ class Sidebar extends Component
         }
     }
 
-    private function getAdminMenu(): array
+    /**
+     * Menu untuk Admin dan Petugas. Petugas tanpa Master & Pelatihan; Master User hanya Admin.
+     */
+    private function getStaffMenu(bool $isAdminOnly): array
     {
-        return [
+        $groups = [
             [
                 'title' => 'Main Menu',
                 'items' => [
@@ -61,13 +67,16 @@ class Sidebar extends Component
                     ],
                 ],
             ],
-            [
+        ];
+
+        if ($isAdminOnly) {
+            $groups[] = [
                 'title' => 'Master',
                 'items' => [
                     [
                         'name' => 'Master Data',
                         'icon' => 'ti ti-id',
-                        'activePattern' => 'master.*',
+                        'activePattern' => 'master.*|teacher.*|books.*|subjects.*',
                         'subItems' => [
                             ['name' => 'Master Jenis', 'route' => 'master-types.index'],
                             ['name' => 'Master Mata Pelajaran', 'route' => 'subjects.index'],
@@ -75,17 +84,18 @@ class Sidebar extends Component
                             ['name' => 'Master Materi', 'route' => 'master-materials.index'],
                             ['name' => 'Data Pengajar', 'route' => 'teacher.index'],
                             ['name' => 'Data Buku', 'route' => 'books.index'],
+                            ['name' => 'Master User', 'route' => 'master-user.index'],
                         ],
                     ],
                 ],
-            ],
-            [
+            ];
+            $groups[] = [
                 'title' => 'Pelatihan',
                 'items' => [
                     [
                         'name' => 'Pelatihan',
                         'icon' => 'ti ti-adjustments-search',
-                        'activePattern' => 'exams.*|bank-questions.*|mapping-questions.*|mapping-package.*',
+                        'activePattern' => 'exams.*|bank-questions.*|mapping-questions.*|mapping-package.*|quizzes.*',
                         'subItems' => [
                             ['name' => 'Try Out', 'route' => 'exams.index'],
                             ['name' => 'Kuis / Latihan', 'route' => 'quizzes.index'],
@@ -95,48 +105,51 @@ class Sidebar extends Component
                         ],
                     ],
                 ],
-            ],
-            [
-                'title' => 'Monitor',
-                'items' => [
-                    [
-                        'name' => 'Monitor Peserta',
-                        'icon' => 'ti ti-chart-line',
-                        'activePattern' => 'monitor-participants.*',
-                        'subItems' => [
-                            ['name' => 'Monitor Peserta', 'route' => 'monitor-participants.index'],
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'title' => 'Hasil',
-                'items' => [
-                    [
-                        'name' => 'Hasil Nilai',
-                        'icon' => 'ti ti-report-analytics',
-                        'activePattern' => 'show-grades.*',
-                        'subItems' => [
-                            ['name' => 'Nilai', 'route' => 'show-grades.index'],
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'title' => 'Sertifikat',
-                'items' => [
-                    [
-                        'name' => 'Data Sertifikat',
-                        'icon' => 'ti ti-certificate',
-                        'activePattern' => 'certificates.*',
-                        'subItems' => [
-                            ['name' => 'Tambah Sertifikat', 'route' => 'certificates.create'],
-                            ['name' => 'Data Sertifikat', 'route' => 'certificates.index'],
-                        ],
+            ];
+        }
+
+        $groups[] = [
+            'title' => 'Monitor',
+            'items' => [
+                [
+                    'name' => 'Monitor Peserta',
+                    'icon' => 'ti ti-chart-line',
+                    'activePattern' => 'monitor-participants.*',
+                    'subItems' => [
+                        ['name' => 'Monitor Peserta', 'route' => 'monitor-participants.index'],
                     ],
                 ],
             ],
         ];
+        $groups[] = [
+            'title' => 'Hasil',
+            'items' => [
+                [
+                    'name' => 'Hasil Nilai',
+                    'icon' => 'ti ti-report-analytics',
+                    'activePattern' => 'show-grades.*',
+                    'subItems' => [
+                        ['name' => 'Nilai', 'route' => 'show-grades.index'],
+                    ],
+                ],
+            ],
+        ];
+        $groups[] = [
+            'title' => 'Sertifikat',
+            'items' => [
+                [
+                    'name' => 'Data Sertifikat',
+                    'icon' => 'ti ti-certificate',
+                    'activePattern' => 'certificates.*',
+                    'subItems' => [
+                        ['name' => 'Tambah Sertifikat', 'route' => 'certificates.create'],
+                        ['name' => 'Data Sertifikat', 'route' => 'certificates.index'],
+                    ],
+                ],
+            ],
+        ];
+
+        return $groups;
     }
 
     private function getUserMenu(): array
