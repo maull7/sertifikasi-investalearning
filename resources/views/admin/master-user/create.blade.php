@@ -1,104 +1,70 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Pengguna Baru')
+@section('title', 'Tambah User Admin/Petugas')
 
 @section('content')
-<div class="max-w-4xl mx-auto space-y-8 pb-20">
-    
-    {{-- Header & Breadcrumb --}}
-    <div class="flex items-center justify-between">
-        <div class="space-y-1">
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Tambah Pengguna</h1>
-            <nav class="flex items-center gap-2 text-xs font-medium text-gray-400">
-                <a href="{{ route('laravel.users.index') }}" class="hover:text-indigo-600 transition-colors">Pengguna</a>
-                <i class="ti ti-chevron-right"></i>
-                <span class="text-gray-500 dark:text-gray-500">Buat Baru</span>
-            </nav>
+    <div class="space-y-8 pb-20">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Tambah User</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1">
+                    Tambah user dengan role Admin atau Petugas. Petugas dapat login dengan menu sama seperti admin kecuali
+                    Master dan Pelatihan.
+                </p>
+            </div>
+            <x-button variant="secondary" href="{{ route('master-user.index') }}" class="rounded-xl">
+                <i class="ti ti-arrow-left mr-2"></i> Kembali
+            </x-button>
         </div>
-        <x-button variant="secondary" href="{{ route('laravel.users.index') }}" class="rounded-xl">
-            <i class="ti ti-arrow-left mr-2"></i> Kembali
-        </x-button>
+
+        <x-card>
+            <form action="{{ route('master-user.store') }}" method="POST" class="space-y-6">
+                @csrf
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <x-input label="Nama" name="name" placeholder="Nama lengkap" value="{{ old('name') }}"
+                        required />
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role <span
+                                class="text-red-500">*</span></label>
+                        <select name="role" required
+                            class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-2.5 focus:ring-2 focus:ring-indigo-500">
+                            <option value="">-- Pilih Role --</option>
+                            <option value="Admin" {{ old('role') === 'Admin' ? 'selected' : '' }}>Admin</option>
+                            <option value="Petugas" {{ old('role') === 'Petugas' ? 'selected' : '' }}>Petugas</option>
+                        </select>
+                        @error('role')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <x-input label="Email" name="email" type="email" placeholder="email@contoh.com"
+                        value="{{ old('email') }}" required />
+                    <x-input label="No Telepon" name="phone" type="number" placeholder="6258181992"
+                        value="{{ old('phone') }}" required />
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password <span
+                                class="text-red-500">*</span></label>
+                        <input type="password" name="password" required minlength="8" placeholder="Min. 8 karakter"
+                            class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 @error('password') border-red-500 @enderror">
+                        @error('password')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Konfirmasi Password
+                            <span class="text-red-500">*</span></label>
+                        <input type="password" name="password_confirmation" required minlength="8"
+                            placeholder="Ulangi password"
+                            class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-2.5 focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <x-button type="submit" variant="primary" class="rounded-xl">Simpan User</x-button>
+                </div>
+            </form>
+        </x-card>
     </div>
-
-    {{-- Form Card --}}
-    <x-card title="Informasi Personal">
-        <form action="{{ route('laravel.users.store') }}" method="POST" class="space-y-8">
-            @csrf
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {{-- Name Input --}}
-                <div class="md:col-span-2">
-                    <x-input 
-                        label="Nama Lengkap" 
-                        name="name" 
-                        placeholder="Contoh: Rafael Nuansa" 
-                        value="{{ old('name') }}"
-                        required 
-                    />
-                </div>
-
-                {{-- Email Input --}}
-                <div class="md:col-span-2">
-                    <x-input 
-                        type="email"
-                        label="Alamat Email" 
-                        name="email" 
-                        icon="mail"
-                        placeholder="nama@perusahaan.com" 
-                        value="{{ old('email') }}"
-                        required 
-                    />
-                    <p class="mt-2 text-[10px] text-gray-400 font-medium ml-1">Pastikan email aktif untuk proses verifikasi akun.</p>
-                </div>
-
-                {{-- Password Input --}}
-                <div class="space-y-4">
-                    <x-input 
-                        type="password"
-                        label="Kata Sandi" 
-                        name="password" 
-                        icon="lock"
-                        placeholder="••••••••" 
-                        required 
-                    />
-                </div>
-
-                {{-- Confirm Password Input --}}
-                <div class="space-y-4">
-                    <x-input 
-                        type="password"
-                        label="Konfirmasi Kata Sandi" 
-                        name="password_confirmation" 
-                        icon="lock-check"
-                        placeholder="••••••••" 
-                        required 
-                    />
-                </div>
-            </div>
-
-            {{-- Info Alert --}}
-            <div class="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20 flex gap-3">
-                <i class="ti ti-info-circle text-indigo-600 text-xl mt-0.5"></i>
-                <div class="text-xs leading-relaxed text-indigo-800/70 dark:text-indigo-400/70 font-medium">
-                    Kata sandi minimal harus terdiri dari 8 karakter dan mengandung kombinasi huruf dan angka untuk keamanan maksimal.
-                </div>
-            </div>
-
-            {{-- Action Buttons --}}
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-50 dark:border-gray-800">
-                <x-button type="reset" variant="secondary" class="rounded-xl">
-                    Reset
-                </x-button>
-                <x-button type="submit" variant="primary" class="rounded-xl shadow-lg shadow-indigo-500/20">
-                    Simpan Pengguna
-                </x-button>
-            </div>
-        </form>
-    </x-card>
-
-    {{-- Footer Info --}}
-    <p class="text-center text-xs text-gray-400 font-medium">
-        Setiap pengguna baru akan didaftarkan sebagai member aktif secara default.
-    </p>
-</div>
 @endsection

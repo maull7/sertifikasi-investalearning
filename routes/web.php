@@ -7,11 +7,13 @@ use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailActivation;
 use App\Http\Controllers\Admin\ExamController;
+
 use App\Http\Controllers\Admin\MappingPackageController;
 use App\Http\Controllers\Admin\MappingQuestionController;
 use App\Http\Controllers\Admin\MasterMaterialController;
 use App\Http\Controllers\Admin\MasterPackegeController;
 use App\Http\Controllers\Admin\MasterTypesController;
+use App\Http\Controllers\Admin\MasterUserController;
 use App\Http\Controllers\Admin\ParticipantMonitorController;
 use App\Http\Controllers\Admin\QuizController;
 use App\Http\Controllers\Admin\ShowGradeController;
@@ -100,59 +102,70 @@ Route::middleware('auth', 'akun-active')->group(function () {
         ->name('certificates.download');
 });
 
-// routes admin
+// routes admin (Admin + Petugas)
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::post('master-types/import', [MasterTypesController::class, 'ImportTemplate'])->name('master-types.import');
-    Route::get('master-types/export-template', [MasterTypesController::class, 'ExportTemplate'])->name('master-types.export-template');
-    Route::resource('master-types', MasterTypesController::class);
+    // Master User (hanya Admin)
+    Route::middleware('admin-only')->group(function () {
+        Route::get('master-user', [MasterUserController::class, 'index'])->name('master-user.index');
+        Route::get('master-user/create', [MasterUserController::class, 'create'])->name('master-user.create');
+        Route::post('master-user', [MasterUserController::class, 'store'])->name('master-user.store');
+        Route::get('master-user/{user}/edit', [MasterUserController::class, 'edit'])->name('master-user.edit');
+        Route::put('master-user/{user}', [MasterUserController::class, 'update'])->name('master-user.update');
+        Route::delete('master-user/{user}', [MasterUserController::class, 'destroy'])->name('master-user.destroy');
+    });
 
-    Route::post('master-packages/import', [MasterPackegeController::class, 'importPackage'])
-        ->name('master-packages.import');
-    Route::get('master-packages/download-template', [MasterPackegeController::class, 'DownloadTemplate'])
-        ->name('master-packages.download-template');
-    Route::patch('master-packages/{package}/toggle-active', [MasterPackegeController::class, 'toggleActive'])
-        ->name('master-packages.toggle-active');
-    Route::resource('master-packages', MasterPackegeController::class);
-    Route::get('mapping-package', [MappingPackageController::class, 'index'])->name('mapping-package.index');
-    Route::get('mapping-package/create', [MappingPackageController::class, 'create'])->name('mapping-package.create');
-    Route::get('master-packages/{package}/mapping-package', [MappingPackageController::class, 'manage'])
-        ->name('mapping-package.manage');
-    Route::post('master-packages/{package}/mapping-package', [MappingPackageController::class, 'store'])
-        ->name('mapping-package.store');
-    Route::delete('master-packages/{package}/mapping-package/{subject}', [MappingPackageController::class, 'destroy'])
-        ->name('mapping-package.destroy');
+    // Master & Pelatihan (hanya Admin)
+    Route::middleware('admin-only')->group(function () {
+        Route::post('master-types/import', [MasterTypesController::class, 'ImportTemplate'])->name('master-types.import');
+        Route::get('master-types/export-template', [MasterTypesController::class, 'ExportTemplate'])->name('master-types.export-template');
+        Route::resource('master-types', MasterTypesController::class);
 
-    Route::resource('master-materials', MasterMaterialController::class);
+        Route::post('master-packages/import', [MasterPackegeController::class, 'importPackage'])
+            ->name('master-packages.import');
+        Route::get('master-packages/download-template', [MasterPackegeController::class, 'DownloadTemplate'])
+            ->name('master-packages.download-template');
+        Route::patch('master-packages/{package}/toggle-active', [MasterPackegeController::class, 'toggleActive'])
+            ->name('master-packages.toggle-active');
+        Route::resource('master-packages', MasterPackegeController::class);
+        Route::get('mapping-package', [MappingPackageController::class, 'index'])->name('mapping-package.index');
+        Route::get('mapping-package/create', [MappingPackageController::class, 'create'])->name('mapping-package.create');
+        Route::get('master-packages/{package}/mapping-package', [MappingPackageController::class, 'manage'])
+            ->name('mapping-package.manage');
+        Route::post('master-packages/{package}/mapping-package', [MappingPackageController::class, 'store'])
+            ->name('mapping-package.store');
+        Route::delete('master-packages/{package}/mapping-package/{subject}', [MappingPackageController::class, 'destroy'])
+            ->name('mapping-package.destroy');
 
-    Route::post('subjects/import', [SubjectController::class, 'ImportExcel'])
-        ->name('subjects.import');
-    Route::get('subjects/template-export', [SubjectController::class, 'TemplateExport'])
-        ->name('subjects.template-export');
-    Route::resource('subjects', SubjectController::class);
+        Route::resource('master-materials', MasterMaterialController::class);
 
-    // Exam routes
-    Route::resource('exams', ExamController::class);
-    Route::get('mapping-questions', [MappingQuestionController::class, 'indexMappingQuestion'])
-        ->name('mapping-questions.index');
-    Route::get('mapping-questions/create', [MappingQuestionController::class, 'create'])
-        ->name('mapping-questions.create');
-    Route::get('exams/{exam}/mapping-questions', [MappingQuestionController::class, 'index'])
-        ->name('mapping-questions.manage');
-    Route::post('exams/{exam}/mapping-questions', [MappingQuestionController::class, 'store'])
-        ->name('mapping-questions.store');
-    Route::post('exams/{exam}/mapping-questions/random', [MappingQuestionController::class, 'random'])
-        ->name('mapping-questions.random');
-    Route::get('exams/{exam}/mapping-questions/{mapping}', [MappingQuestionController::class, 'show'])
-        ->name('mapping-questions.show');
-    Route::delete('exams/{exam}/mapping-questions/{mapping}', [MappingQuestionController::class, 'destroy'])
-        ->name('mapping-questions.destroy');
+        Route::post('subjects/import', [SubjectController::class, 'ImportExcel'])
+            ->name('subjects.import');
+        Route::get('subjects/template-export', [SubjectController::class, 'TemplateExport'])
+            ->name('subjects.template-export');
+        Route::resource('subjects', SubjectController::class);
 
-    // Bank Question routes
-    Route::get('bank-questions/download-template', [BankQuestionController::class, 'downloadTemplate'])
-        ->name('bank-questions.download-template');
-    Route::post('bank-questions/import', [BankQuestionController::class, 'import'])
-        ->name('bank-questions.import');
-    Route::resource('bank-questions', BankQuestionController::class);
+        Route::resource('exams', ExamController::class);
+        Route::get('mapping-questions', [MappingQuestionController::class, 'indexMappingQuestion'])
+            ->name('mapping-questions.index');
+        Route::get('mapping-questions/create', [MappingQuestionController::class, 'create'])
+            ->name('mapping-questions.create');
+        Route::get('exams/{exam}/mapping-questions', [MappingQuestionController::class, 'index'])
+            ->name('mapping-questions.manage');
+        Route::post('exams/{exam}/mapping-questions', [MappingQuestionController::class, 'store'])
+            ->name('mapping-questions.store');
+        Route::post('exams/{exam}/mapping-questions/random', [MappingQuestionController::class, 'random'])
+            ->name('mapping-questions.random');
+        Route::get('exams/{exam}/mapping-questions/{mapping}', [MappingQuestionController::class, 'show'])
+            ->name('mapping-questions.show');
+        Route::delete('exams/{exam}/mapping-questions/{mapping}', [MappingQuestionController::class, 'destroy'])
+            ->name('mapping-questions.destroy');
+
+        Route::get('bank-questions/download-template', [BankQuestionController::class, 'downloadTemplate'])
+            ->name('bank-questions.download-template');
+        Route::post('bank-questions/import', [BankQuestionController::class, 'import'])
+            ->name('bank-questions.import');
+        Route::resource('bank-questions', BankQuestionController::class);
+    });
 
     // Show Grade routes
     Route::get('show-grades', [ShowGradeController::class, 'index'])
@@ -166,10 +179,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::patch('users/{user}/activate', [EmailActivation::class, 'activate'])
         ->name('user.activate');
 
-    // Teacher
-    Route::resource('teacher', TeacherController::class);
-
-    Route::resource('quizzes', QuizController::class);
+    // Teacher, Quizzes, Books (hanya Admin)
+    Route::middleware('admin-only')->group(function () {
+        Route::resource('teacher', TeacherController::class);
+        Route::resource('quizzes', QuizController::class);
+        Route::resource('books', BookController::class);
+    });
 
     // Certificates
     Route::get('/get-package/{type}', [CertificateController::class, 'getPackage'])->name('get-package.type');
@@ -200,7 +215,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('monitor-participants.export');
     Route::get('monitor-participants/{userJoin}', [ParticipantMonitorController::class, 'show'])
         ->name('monitor-participants.show');
-    Route::resource('books', BookController::class);
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
