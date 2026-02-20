@@ -17,7 +17,7 @@ class MyPackageController extends Controller
     {
         $user = Auth::user();
         $joinedPackages = UserJoin::where('user_id', $user->id)
-            ->with(['package.masterType.subjects.materials'])
+            ->with(['package.mappedSubjects.materials', 'package.masterType'])
             ->whereHas('package', fn($q) => $q->where('status', 'active'))
             ->paginate(12);
 
@@ -32,12 +32,12 @@ class MyPackageController extends Controller
             ->where('id_package', $package->id)
             ->first();
 
-        if (!$userJoin) {
+        if (! $userJoin) {
             abort(403, 'Anda belum bergabung dengan package ini.');
         }
 
-        $package->load(['masterType.subjects' => fn($q) => $q->with(['materials' => fn($mq) => $mq->with('subject'), 'quizzes' => fn($qq) => $qq->with('subject')])]);
-        $subjects = $package->masterType ? $package->masterType->subjects : collect();
+        $subjects = $package->getSubjectsForPackage();
+        $subjects->load(['materials' => fn($q) => $q->with('subject'), 'quizzes' => fn($q) => $q->with('subject')]);
 
         $materialIdsBySubject = $subjects->keyBy('id')->map(fn($s) => $s->materials->pluck('id')->filter()->values());
         $completedMaterialIds = StatusMateri::where('id_user', $user->id)

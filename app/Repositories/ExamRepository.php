@@ -3,20 +3,20 @@
 namespace App\Repositories;
 
 use App\Models\BankQuestion;
-use App\Models\Exam;
-use App\Models\Quiz;
-use App\Models\User;
-use App\Models\Package;
-use App\Models\ExamAttempt;
-use App\Models\QuizAttempt;
 use App\Models\DetailResult;
+use App\Models\DetailResultQuiz;
+use App\Models\Exam;
+use App\Models\ExamAttempt;
+use App\Models\MappingQuestion;
+use App\Models\Package;
+use App\Models\Quiz;
+use App\Models\QuizAttempt;
 use App\Models\TransQuestion;
 use App\Models\TransQuiz;
-use App\Models\DetailResultQuiz;
-use App\Models\MappingQuestion;
-use Illuminate\Support\Collection;
+use App\Models\User;
 use App\Repositories\Contracts\ExamRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class ExamRepository implements ExamRepositoryInterface
 {
@@ -32,6 +32,7 @@ class ExamRepository implements ExamRepositoryInterface
         if ($this->isPretest($exam)) {
             return (int) $exam->total_questions;
         }
+
         return MappingQuestion::where('id_exam', $exam->id)->count();
     }
 
@@ -71,11 +72,9 @@ class ExamRepository implements ExamRepositoryInterface
             $ids = $attempt->question_ids ?? [];
 
             if (empty($ids)) {
-                $package->loadMissing(['masterType.subjects']);
-
                 $subjectIds = $exam->subject_id
                     ? collect([$exam->subject_id])
-                    : $package->masterType?->subjects?->pluck('id') ?? collect();
+                    : $package->getSubjectsForPackage()->pluck('id');
 
                 $limit = (int) max(1, $exam->total_questions);
 
@@ -119,7 +118,8 @@ class ExamRepository implements ExamRepositoryInterface
         $offset = ($page - 1) * $perPage;
         $chunk = array_slice($ids, $offset, $perPage);
         $questions = BankQuestion::whereIn('id', $chunk)->get()->keyBy('id');
-        $ordered = collect($chunk)->map(fn($id) => $questions->get($id))->filter()->values();
+        $ordered = collect($chunk)->map(fn ($id) => $questions->get($id))->filter()->values();
+
         return new \Illuminate\Pagination\LengthAwarePaginator($ordered, $total, $perPage, $page);
     }
 
@@ -133,8 +133,10 @@ class ExamRepository implements ExamRepositoryInterface
             return collect();
         }
         $questions = BankQuestion::whereIn('id', $ids)->get()->keyBy('id');
+
         return collect($ids)->map(function ($id) use ($questions) {
             $q = $questions->get($id);
+
             return $q ? (object) ['questionBank' => $q] : null;
         })->filter()->values();
     }
@@ -180,7 +182,8 @@ class ExamRepository implements ExamRepositoryInterface
         $offset = ($page - 1) * $perPage;
         $chunk = array_slice($ids, $offset, $perPage);
         $questions = BankQuestion::whereIn('id', $chunk)->get()->keyBy('id');
-        $ordered = collect($chunk)->map(fn($id) => $questions->get($id))->filter()->values();
+        $ordered = collect($chunk)->map(fn ($id) => $questions->get($id))->filter()->values();
+
         return new \Illuminate\Pagination\LengthAwarePaginator($ordered, $total, $perPage, $page);
     }
 
@@ -194,8 +197,10 @@ class ExamRepository implements ExamRepositoryInterface
             return collect();
         }
         $questions = BankQuestion::whereIn('id', $ids)->get()->keyBy('id');
+
         return collect($ids)->map(function ($id) use ($questions) {
             $q = $questions->get($id);
+
             return $q ? (object) ['questionBank' => $q] : null;
         })->filter()->values();
     }
@@ -242,6 +247,7 @@ class ExamRepository implements ExamRepositoryInterface
         if (count($availableIds) >= $limit) {
             $pick = collect($availableIds)->random($limit)->values()->all();
             shuffle($pick);
+
             return $pick;
         }
 

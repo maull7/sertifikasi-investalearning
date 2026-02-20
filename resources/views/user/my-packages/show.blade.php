@@ -74,120 +74,92 @@
             @if ($subjects->sum(fn($s) => $s->materials->count()) > 0)
                 <div class="space-y-8">
                     @foreach ($subjects as $subject)
-                        @if ($subject->materials->count() > 0)
-                            @php
-                                $progress = $subjectProgress[$subject->id] ?? [
-                                    'total' => 0,
-                                    'read' => 0,
-                                    'can_do_quiz' => false,
-                                ];
-                                $pct =
-                                    $progress['total'] > 0 ? round(($progress['read'] / $progress['total']) * 100) : 0;
-                            @endphp
-                            {{-- Header Mata Pelajaran + Progress --}}
-                            <div class="border-b border-gray-200 dark:border-gray-700 pb-3">
-                                <div class="flex flex-wrap items-center justify-between gap-2">
-                                    <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        @php
+                            $progress = $subjectProgress[$subject->id] ?? [
+                                'total' => 0,
+                                'read' => 0,
+                                'can_do_quiz' => false,
+                            ];
+                            $pct = $progress['total'] > 0 ? round(($progress['read'] / $progress['total']) * 100) : 0;
+                        @endphp
+                        {{-- Header Mata Pelajaran + Progress --}}
+                        <div class="border-b border-gray-200 dark:border-gray-700 pb-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <span
+                                        class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
+                                        <i class="ti ti-book text-sm"></i>
+                                    </span>
+                                    {{ $subject->name }}
+                                    @if ($subject->code)
                                         <span
-                                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
-                                            <i class="ti ti-book text-sm"></i>
-                                        </span>
-                                        {{ $subject->name }}
-                                        @if ($subject->code)
-                                            <span
-                                                class="text-xs font-medium text-gray-500 dark:text-gray-400">({{ $subject->code }})</span>
-                                        @endif
-                                    </h3>
-                                    <div class="flex items-center gap-3">
-                                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
-                                            {{ $progress['read'] }}/{{ $progress['total'] }} materi dibaca
-                                        </span>
-                                        <div class="w-24 h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"
-                                            title="{{ $pct }}%">
-                                            <div class="h-full rounded-full bg-indigo-600 transition-all duration-300"
-                                                style="width: {{ $pct }}%"></div>
-                                        </div>
+                                            class="text-xs font-medium text-gray-500 dark:text-gray-400">({{ $subject->code }})</span>
+                                    @endif
+                                </h3>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                                        {{ $progress['read'] }}/{{ $progress['total'] }} materi dibaca
+                                    </span>
+                                    <div class="w-24 h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"
+                                        title="{{ $pct }}%">
+                                        <div class="h-full rounded-full bg-indigo-600 transition-all duration-300"
+                                            style="width: {{ $pct }}%"></div>
                                     </div>
                                 </div>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-10">
-                                    {{ $subject->materials->count() }} materi</p>
                             </div>
-                            {{-- Daftar Materi di bawah mata pelajaran --}}
-                            <div
-                                class="space-y-3 ml-0 md:ml-4 pl-0 md:pl-4 border-l-0 md:border-l-2 border-indigo-100 dark:border-indigo-900/50">
-                                @foreach ($subject->materials as $material)
-                                    @php
-                                        $statusMateri = \App\Models\StatusMateri::where('id_user', Auth::id())
-                                            ->where('id_material', $material->id)
-                                            ->first();
-                                    @endphp
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-10">
+                                {{ $subject->materials->count() }} materi</p>
+                        </div>
+                        {{-- Daftar Materi di bawah mata pelajaran --}}
+                        <div
+                            class="space-y-3 ml-0 md:ml-4 pl-0 md:pl-4 border-l-0 md:border-l-2 border-indigo-100 dark:border-indigo-900/50">
+                            @forelse ($subject->materials as $material)
+                                @php
+                                    $statusMateri = \App\Models\StatusMateri::where('id_user', Auth::id())
+                                        ->where('id_material', $material->id)
+                                        ->first();
+                                @endphp
+                                <div
+                                    class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors {{ $statusMateri && $statusMateri->status == 'completed' ? 'opacity-80' : '' }}">
                                     <div
-                                        class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors {{ $statusMateri && $statusMateri->status == 'completed' ? 'opacity-80' : '' }}">
-                                        <div
-                                            class="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg flex items-center justify-center shrink-0">
-                                            @if ($material->materi_type == 'File')
-                                                <i
-                                                    class="{{ $material->file_icon }} text-xl {{ $material->file_type === 'pdf' ? 'text-rose-600' : 'text-blue-600' }}"></i>
-                                            @else
-                                                <i class="ti ti-video text-xl text-indigo-600"></i>
-                                            @endif
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <h4 class="font-semibold text-gray-900 dark:text-white mb-1">
-                                                {{ $material->title }}</h4>
-                                            <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-                                                @if ($material->topic)
-                                                    <span class="inline-flex items-center gap-1">
-                                                        <i class="ti ti-tag"></i>
-                                                        {{ $material->topic }}
-                                                    </span>
-                                                @endif
-                                                @if ($material->value)
-                                                    <span>{{ $material->file_size_formatted }}</span>
-                                                @endif
-                                            </div>
-                                            @if ($material->description)
-                                                <p class="text-xs text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
-                                                    {{ Str::limit(strip_tags($material->description), 100) }}
-                                                </p>
-                                            @endif
-                                        </div>
-
+                                        class="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg flex items-center justify-center shrink-0">
                                         @if ($material->materi_type == 'File')
-                                            <div class="flex items-center gap-2 shrink-0">
-                                                @if ($material->value)
-                                                    @if (!$statusMateri || $statusMateri->status != 'completed')
-                                                        <x-button
-                                                            class="inline-flex items-center gap-1 px-3 py-2 bg-green-50 hover:bg-green-100 dark:bg-green-500/10 dark:hover:bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-semibold rounded-lg transition-colors"
-                                                            @click="confirmMarkRead('{{ route('user.mark-as-read', $material) }}', {{ \Illuminate\Support\Js::from($material->title) }})">
-                                                            <i class="ti ti-square-check"></i>
-                                                            Tandai Telah Dibaca
-                                                        </x-button>
-                                                    @else
-                                                        <span
-                                                            class="inline-flex items-center gap-1 px-3 py-2 bg-green-100 text-green-700 text-xs font-semibold rounded-lg">
-                                                            <i class="ti ti-check"></i>
-                                                            Materi Telah Dibaca
-                                                        </span>
-                                                    @endif
-                                                    <a href="{{ route('master-materials.preview', $material->id) }}?v={{ $material->updated_at->timestamp }}"
-                                                        target="_blank"
-                                                        class="inline-flex items-center gap-1 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-semibold rounded-lg transition-colors">
-                                                        <i class="ti ti-eye"></i>
-                                                        Baca Materi
-                                                    </a>
-                                                @else
-                                                    <span class="text-xs text-gray-400">Tidak ada file</span>
-                                                @endif
-                                            </div>
+                                            <i
+                                                class="{{ $material->file_icon }} text-xl {{ $material->file_type === 'pdf' ? 'text-rose-600' : 'text-blue-600' }}"></i>
                                         @else
-                                            <div class="flex items-center gap-2 shrink-0">
+                                            <i class="ti ti-video text-xl text-indigo-600"></i>
+                                        @endif
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="font-semibold text-gray-900 dark:text-white mb-1">
+                                            {{ $material->title }}</h4>
+                                        <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                            @if ($material->topic)
+                                                <span class="inline-flex items-center gap-1">
+                                                    <i class="ti ti-tag"></i>
+                                                    {{ $material->topic }}
+                                                </span>
+                                            @endif
+                                            @if ($material->value)
+                                                <span>{{ $material->file_size_formatted }}</span>
+                                            @endif
+                                        </div>
+                                        @if ($material->description)
+                                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
+                                                {{ Str::limit(strip_tags($material->description), 100) }}
+                                            </p>
+                                        @endif
+                                    </div>
+
+                                    @if ($material->materi_type == 'File')
+                                        <div class="flex items-center gap-2 shrink-0">
+                                            @if ($material->value)
                                                 @if (!$statusMateri || $statusMateri->status != 'completed')
                                                     <x-button
                                                         class="inline-flex items-center gap-1 px-3 py-2 bg-green-50 hover:bg-green-100 dark:bg-green-500/10 dark:hover:bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-semibold rounded-lg transition-colors"
                                                         @click="confirmMarkRead('{{ route('user.mark-as-read', $material) }}', {{ \Illuminate\Support\Js::from($material->title) }})">
                                                         <i class="ti ti-square-check"></i>
-                                                        Tandai Telah DiPelajari
+                                                        Tandai Telah Dibaca
                                                     </x-button>
                                                 @else
                                                     <span
@@ -196,30 +168,58 @@
                                                         Materi Telah Dibaca
                                                     </span>
                                                 @endif
-                                            </div>
-                                            @if ($material->value)
-                                                @php
-                                                    $url = $material->value;
-                                                    if (str_contains($url, 'youtu.be')) {
-                                                        $url =
-                                                            'https://www.youtube.com/embed/' .
-                                                            explode('?', last(explode('/', $url)))[0];
-                                                    }
-                                                    if (str_contains($url, 'youtube.com/watch')) {
-                                                        parse_str(parse_url($url, PHP_URL_QUERY), $q);
-                                                        $url = 'https://www.youtube.com/embed/' . ($q['v'] ?? '');
-                                                    }
-                                                @endphp
-                                                <iframe id="frame-video" src="{{ $url }}"
-                                                    class="w-full aspect-video rounded-xl max-w-md" frameborder="0"
-                                                    allowfullscreen
-                                                    referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                                                <a href="{{ route('master-materials.preview', $material->id) }}?v={{ $material->updated_at->timestamp }}"
+                                                    target="_blank"
+                                                    class="inline-flex items-center gap-1 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-semibold rounded-lg transition-colors">
+                                                    <i class="ti ti-eye"></i>
+                                                    Baca Materi
+                                                </a>
+                                            @else
+                                                <span class="text-xs text-gray-400">Tidak ada file</span>
                                             @endif
+                                        </div>
+                                    @else
+                                        <div class="flex items-center gap-2 shrink-0">
+                                            @if (!$statusMateri || $statusMateri->status != 'completed')
+                                                <x-button
+                                                    class="inline-flex items-center gap-1 px-3 py-2 bg-green-50 hover:bg-green-100 dark:bg-green-500/10 dark:hover:bg-green-500/20 text-green-600 dark:text-green-400 text-xs font-semibold rounded-lg transition-colors"
+                                                    @click="confirmMarkRead('{{ route('user.mark-as-read', $material) }}', {{ \Illuminate\Support\Js::from($material->title) }})">
+                                                    <i class="ti ti-square-check"></i>
+                                                    Tandai Telah DiPelajari
+                                                </x-button>
+                                            @else
+                                                <span
+                                                    class="inline-flex items-center gap-1 px-3 py-2 bg-green-100 text-green-700 text-xs font-semibold rounded-lg">
+                                                    <i class="ti ti-check"></i>
+                                                    Materi Telah Dibaca
+                                                </span>
+                                            @endif
+                                        </div>
+                                        @if ($material->value)
+                                            @php
+                                                $url = $material->value;
+                                                if (str_contains($url, 'youtu.be')) {
+                                                    $url =
+                                                        'https://www.youtube.com/embed/' .
+                                                        explode('?', last(explode('/', $url)))[0];
+                                                }
+                                                if (str_contains($url, 'youtube.com/watch')) {
+                                                    parse_str(parse_url($url, PHP_URL_QUERY), $q);
+                                                    $url = 'https://www.youtube.com/embed/' . ($q['v'] ?? '');
+                                                }
+                                            @endphp
+                                            <iframe id="frame-video" src="{{ $url }}"
+                                                class="w-full aspect-video rounded-xl max-w-md" frameborder="0"
+                                                allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
                                         @endif
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
+                                    @endif
+                                </div>
+                            @empty
+                                <div class="p-4 text-sm text-gray-500 dark:text-gray-400 italic">
+                                    Belum ada materi untuk mata pelajaran ini.
+                                </div>
+                            @endforelse
+                        </div>
                     @endforeach
                 </div>
             @else

@@ -85,12 +85,13 @@ class Sidebar extends Component
                     [
                         'name' => 'Pelatihan',
                         'icon' => 'ti ti-adjustments-search',
-                        'activePattern' => 'exams.*|bank-questions.*|mapping-questions.*',
+                        'activePattern' => 'exams.*|bank-questions.*|mapping-questions.*|mapping-package.*',
                         'subItems' => [
                             ['name' => 'Try Out', 'route' => 'exams.index'],
                             ['name' => 'Kuis / Latihan', 'route' => 'quizzes.index'],
                             ['name' => 'Bank Soal', 'route' => 'bank-questions.index'],
                             ['name' => 'Mapping Soal', 'route' => 'mapping-questions.index'],
+                            ['name' => 'Mapping Mapel', 'route' => 'mapping-package.index'],
                         ],
                     ],
                 ],

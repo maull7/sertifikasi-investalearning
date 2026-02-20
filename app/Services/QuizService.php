@@ -22,8 +22,7 @@ class QuizService
             abort(403, 'Anda belum bergabung dengan package ini.');
         }
 
-        $package->loadMissing(['masterType.subjects']);
-        $subjectIds = $package->masterType?->subjects?->pluck('id') ?? collect();
+        $subjectIds = $package->getSubjectsForPackage()->pluck('id');
         if (! $subjectIds->contains($quiz->subject_id)) {
             abort(404, 'Kuis tidak ditemukan dalam package ini.');
         }

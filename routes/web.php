@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailActivation;
 use App\Http\Controllers\Admin\ExamController;
+use App\Http\Controllers\Admin\MappingPackageController;
 use App\Http\Controllers\Admin\MappingQuestionController;
 use App\Http\Controllers\Admin\MasterMaterialController;
 use App\Http\Controllers\Admin\MasterPackegeController;
@@ -112,6 +113,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::patch('master-packages/{package}/toggle-active', [MasterPackegeController::class, 'toggleActive'])
         ->name('master-packages.toggle-active');
     Route::resource('master-packages', MasterPackegeController::class);
+    Route::get('mapping-package', [MappingPackageController::class, 'index'])->name('mapping-package.index');
+    Route::get('mapping-package/create', [MappingPackageController::class, 'create'])->name('mapping-package.create');
+    Route::get('master-packages/{package}/mapping-package', [MappingPackageController::class, 'manage'])
+        ->name('mapping-package.manage');
+    Route::post('master-packages/{package}/mapping-package', [MappingPackageController::class, 'store'])
+        ->name('mapping-package.store');
+    Route::delete('master-packages/{package}/mapping-package/{subject}', [MappingPackageController::class, 'destroy'])
+        ->name('mapping-package.destroy');
 
     Route::resource('master-materials', MasterMaterialController::class);
 
@@ -194,4 +203,4 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('books', BookController::class);
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
