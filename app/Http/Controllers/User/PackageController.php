@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Http\Controllers\Controller;
+use App\Models\MasterType;
 use App\Models\Package;
 use App\Models\UserJoin;
-use Illuminate\View\View;
-use App\Models\MasterType;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class PackageController extends Controller
 {
@@ -18,7 +18,7 @@ class PackageController extends Controller
         $user = Auth::user();
         $types = MasterType::with('subjects', 'packages')->get();
 
-        $query = Package::with(['masterType.subjects.materials'])
+        $query = Package::with(['masterType', 'mappedSubjects.materials', 'userJoins'])
             ->where('status', 'active');
 
         if ($request->has('search')) {
@@ -47,8 +47,10 @@ class PackageController extends Controller
             ->where('id_package', $package->id)
             ->exists();
 
-        $package->load(['masterType.subjects.materials' => fn($q) => $q->with('subject')]);
-        $subjects = $package->masterType ? $package->masterType->subjects : collect();
+        $subjects = $package->getSubjectsForPackage();
+        if ($subjects->isNotEmpty()) {
+            $subjects->load(['materials' => fn($q) => $q->with('subject'), 'quizzes' => fn($q) => $q->with('subject')]);
+        }
 
         return view('user.packages.show', compact('package', 'isJoined', 'subjects'));
     }
@@ -94,6 +96,7 @@ class PackageController extends Controller
         $joinedPackageIds = UserJoin::where('user_id', $user->id)
             ->pluck('id_package')
             ->toArray();
+
         return view('user.landing', compact('packages', 'joinedPackageIds', 'types'));
     }
 }

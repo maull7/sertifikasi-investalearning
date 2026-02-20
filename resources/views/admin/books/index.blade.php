@@ -41,6 +41,10 @@
                                 Description
                             </th>
                             <th
+                                class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider whitespace-nowrap">
+                                Cover
+                            </th>
+                            <th
                                 class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right whitespace-nowrap">
                                 Aksi
                             </th>
@@ -63,6 +67,14 @@
                                     <span class="text-sm text-gray-900 dark:text-white">
                                         {{ $book->description ?: '-' }}
                                     </span>
+                                </td>
+                                <td class="py-3 px-4 sm:px-6">
+                                    @if ($book->cover_image)
+                                        <div class="mb-4">
+                                            <img src="{{ asset('storage/' . $book->cover_image) }}" alt="Cover Lama"
+                                                class="w-20 h-24 object-cover rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="py-3 px-4 sm:px-6">
                                     <div class="flex items-center justify-end gap-2">

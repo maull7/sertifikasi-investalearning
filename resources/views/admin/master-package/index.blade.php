@@ -49,7 +49,7 @@
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari paket terbaru..."
                     class="w-full pl-11 pr-12 py-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all dark:text-white">
                 @if (request('search'))
-                    <a href="{{ route('master-types.index') }}"
+                    <a href="{{ route('master-packages.index') }}"
                         class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors">
                         <i class="ti ti-x"></i>
                     </a>
@@ -101,6 +101,12 @@
                                 </td>
                                 <td class="py-4 px-8">
                                     <div class="flex items-center justify-end gap-2">
+                                        <x-button variant="info" size="sm"
+                                            href="{{ route('mapping-package.manage', $value) }}"
+                                            class="rounded-lg h-9 w-9 p-0 flex items-center justify-center"
+                                            title="Mapping Mapel">
+                                            <i class="ti ti-list-details text-base"></i>
+                                        </x-button>
                                         <x-button variant="secondary" size="sm"
                                             href="{{ route('master-packages.edit', $value->id) }}"
                                             class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">
