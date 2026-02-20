@@ -11,7 +11,7 @@ class IndexController extends Controller
     public function index()
     {
         $jenis = MasterType::orderBy('id')->get();
-        $paketPerJenis = Package::with(['masterType.subjects.materials', 'userJoins'])
+        $paketPerJenis = Package::with(['mappedSubjects.materials', 'userJoins'])
             ->get()
             ->groupBy('id_master_types');
         $books = Book::paginate(10);
