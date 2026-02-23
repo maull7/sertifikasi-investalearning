@@ -23,13 +23,13 @@ class RequestExam extends FormRequest
     {
         return [
             'package_id' => 'required|exists:packages,id',
-            'subject_id' => 'nullable|exists:subjects,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'duration' => 'required|integer|min:1',
             'passing_grade' => 'required|integer|min:0|max:100',
             'total_questions' => 'nullable|integer|min:1',
             'type' => 'required|in:pretest,posttest',
+            'show_result_after' => 'nullable|boolean',
         ];
     }
 

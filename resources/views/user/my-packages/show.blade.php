@@ -314,11 +314,20 @@
                                     Selesaikan semua materi mapel ini
                                 </span>
                             @else
-                                <x-button variant="success"
-                                    href="{{ route('user.quizzes.show', ['package' => $package->id, 'quiz' => $quizItem->id, 'subject' => $quizItem->subject->id]) }}"
-                                    class="rounded-xl shrink-0 shadow-lg shadow-emerald-500/20">
-                                    <i class="ti ti-arrow-right mr-2"></i> Mulai Kuis
-                                </x-button>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    @if ($quizScores->get($quizItem->id))
+                                        <x-button variant="secondary"
+                                            href="{{ route('user.quizzes.review', ['package' => $package->id, 'quiz' => $quizItem->id, 'transQuiz' => $quizScores->get($quizItem->id)->id]) }}"
+                                            class="rounded-xl">
+                                            <i class="ti ti-chart-bar mr-2"></i> Lihat Hasil
+                                        </x-button>
+                                    @endif
+                                    <x-button variant="success"
+                                        href="{{ route('user.quizzes.show', ['package' => $package->id, 'quiz' => $quizItem->id, 'subject' => $quizItem->subject->id]) }}"
+                                        class="rounded-xl shadow-lg shadow-emerald-500/20">
+                                        <i class="ti ti-arrow-right mr-2"></i> Mulai Kuis
+                                    </x-button>
+                                </div>
                             @endif
                         </div>
                     @endforeach
@@ -327,7 +336,8 @@
         @endif
 
         @php
-            $exams = \App\Models\Exam::where('package_id', $package->id)->get();
+            $exams = \App\Models\Exam::with('subjects')->where('package_id', $package->id)->get();
+            $posttestQuestionCounts = \App\Models\MappingQuestion::whereIn('id_exam', $exams->pluck('id'))->selectRaw('id_exam, count(*) as cnt')->groupBy('id_exam')->pluck('cnt', 'id_exam');
         @endphp
 
         @if ($exams->count() > 0)
@@ -335,40 +345,43 @@
                 <div class="space-y-4">
                     @foreach ($exams as $examItem)
                         @php
-                            $totalQuestions = \App\Models\MappingQuestion::where('id_exam', $examItem->id)->count();
+                            $totalQuestions = $examItem->type === 'pretest'
+                                ? (int) $examItem->total_questions
+                                : ($posttestQuestionCounts->get($examItem->id) ?? 0);
+                            $attempts = $examAttemptsByExam->get($examItem->id, collect());
                         @endphp
                         <div
-                            class="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-500/10 dark:to-violet-500/10 rounded-xl border border-indigo-100 dark:border-indigo-800">
-                            <div class="flex items-center gap-4">
+                            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-500/10 dark:to-violet-500/10 rounded-xl border border-indigo-100 dark:border-indigo-800">
+                            <div class="flex items-center gap-4 flex-1 min-w-0">
                                 <div
-                                    class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white">
+                                    class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white shrink-0">
                                     <i class="ti ti-clipboard-check text-xl"></i>
                                 </div>
-                                <div>
-                                    <div class="flex gap-2 items-center mb-2">
-                                        <h4 class="font-bold text-gray-900 dark:text-white mb-1">{{ $examItem->title }}
-                                        </h4>
+                                <div class="min-w-0">
+                                    <div class="flex flex-wrap gap-2 items-center mb-2">
+                                        <h4 class="font-bold text-gray-900 dark:text-white">{{ $examItem->title }}</h4>
                                         @if ($examItem->type === 'pretest')
                                             <span
-                                                class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                                                class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-xs font-semibold rounded-full">
                                                 <i class="ti ti-copyleft"></i> Pretest
                                             </span>
-                                            <span
-                                                class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
-                                                <i class="ti ti-school"></i> {{ $examItem->subject->name ?? 'Umum' }}
-                                            </span>
+                                            @if ($examItem->subjects->isNotEmpty())
+                                                <span
+                                                    class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-xs font-semibold rounded-full">
+                                                    <i class="ti ti-school"></i> {{ $examItem->subjects->pluck('name')->join(', ') }}
+                                                </span>
+                                            @endif
                                         @else
                                             <span
-                                                class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                                                class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300 text-xs font-semibold rounded-full">
                                                 <i class="ti ti-devices-question"></i> Posttest
                                             </span>
                                         @endif
                                     </div>
-                                    <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+                                    <div class="flex flex-wrap items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
                                         <span class="inline-flex items-center gap-1">
                                             <i class="ti ti-help-circle"></i>
-                                            {{ $examItem->type === 'pretest' ? $examItem->total_questions : $totalQuestions }}
-                                            Soal
+                                            {{ $totalQuestions }} Soal
                                         </span>
                                         @if ($examItem->duration)
                                             <span class="inline-flex items-center gap-1">
@@ -390,11 +403,20 @@
                                     @endif
                                 </div>
                             </div>
-                            <x-button variant="primary"
-                                href="{{ route('user.exams.show', ['package' => $package->id, 'exam' => $examItem->id]) }}"
-                                class="rounded-xl shadow-lg shadow-indigo-500/20">
-                                <i class="ti ti-arrow-right mr-2"></i> Mulai Ujian
-                            </x-button>
+                            <div class="flex items-center gap-2 shrink-0">
+                                @if ($attempts->isNotEmpty())
+                                    <x-button variant="secondary"
+                                        href="{{ route('user.exams.attempts', ['package' => $package->id, 'exam' => $examItem->id]) }}"
+                                        class="rounded-xl">
+                                        <i class="ti ti-chart-bar mr-2"></i> Lihat Hasil ({{ $attempts->count() }})
+                                    </x-button>
+                                @endif
+                                <x-button variant="primary"
+                                    href="{{ route('user.exams.show', ['package' => $package->id, 'exam' => $examItem->id]) }}"
+                                    class="rounded-xl shadow-lg shadow-indigo-500/20">
+                                    <i class="ti ti-arrow-right mr-2"></i> {{ $attempts->isNotEmpty() ? 'Kerjakan Lagi' : 'Mulai Ujian' }}
+                                </x-button>
+                            </div>
                         </div>
                     @endforeach
                 </div>

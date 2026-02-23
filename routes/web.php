@@ -7,7 +7,6 @@ use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailActivation;
 use App\Http\Controllers\Admin\ExamController;
-
 use App\Http\Controllers\Admin\MappingPackageController;
 use App\Http\Controllers\Admin\MappingQuestionController;
 use App\Http\Controllers\Admin\MasterMaterialController;
@@ -76,6 +75,8 @@ Route::middleware('auth', 'akun-active')->group(function () {
     Route::get('user/packages/{package}/exams/{exam}', [UserExamController::class, 'show'])->name('user.exams.show');
     Route::get('user/packages/{package}/exams/{exam}/questions', [UserExamController::class, 'getQuestions'])->name('user.exams.questions');
     Route::post('user/packages/{package}/exams/{exam}/submit', [UserExamController::class, 'submit'])->name('user.exams.submit');
+    Route::get('user/packages/{package}/exams/{exam}/attempts', [UserExamController::class, 'attempts'])->name('user.exams.attempts');
+    Route::get('user/packages/{package}/exams/{exam}/result/{trans}', [UserExamController::class, 'result'])->name('user.exams.result');
     Route::get('user/packages/{package}/exams/{exam}/review/{trans}', [UserExamController::class, 'review'])->name('user.exams.review');
 
     // User Quiz routes
@@ -144,6 +145,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
             ->name('subjects.template-export');
         Route::resource('subjects', SubjectController::class);
 
+        Route::get('exams/subjects-by-package/{package}', [ExamController::class, 'subjectsByPackage'])
+            ->name('exams.subjects-by-package');
         Route::resource('exams', ExamController::class);
         Route::get('mapping-questions', [MappingQuestionController::class, 'indexMappingQuestion'])
             ->name('mapping-questions.index');
@@ -217,4 +220,4 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('monitor-participants.show');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

@@ -97,11 +97,12 @@ class Sidebar extends Component
                         'icon' => 'ti ti-adjustments-search',
                         'activePattern' => 'exams.*|bank-questions.*|mapping-questions.*|mapping-package.*|quizzes.*',
                         'subItems' => [
+                            ['name' => 'Mapping Mapel', 'route' => 'mapping-package.index'],
                             ['name' => 'Try Out', 'route' => 'exams.index'],
                             ['name' => 'Kuis / Latihan', 'route' => 'quizzes.index'],
                             ['name' => 'Bank Soal', 'route' => 'bank-questions.index'],
                             ['name' => 'Mapping Soal', 'route' => 'mapping-questions.index'],
-                            ['name' => 'Mapping Mapel', 'route' => 'mapping-package.index'],
+
                         ],
                     ],
                 ],
@@ -192,14 +193,14 @@ class Sidebar extends Component
                             ['name' => 'Package Saya', 'route' => 'user.my-packages.index'],
                         ],
                     ],
-                    [
-                        'name' => 'Riwayat Ujian',
-                        'icon' => 'list-check',
-                        'activePattern' => 'user.history-exams.*',
-                        'subItems' => [
-                            ['name' => 'Riwayat Ujian', 'route' => 'user.history-exams.index'],
-                        ],
-                    ],
+                    // [
+                    //     'name' => 'Riwayat Ujian',
+                    //     'icon' => 'list-check',
+                    //     'activePattern' => 'user.history-exams.*',
+                    //     'subItems' => [
+                    //         ['name' => 'Riwayat Ujian', 'route' => 'user.history-exams.index'],
+                    //     ],
+                    // ],
 
                 ],
             ],

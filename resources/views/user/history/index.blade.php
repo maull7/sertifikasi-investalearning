@@ -85,7 +85,7 @@
                            <td class="py-4 px-8">
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
                                     bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
-                                    {{ $data->Package->title ?? '-' }}
+                                    {{ $data->package->title ?? '-' }}
                                 </span>
                             </td>
 
@@ -104,7 +104,7 @@
                             <td class="py-4 px-8 text-center">
                                 <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold
                                     bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                                    {{ strtoupper($data->Package->masterType->name_type ?? '-') }}
+                                    {{ strtoupper($data->package->masterType->name_type ?? '-') }}
                                 </span>
                             </td>
 
@@ -112,7 +112,7 @@
                                 @php $examType = $data->Exam->type ?? null; @endphp
                                 @if($examType === 'pretest')
                                     <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold bg-sky-100 text-sky-800 dark:bg-sky-500/20 dark:text-sky-300">Pretest</span>
-                                @elseif($examType === 'posttest')
+                                @elseif($typeExam === 'posttest')
                                     <span class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold bg-violet-100 text-violet-800 dark:bg-violet-500/20 dark:text-violet-300">Posttest</span>
                                 @else
                                     <span class="text-xs text-gray-400">-</span>
@@ -144,7 +144,7 @@
 
                             <td class="py-4 px-8 text-center">
                                 <div class="flex items-center justify-end gap-2">
-                                    <x-button variant="primary" size="sm" href="{{ route('user.history-exams.detail', $data->id) }}" class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">
+                                    <x-button variant="primary" size="sm" href="{{ route('user.exams.review', ['package' => $data->id_package, 'exam' => $data->id_exam, 'trans' => $data->id]) }}" class="rounded-lg h-9 w-9 p-0 flex items-center justify-center" title="Lihat pembahasan">
                                         <i class="ti ti-eye text-base"></i>
                                     </x-button>
                                 </div>

@@ -72,9 +72,11 @@ class ExamRepository implements ExamRepositoryInterface
             $ids = $attempt->question_ids ?? [];
 
             if (empty($ids)) {
-                $subjectIds = $exam->subject_id
-                    ? collect([$exam->subject_id])
-                    : $package->getSubjectsForPackage()->pluck('id');
+                $exam->loadMissing('subjects');
+                $subjectIds = $exam->subjects->pluck('id');
+                if ($subjectIds->isEmpty()) {
+                    $subjectIds = $package->getSubjectsForPackage()->pluck('id');
+                }
 
                 $limit = (int) max(1, $exam->total_questions);
 

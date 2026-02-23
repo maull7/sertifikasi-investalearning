@@ -443,13 +443,35 @@
 
                         const data = await response.json();
 
-                        // Set flag bahwa sudah submit SEBELUM redirect
                         localStorage.setItem(this.storageKey + '_submitted', 'true');
-
-                        // Bersihkan state lokal
                         localStorage.removeItem(this.storageKey);
 
-                        if (data.redirect) {
+                        if (data.show_choices && data.attempts_url && data.back_url && typeof Swal !== 'undefined') {
+                            const statusLabel = data.status === 'lulus' ? 'Lulus' : 'Tidak Lulus';
+                            const statusColor = data.status === 'lulus' ? '#10b981' : '#f59e0b';
+                            Swal.fire({
+                                title: 'Ujian Selesai!',
+                                html: `
+                                    <p class="text-lg mb-2">Nilai: <strong class="text-indigo-600">${Number(data.score).toFixed(1)}</strong></p>
+                                    <p class="text-gray-600 dark:text-gray-400">Benar: <strong>${data.correct ?? 0}</strong> / ${data.total ?? 0} soal</p>
+                                    <p class="mt-2" style="color: ${statusColor}; font-weight: 600;">${statusLabel}</p>
+                                `,
+                                icon: data.status === 'lulus' ? 'success' : 'info',
+                                showDenyButton: true,
+                                confirmButtonText: 'Lihat Hasil',
+                                confirmButtonColor: '#4f46e5',
+                                denyButtonText: 'Kembali',
+                                denyButtonColor: '#6b7280',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = data.attempts_url;
+                                } else {
+                                    window.location.href = data.back_url;
+                                }
+                            });
+                        } else if (data.back_url) {
+                            window.location.href = data.back_url;
+                        } else if (data.redirect) {
                             window.location.href = data.redirect;
                         } else if (data.message) {
                             alert(data.message);

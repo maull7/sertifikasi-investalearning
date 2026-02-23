@@ -74,7 +74,7 @@
                                 <td class="py-4 px-8">
                                     <span
                                         class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
-                                        {{ $value->subject->name ?? '-' }}
+                                        {{ $value->subjects->isNotEmpty() ? $value->subjects->pluck('name')->join(', ') : '-' }}
                                     </span>
                                 </td>
                                 <td class="py-4 px-8">

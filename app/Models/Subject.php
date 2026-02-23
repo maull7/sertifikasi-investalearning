@@ -45,8 +45,9 @@ class Subject extends Model
         return $this->hasMany(StatusMateri::class, 'id_subject');
     }
 
-    public function exams(): HasMany
+    public function exams(): BelongsToMany
     {
-        return $this->hasMany(Exam::class, 'subject_id');
+        return $this->belongsToMany(Exam::class, 'exam_subject', 'subject_id', 'exam_id')
+            ->withTimestamps();
     }
 }
