@@ -49,8 +49,34 @@
                         </x-select>
                     </div>
                     {{-- Package Select --}}
-                    <div class="md:col-span-2">
-                        <x-select label="Paket" name="package_id" required>
+                    <div class="md:col-span-2"
+                        x-data="{
+                            packageId: '{{ old('package_id', $data->package_id) }}',
+                            subjects: [],
+                            loading: false,
+                            baseUrl: '{{ route('exams.subjects-by-package', ['package' => 0]) }}',
+                            loadSubjects() {
+                                const id = this.packageId || (this.$refs.packageSelect && this.$refs.packageSelect.value);
+                                if (!id) { this.subjects = []; return; }
+                                this.loading = true;
+                                const url = this.baseUrl.replace(/\/0$/, '/' + id);
+                                fetch(url, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+                                    .then(r => r.json())
+                                    .then(d => { this.subjects = d.subjects || []; })
+                                    .catch(() => { this.subjects = []; })
+                                    .finally(() => { this.loading = false; });
+                            }
+                        }"
+                        x-init="
+                            $nextTick(() => {
+                                if ($refs.packageSelect) packageId = $refs.packageSelect.value;
+                                loadSubjects();
+                            });
+                        ">
+                        <x-select label="Paket" name="package_id" required
+                            x-ref="packageSelect"
+                            x-model="packageId"
+                            @change="loadSubjects()">
                             <option value="">Pilih Paket</option>
                             @foreach ($packages as $package)
                                 <option value="{{ $package->id }}"
@@ -59,6 +85,30 @@
                                 </option>
                             @endforeach
                         </x-select>
+                        <div class="mt-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 p-6 flex items-center justify-center gap-3"
+                            x-show="loading" x-cloak x-transition>
+                            <div class="w-8 h-8 rounded-full border-2 border-indigo-200 dark:border-indigo-500/30 border-t-indigo-600 dark:border-t-indigo-400 animate-spin"></div>
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Memuat mata pelajaran...</span>
+                        </div>
+                        {{-- Tampilan mata pelajaran terpilih --}}
+                        <div class="mt-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 overflow-hidden" x-show="!loading && subjects.length > 0" x-cloak x-transition>
+                            <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50">
+                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Mata pelajaran yang terpilih</span>
+                                <span class="ml-2 text-xs text-gray-500 dark:text-gray-400" x-text="'( ' + subjects.length + ' mapel dari mapping paket )'"></span>
+                            </div>
+                            <ul class="p-3 flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                                <template x-for="(s, i) in subjects" :key="s.id">
+                                    <li class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20">
+                                        <span class="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold" x-text="i + 1"></span>
+                                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200" x-text="s.name"></span>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400" x-show="s.code" x-text="s.code ? '(' + s.code + ')' : ''"></span>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                        <div class="mt-4 rounded-xl border border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-800/20 p-4 text-center" x-show="packageId && !loading && subjects.length === 0" x-cloak>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Paket ini belum memiliki mapping mata pelajaran. Atur mapel di <a href="{{ route('mapping-package.index') }}" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Mapping Paket</a>.</p>
+                        </div>
                     </div>
 
                     {{-- Title --}}
@@ -96,21 +146,22 @@
 
                     {{-- Total Questions --}}
                     <div>
-                        <x-select label="Mata Pelajaran" name="subject_id" required>
-                            @foreach ($subjects as $subject)
-                                <option value="{{ $subject->id }}"
-                                    {{ old('subject_id', $data->subject_id) == $subject->id ? 'selected' : '' }}>
-                                    {{ $subject->name }}
-                                </option>
-                            @endforeach
-                        </x-select>
-                    </div>
-                    <div>
                         <x-input label="Jumlah Soal Ujian (Opsional)" name="total_questions" type="number" min="1"
                             placeholder="Contoh: 50" value="{{ old('total_questions', $data->total_questions) }}" />
                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                             Isi jumlah soal yang direncanakan untuk ujian ini (boleh dikosongkan).
                         </p>
+                    </div>
+                    {{-- Show result after --}}
+                    <div class="md:col-span-2">
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="hidden" name="show_result_after" value="0">
+                            <input type="checkbox" name="show_result_after" value="1"
+                                {{ old('show_result_after', $data->show_result_after ?? true) ? 'checked' : '' }}
+                                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Tampilkan hasil & pembahasan setelah ujian</span>
+                        </label>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Jika dicentang, peserta bisa lihat nilai dan pembahasan jawaban setelah menyelesaikan ujian.</p>
                     </div>
                 </div>
 

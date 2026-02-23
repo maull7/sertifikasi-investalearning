@@ -52,7 +52,7 @@
                     <div class="md:w-2/3">
                         <span
                             class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
-                            {{ $data->subject->name ?? '-' }}
+                            {{ $data->subjects->isNotEmpty() ? $data->subjects->pluck('name')->join(', ') : '-' }}
                         </span>
                     </div>
                 </div>

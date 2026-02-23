@@ -45,19 +45,18 @@ class ExamController extends Controller
                 'exam_title' => $exam->title,
             ]);
 
-            // Jika sudah 3 kali mengerjakan, redirect ke halaman review dengan kunci jawaban
-            if ($result['show_solutions'] ?? false) {
-                return response()->json([
-                    'redirect' => route('user.exams.review', [
-                        'package' => $package->id,
-                        'exam' => $exam->id,
-                        'trans' => $result['trans_question_id'],
-                    ]),
-                ]);
-            }
+            $attemptsUrl = route('user.exams.attempts', ['package' => $package->id, 'exam' => $exam->id]);
+            $backUrl = route('user.my-packages.show', $package->id);
 
             return response()->json([
-                'redirect' => route('user.my-packages.show', $package->id),
+                'score' => $result['score'],
+                'correct' => $result['correct'],
+                'total' => $result['total'],
+                'status' => $result['status'],
+                'exam_title' => $exam->title,
+                'attempts_url' => $attemptsUrl,
+                'back_url' => $backUrl,
+                'show_choices' => (bool) ($exam->show_result_after ?? true),
             ]);
         } catch (\Throwable $e) {
             report($e);
@@ -80,6 +79,7 @@ class ExamController extends Controller
 
         $questions = collect($questionPage->items())->map(function ($item) {
             $question = isset($item->questionBank) ? $item->questionBank : $item;
+
             return [
                 'id' => $question->id,
                 'question_type' => $question->question_type,
@@ -87,7 +87,7 @@ class ExamController extends Controller
                 'question_image_url' => $question->question_type === 'Image'
                     ? (str_starts_with($question->question, 'http')
                         ? $question->question
-                        : asset('storage/' . ltrim($question->question, '/')))
+                        : asset('storage/'.ltrim($question->question, '/')))
                     : null,
                 'option_a' => $question->option_a,
                 'option_b' => $question->option_b,
@@ -120,17 +120,14 @@ class ExamController extends Controller
     {
         $user = Auth::user();
 
-        // Pastikan trans_question milik user yang sedang login
         if ($trans->id_user !== $user->id) {
             abort(403, 'Anda tidak memiliki akses ke hasil ujian ini.');
         }
 
-        // Pastikan trans_question sesuai dengan package dan exam
         if ($trans->id_package !== $package->id || $trans->id_exam !== $exam->id) {
             abort(404, 'Hasil ujian tidak ditemukan.');
         }
 
-        // Ambil detail hasil dengan pagination (1 soal per halaman)
         $detailResults = DetailResult::with('Question.subject')
             ->where('id_trans_question', $trans->id)
             ->orderBy('id')
@@ -138,5 +135,34 @@ class ExamController extends Controller
             ->withQueryString();
 
         return view('user.exams.review', compact('package', 'exam', 'trans', 'detailResults'));
+    }
+
+    public function result(Package $package, Exam $exam, TransQuestion $trans): View
+    {
+        $user = Auth::user();
+
+        if ($trans->id_user !== $user->id) {
+            abort(403, 'Anda tidak memiliki akses ke hasil ujian ini.');
+        }
+
+        if ($trans->id_package !== $package->id || $trans->id_exam !== $exam->id) {
+            abort(404, 'Hasil ujian tidak ditemukan.');
+        }
+
+        return view('user.exams.result', compact('package', 'exam', 'trans'));
+    }
+
+    public function attempts(Package $package, Exam $exam): View
+    {
+        $user = Auth::user();
+        $this->examService->ensureUserCanAccessExam($user, $package, $exam);
+
+        $attempts = TransQuestion::where('id_user', $user->id)
+            ->where('id_package', $package->id)
+            ->where('id_exam', $exam->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('user.exams.attempts', compact('package', 'exam', 'attempts'));
     }
 }

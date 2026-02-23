@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Material;
 use App\Models\Package;
 use App\Models\StatusMateri;
+use App\Models\TransQuestion;
 use App\Models\UserJoin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +19,7 @@ class MyPackageController extends Controller
         $user = Auth::user();
         $joinedPackages = UserJoin::where('user_id', $user->id)
             ->with(['package.mappedSubjects.materials', 'package.masterType'])
-            ->whereHas('package', fn($q) => $q->where('status', 'active'))
+            ->whereHas('package', fn ($q) => $q->where('status', 'active'))
             ->paginate(12);
 
         return view('user.my-packages.index', compact('joinedPackages'));
@@ -37,9 +38,9 @@ class MyPackageController extends Controller
         }
 
         $subjects = $package->getSubjectsForPackage();
-        $subjects->load(['materials' => fn($q) => $q->with('subject'), 'quizzes' => fn($q) => $q->with('subject')]);
+        $subjects->load(['materials' => fn ($q) => $q->with('subject'), 'quizzes' => fn ($q) => $q->with('subject')]);
 
-        $materialIdsBySubject = $subjects->keyBy('id')->map(fn($s) => $s->materials->pluck('id')->filter()->values());
+        $materialIdsBySubject = $subjects->keyBy('id')->map(fn ($s) => $s->materials->pluck('id')->filter()->values());
         $completedMaterialIds = StatusMateri::where('id_user', $user->id)
             ->where('status', 'completed')
             ->pluck('id_material');
@@ -56,7 +57,14 @@ class MyPackageController extends Controller
             ];
         }
 
-        return view('user.my-packages.show', compact('package', 'subjects', 'subjectProgress'));
+        $exams = \App\Models\Exam::with('subjects')->where('package_id', $package->id)->get();
+        $examAttemptsByExam = TransQuestion::where('id_user', $user->id)
+            ->whereIn('id_exam', $exams->pluck('id'))
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy('id_exam');
+
+        return view('user.my-packages.show', compact('package', 'subjects', 'subjectProgress', 'examAttemptsByExam'));
     }
 
     public function markAsRead(Material $material): RedirectResponse
