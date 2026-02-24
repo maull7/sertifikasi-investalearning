@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RequestMasterUser;
+use App\Models\Package;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,9 +19,10 @@ class MasterUserController extends Controller
 
         $query = User::query()
             ->whereIn('role', ['Admin', 'Petugas'])
-            ->when($search, fn($q, $v) => $q->where('name', 'like', '%' . $v . '%')
-                ->orWhere('email', 'like', '%' . $v . '%'))
-            ->when($roleFilter !== null && $roleFilter !== '', fn($q) => $q->where('role', $roleFilter))
+            ->when($search, fn ($q, $v) => $q->where('name', 'like', '%'.$v.'%')
+                ->orWhere('email', 'like', '%'.$v.'%'))
+            ->when($roleFilter !== null && $roleFilter !== '', fn ($q) => $q->where('role', $roleFilter))
+            ->with('managedPackages:id,title')
             ->orderBy('role')
             ->orderBy('name');
 
@@ -31,7 +33,9 @@ class MasterUserController extends Controller
 
     public function create(): View
     {
-        return view('admin.master-user.create');
+        $packages = Package::where('status', 'active')->orderBy('title')->get();
+
+        return view('admin.master-user.create', compact('packages'));
     }
 
     public function store(RequestMasterUser $request): RedirectResponse
@@ -41,7 +45,15 @@ class MasterUserController extends Controller
         $validated['status_user'] = 'Teraktivasi';
         unset($validated['password_confirmation']);
 
-        User::query()->create($validated);
+        $managedPackageIds = $validated['managed_package_ids'] ?? [];
+        unset($validated['managed_package_ids']);
+
+        /** @var \App\Models\User $user */
+        $user = User::query()->create($validated);
+
+        if ($user->role === 'Petugas') {
+            $user->managedPackages()->sync($managedPackageIds);
+        }
 
         return redirect()
             ->route('master-user.index')
@@ -54,7 +66,21 @@ class MasterUserController extends Controller
             abort(404);
         }
 
-        return view('admin.master-user.edit', compact('user'));
+        $user->load('managedPackages');
+        $packages = Package::where('status', 'active')->orderBy('title')->get();
+
+        return view('admin.master-user.edit', compact('user', 'packages'));
+    }
+
+    public function show(User $user): View
+    {
+        if (! in_array($user->role, ['Admin', 'Petugas'], true)) {
+            abort(404);
+        }
+
+        $user->load('managedPackages');
+
+        return view('admin.master-user.show', compact('user'));
     }
 
     public function update(RequestMasterUser $request, User $user): RedirectResponse
@@ -64,6 +90,8 @@ class MasterUserController extends Controller
         }
 
         $validated = $request->validated();
+        $managedPackageIds = $validated['managed_package_ids'] ?? [];
+        unset($validated['managed_package_ids']);
         if (! empty($validated['password'])) {
             $validated['password'] = bcrypt($validated['password']);
         } else {
@@ -73,13 +101,21 @@ class MasterUserController extends Controller
 
         $user->update($validated);
 
+        if ($user->role === 'Petugas') {
+            $user->managedPackages()->sync($managedPackageIds);
+        } else {
+            $user->managedPackages()->detach();
+        }
+
         return redirect()
             ->route('master-user.index')
             ->with('success', 'User berhasil diperbarui.');
     }
+
     public function destroy(User $user)
     {
         $user->delete();
+
         return redirect()->back()->with('success', 'Berhasil menghapus data user');
     }
 }

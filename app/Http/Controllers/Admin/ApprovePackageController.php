@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Package;
+use App\Models\User;
 use App\Models\UserJoin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class ApprovePackageController extends Controller
@@ -24,26 +26,51 @@ class ApprovePackageController extends Controller
     public function index(Request $request)
     {
         $search = $request->query('search');
+        $user = Auth::user();
 
-        $data = UserJoin::with('user', 'package')
+        // default kosong
+        $packageIds = [];
+
+        // cek kalau role petugas
+        if ($user->role === 'Petugas') {
+            $packageIds = $user->managedPackages()
+                ->pluck('package_id')
+                ->toArray();
+        }
+
+        $dataQuery = UserJoin::with('user.managedPackages', 'package')
             ->when($search, function ($query, $search) {
                 $query->whereHas('package', function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%");
                 });
             })
-            ->where('status', 'pending')
+            ->where('status', 'pending');
+
+        // kalau petugas baru pakai filter package
+        if ($user->role === 'Petugas') {
+            $dataQuery->whereIn('id_package', $packageIds);
+        }
+
+        $data = $dataQuery
             ->orderBy('created_at', 'desc')
             ->paginate(10, ['*'], 'pending_page')
             ->withQueryString();
 
-        $activePackages = Package::with('masterType')
+
+        $activeQuery = Package::with('masterType')
             ->withCount(['userJoins as approved_members_count' => function ($q) {
                 $q->where('status', 'approved');
             }])
             ->where('status', 'active')
             ->when($search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%");
-            })
+            });
+
+        if ($user->role === 'Petugas') {
+            $activeQuery->whereIn('id', $packageIds);
+        }
+
+        $activePackages = $activeQuery
             ->orderBy('title')
             ->paginate(10, ['*'], 'active_page')
             ->withQueryString();

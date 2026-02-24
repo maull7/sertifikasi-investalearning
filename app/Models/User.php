@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -79,5 +80,11 @@ class User extends Authenticatable
     public function certificates(): HasMany
     {
         return $this->hasMany(Certificate::class, 'id_user');
+    }
+
+    public function managedPackages(): BelongsToMany
+    {
+        return $this->belongsToMany(Package::class, 'package_staff', 'user_id', 'package_id')
+            ->withTimestamps();
     }
 }

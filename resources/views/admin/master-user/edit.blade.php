@@ -17,7 +17,7 @@
         </div>
 
         <x-card>
-            <form action="{{ route('master-user.update', $user) }}" method="POST" class="space-y-6">
+            <form action="{{ route('master-user.update', $user) }}" method="POST" class="space-y-6" x-data="{ role: '{{ old('role', $user->role) }}' }">
                 @csrf
                 @method('PUT')
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -26,7 +26,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role <span
                                 class="text-red-500">*</span></label>
-                        <select name="role" required
+                        <select name="role" required x-model="role"
                             class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-2.5 focus:ring-2 focus:ring-indigo-500">
                             <option value="Admin" {{ old('role', $user->role) === 'Admin' ? 'selected' : '' }}>Admin
                             </option>
@@ -60,6 +60,32 @@
                         <input type="password" name="password_confirmation" minlength="8"
                             placeholder="Ulangi password baru"
                             class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-2.5 focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 gap-6" x-show="role === 'Petugas'">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Paket yang Dikelola
+                        </label>
+                        @php
+                            $selectedPackages = collect(old('managed_package_ids', $user->managedPackages->pluck('id')->all()));
+                        @endphp
+                        <div class="mt-2 space-y-2 max-h-64 overflow-y-auto rounded-xl border border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-900">
+                            @foreach ($packages as $package)
+                                <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+                                    <input type="checkbox" name="managed_package_ids[]" value="{{ $package->id }}"
+                                        class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                        {{ $selectedPackages->contains($package->id) ? 'checked' : '' }}>
+                                    <span>{{ $package->title }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            Checklist paket yang akan dikelola oleh petugas ini.
+                        </p>
+                        @error('managed_package_ids.*')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
                 <div class="flex justify-end">

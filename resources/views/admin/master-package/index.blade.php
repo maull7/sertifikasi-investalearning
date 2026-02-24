@@ -101,6 +101,12 @@
                                 </td>
                                 <td class="py-4 px-8">
                                     <div class="flex items-center justify-end gap-2">
+                                        <x-button variant="success" size="sm"
+                                            href="{{ route('master-packages.show', $value->id) }}"
+                                            class="rounded-lg h-9 w-9 p-0 flex items-center justify-center"
+                                            title="Mapping Mapel">
+                                            <i class="ti ti-eye text-base"></i>
+                                        </x-button>
                                         <x-button variant="info" size="sm"
                                             href="{{ route('mapping-package.manage', $value) }}"
                                             class="rounded-lg h-9 w-9 p-0 flex items-center justify-center"
@@ -188,7 +194,8 @@
                             class="w-20 h-20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
                             <i class="ti ti-file-upload text-4xl"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">Import Paket dari Excel
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">Import Paket dari
+                            Excel
                         </h3>
                         <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed text-center mb-6">
                             Upload file Excel (.xlsx atau .xls) untuk import paket dalam jumlah banyak.

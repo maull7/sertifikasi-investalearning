@@ -110,6 +110,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('master-user', [MasterUserController::class, 'index'])->name('master-user.index');
         Route::get('master-user/create', [MasterUserController::class, 'create'])->name('master-user.create');
         Route::post('master-user', [MasterUserController::class, 'store'])->name('master-user.store');
+        Route::get('master-user/{user}', [MasterUserController::class, 'show'])->name('master-user.show');
         Route::get('master-user/{user}/edit', [MasterUserController::class, 'edit'])->name('master-user.edit');
         Route::put('master-user/{user}', [MasterUserController::class, 'update'])->name('master-user.update');
         Route::delete('master-user/{user}', [MasterUserController::class, 'destroy'])->name('master-user.destroy');

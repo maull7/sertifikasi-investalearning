@@ -39,7 +39,7 @@ class AuthenticatedSessionController extends Controller
             }
         }
 
-        if ($user->role === 'Admin') {
+        if ($user->role === 'Admin' || 'Petugas') {
             return redirect()->route('dashboard');
         }
 
