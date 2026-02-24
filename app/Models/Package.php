@@ -48,6 +48,12 @@ class Package extends Model
             ->withTimestamps();
     }
 
+    public function staff(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'package_staff', 'package_id', 'user_id')
+            ->withTimestamps();
+    }
+
     /**
      * Materi dalam paket: dari mappedSubjects (mapping mapel) atau fallback masterType->subjects.
      */

@@ -49,12 +49,14 @@
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
                         <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
-                            <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Nama
-                            </th>
-                            <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Email
-                            </th>
-                            <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Role
-                            </th>
+                            <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
+                                Nama</th>
+                            <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
+                                Email</th>
+                            <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
+                                Role</th>
+                            <th class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
+                                Paket Dikelola</th>
                             <th
                                 class="py-3 px-4 sm:px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">
                                 Aksi</th>
@@ -73,7 +75,32 @@
                                         {{ $u->role }}
                                     </span>
                                 </td>
+                                <td class="py-3 px-4 sm:px-6">
+                                    @if ($u->role === 'Petugas')
+                                        @php
+                                            $titles = $u->managedPackages->pluck('title');
+                                        @endphp
+                                        @if ($titles->isNotEmpty())
+                                            <div class="flex flex-wrap gap-1">
+                                                @foreach ($titles as $title)
+                                                    <span
+                                                        class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                                        {{ $title }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-xs text-gray-400">Belum ada paket</span>
+                                        @endif
+                                    @else
+                                        <span class="text-xs text-gray-400">-</span>
+                                    @endif
+                                </td>
                                 <td class="py-3 px-4 sm:px-6 text-right">
+                                    <x-button variant="success" size="sm" href="{{ route('master-user.show', $u) }}"
+                                        class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">
+                                        <i class="ti ti-eye text-base"></i>
+                                    </x-button>
                                     <x-button variant="warning" size="sm" href="{{ route('master-user.edit', $u) }}"
                                         class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">
                                         <i class="ti ti-pencil text-base"></i>

@@ -53,7 +53,7 @@ class MasterPackegeController extends Controller
      */
     public function show(string $id)
     {
-        $data = Package::findOrFail($id);
+        $data = Package::with('users')->findOrFail($id);
         return view('admin.master-package.show', compact('data'));
     }
 

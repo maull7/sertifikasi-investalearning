@@ -30,7 +30,9 @@ class RequestMasterUser extends FormRequest
             'email' => $emailRule,
             'password' => [$this->isMethod('PUT') || $this->isMethod('PATCH') ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'string', Rule::in(['Admin', 'Petugas'])],
-            'phone' => ['required', 'numeric']
+            'phone' => ['required', 'numeric'],
+            'managed_package_ids' => ['nullable', 'array'],
+            'managed_package_ids.*' => ['integer', 'exists:packages,id'],
         ];
     }
 
@@ -48,7 +50,7 @@ class RequestMasterUser extends FormRequest
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
             'role.required' => 'Role wajib dipilih.',
             'role.in' => 'Role harus Admin atau Petugas.',
-            'phone.required' => 'nomor telepon wajib di isi'
+            'phone.required' => 'nomor telepon wajib di isi',
         ];
     }
 }
