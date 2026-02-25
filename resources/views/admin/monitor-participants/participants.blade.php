@@ -41,9 +41,23 @@
         </form>
 
         @if (!empty($rankingChartData))
-            <x-card title="Perbandingan Nilai Peserta (Rata-rata Tryout)">
-                <div class="w-full max-w-4xl mx-auto min-h-[240px] h-64 sm:h-72 overflow-hidden">
-                    <canvas id="rankingChart"></canvas>
+            <x-card title="Grafik Perbandingan Nilai Peserta (rata-rata TryOut)">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Grafik garis vertikal: peserta dari atas ke bawah, nilai diplot horizontal.</p>
+                <div class="w-full overflow-x-auto overflow-y-auto" style="max-height: min(800px, {{ max(300, count($rankingChartData) * 28) }}px);">
+                    <div class="min-w-[480px]" style="height: {{ max(300, count($rankingChartData) * 28) }}px;">
+                        <canvas id="rankingChart"></canvas>
+                    </div>
+                </div>
+            </x-card>
+        @endif
+
+        @if (!empty($subjectChartData['labels']) && !empty($subjectChartData['datasets']))
+            <x-card title="Grafik Perbandingan Nilai Peserta (rata-rata per Mata Pelajaran)">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Nilai rata-rata kuis per mata pelajaran untuk tiap peserta. Klik legend untuk tampilkan/sembunyikan mapel.</p>
+                <div class="w-full overflow-x-auto overflow-y-auto" style="max-height: min(800px, {{ max(320, count($subjectChartData['labels']) * 40) }}px);">
+                    <div class="min-w-[640px]" style="height: {{ max(320, count($subjectChartData['labels']) * 40) }}px;">
+                        <canvas id="subjectChart"></canvas>
+                    </div>
                 </div>
             </x-card>
         @endif
@@ -144,27 +158,28 @@
         </x-card>
     </div>
 
-    @if (!empty($rankingChartData))
+    @if (!empty($rankingChartData) || (!empty($subjectChartData['labels'] ?? []) && !empty($subjectChartData['datasets'] ?? [])))
         @push('scripts')
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    const data = @json($rankingChartData);
-                    const ctx = document.getElementById('rankingChart');
-                    if (ctx && data.length > 0) {
-                        new Chart(ctx, {
-                            type: 'line',
+                    @if (!empty($rankingChartData))
+                    const rankingData = @json($rankingChartData);
+                    const rankingCtx = document.getElementById('rankingChart');
+                    if (rankingCtx && rankingData.length > 0) {
+                        const labels = rankingData.map(d => d.label);
+                        new Chart(rankingCtx, {
+                            type: 'scatter',
                             data: {
-                                labels: data.map(d => d.label),
                                 datasets: [{
-                                    label: 'Rata-rata Tryout',
-                                    data: data.map(d => d.score),
+                                    label: 'Rata-rata TryOut',
+                                    data: rankingData.map((d, i) => ({ x: d.score, y: labels.length - 1 - i })),
+                                    showLine: true,
                                     borderColor: 'rgb(99, 102, 241)',
-                                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
                                     borderWidth: 2,
-                                    fill: true,
-                                    tension: 0.3,
+                                    fill: false,
                                     pointBackgroundColor: 'rgb(99, 102, 241)',
+                                    pointBorderColor: 'rgb(99, 102, 241)',
                                     pointRadius: 4,
                                     pointHoverRadius: 6,
                                 }]
@@ -173,37 +188,101 @@
                                 responsive: true,
                                 maintainAspectRatio: false,
                                 plugins: {
-                                    legend: {
-                                        display: false
+                                    legend: { display: false },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(ctx) {
+                                                const idx = labels.length - 1 - ctx.raw.y;
+                                                return (labels[idx] || '') + ': ' + ctx.raw.x;
+                                            }
+                                        }
                                     }
                                 },
                                 scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        max: 100,
-                                        grid: {
-                                            color: 'rgba(0,0,0,0.06)'
-                                        },
-                                        ticks: {
-                                            color: '#6b7280',
-                                            maxTicksLimit: 6
-                                        }
-                                    },
                                     x: {
-                                        grid: {
-                                            display: false
-                                        },
+                                        min: 0,
+                                        max: 100,
+                                        title: { display: true, text: 'Nilai' },
+                                        grid: { color: 'rgba(0,0,0,0.06)' },
+                                        ticks: { color: '#6b7280', maxTicksLimit: 6 }
+                                    },
+                                    y: {
+                                        min: -0.5,
+                                        max: labels.length - 0.5,
+                                        reverse: true,
+                                        grid: { display: false },
                                         ticks: {
+                                            stepSize: 1,
                                             color: '#6b7280',
-                                            maxRotation: 45,
-                                            autoSkip: true,
-                                            maxTicksLimit: 12
+                                            font: { size: 11 },
+                                            callback: (_, i) => labels[labels.length - 1 - i] || ''
                                         }
                                     }
                                 }
                             }
                         });
                     }
+                    @endif
+
+                    @if (!empty($subjectChartData['labels'] ?? []) && !empty($subjectChartData['datasets'] ?? []))
+                    const subjectData = @json($subjectChartData);
+                    const subjectCtx = document.getElementById('subjectChart');
+                    if (subjectCtx && subjectData.labels && subjectData.datasets && subjectData.datasets.length > 0) {
+                        new Chart(subjectCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: subjectData.labels,
+                                datasets: subjectData.datasets.map((ds) => ({
+                                    label: ds.label,
+                                    data: ds.data,
+                                    backgroundColor: ds.backgroundColor,
+                                    borderColor: ds.backgroundColor,
+                                    borderWidth: 1,
+                                    barThickness: 'flex',
+                                    maxBarThickness: 14,
+                                }))
+                            },
+                            options: {
+                                indexAxis: 'y',
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                        labels: {
+                                            usePointStyle: true,
+                                            padding: 16,
+                                            font: { size: 12 }
+                                        }
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: (ctx) => ctx.dataset.label + ': ' + (ctx.raw != null ? ctx.raw.toFixed(1) : '—')
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        beginAtZero: true,
+                                        max: 100,
+                                        title: { display: true, text: 'Nilai' },
+                                        grid: { color: 'rgba(0,0,0,0.06)' },
+                                        ticks: { color: '#6b7280', maxTicksLimit: 6 }
+                                    },
+                                    y: {
+                                        grid: { display: false },
+                                        ticks: {
+                                            color: '#6b7280',
+                                            font: { size: 11 },
+                                            maxRotation: 0,
+                                            autoSkip: false
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    @endif
                 });
             </script>
         @endpush

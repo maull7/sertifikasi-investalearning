@@ -55,6 +55,8 @@
                             <form action="{{ route('mapping-questions.manage', $mappable) }}" method="GET"
                                 class="flex-1 flex flex-col md:flex-row gap-3">
                                 <input type="hidden" name="mapped_page" value="{{ request('mapped_page') }}">
+                                <input type="hidden" name="sort_by" value="{{ $sortBy ?? 'created_at' }}">
+                                <input type="hidden" name="sort_order" value="{{ $sortOrder ?? 'desc' }}">
                                 <div class="w-full md:w-60">
                                     <x-select name="subject_id" label="Filter Mata Pelajaran" inline>
                                         <option value="">Semua Mata Pelajaran</option>
@@ -123,16 +125,74 @@
                                 <thead>
                                     <tr
                                         class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
-                                        <th class="py-3 px-6 w-10">
-                                            {{-- Checkbox all (optional) --}}
+                                        <th class="py-3 px-6 w-10"></th>
+                                        @php
+                                            $sortBy = $sortBy ?? 'created_at';
+                                            $sortOrder = $sortOrder ?? 'desc';
+                                            $sortUrl = fn($col) => route(
+                                                'mapping-questions.manage',
+                                                array_merge(
+                                                    [$mappable],
+                                                    array_filter([
+                                                        'subject_id' => $subjectId ?? null,
+                                                        'mapped_page' => request('mapped_page'),
+                                                        'page' => request('page'),
+                                                        'sort_by' => $col,
+                                                        'sort_order' =>
+                                                            $sortBy === $col && $sortOrder === 'asc' ? 'desc' : 'asc',
+                                                    ]),
+                                                ),
+                                            );
+                                        @endphp
+                                        <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
+                                            <a href="{{ $sortUrl('mapel') }}"
+                                                class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                                                Mapel
+                                                @if ($sortBy === 'mapel')
+                                                    <i
+                                                        class="ti {{ $sortOrder === 'asc' ? 'ti-sort-ascending' : 'ti-sort-descending' }} text-sm"></i>
+                                                @else
+                                                    <i class="ti ti-arrows-sort text-sm opacity-50"></i>
+                                                @endif
+                                            </a>
                                         </th>
                                         <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
-                                            Mapel</th>
+                                            <a href="{{ $sortUrl('soal') }}"
+                                                class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                                                Soal
+                                                @if ($sortBy === 'soal')
+                                                    <i
+                                                        class="ti {{ $sortOrder === 'asc' ? 'ti-sort-ascending' : 'ti-sort-descending' }} text-sm"></i>
+                                                @else
+                                                    <i class="ti ti-arrows-sort text-sm opacity-50"></i>
+                                                @endif
+                                            </a>
+                                        </th>
                                         <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
-                                            Soal</th>
+                                            <a href="{{ $sortUrl('jenis') }}"
+                                                class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                                                Jenis
+                                                @if ($sortBy === 'jenis')
+                                                    <i
+                                                        class="ti {{ $sortOrder === 'asc' ? 'ti-sort-ascending' : 'ti-sort-descending' }} text-sm"></i>
+                                                @else
+                                                    <i class="ti ti-arrows-sort text-sm opacity-50"></i>
+                                                @endif
+                                            </a>
+                                        </th>
                                         <th
                                             class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-center">
-                                            Jawaban</th>
+                                            <a href="{{ $sortUrl('jawaban') }}"
+                                                class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors justify-center w-full">
+                                                Jawaban
+                                                @if ($sortBy === 'jawaban')
+                                                    <i
+                                                        class="ti {{ $sortOrder === 'asc' ? 'ti-sort-ascending' : 'ti-sort-descending' }} text-sm"></i>
+                                                @else
+                                                    <i class="ti ti-arrows-sort text-sm opacity-50"></i>
+                                                @endif
+                                            </a>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-50 dark:divide-gray-800" x-ref="questionTbody">
@@ -143,21 +203,10 @@
                                                     class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                                             </td>
                                             <td class="py-3 px-6 align-top">
-                                                <div class="flex flex-col gap-1">
-                                                    <span
-                                                        class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300">
-                                                        {{ $q->subject->name ?? '-' }}
-                                                    </span>
-                                                    <span
-                                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold 
-                                                    {{ ($q->question_type ?? 'Text') === 'Image'
-                                                        ? 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300'
-                                                        : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300' }}">
-                                                        <i
-                                                            class="ti {{ ($q->question_type ?? 'Text') === 'Image' ? 'ti-photo' : 'ti-text-size' }} mr-1"></i>
-                                                        {{ $q->question_type ?? 'Text' }}
-                                                    </span>
-                                                </div>
+                                                <span
+                                                    class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-300">
+                                                    {{ $q->subject->name ?? '-' }}
+                                                </span>
                                             </td>
                                             <td class="py-3 px-6 align-top">
                                                 <div class="max-w-md space-y-1">
@@ -182,6 +231,12 @@
                                             </td>
                                             <td class="py-3 px-6 text-center align-top">
                                                 <span
+                                                    class="inline-flex items-center justify-center {{ $q->question_type === 'Text' ? 'text-green-700' : 'text-red-700' }} font-bold text-xs">
+                                                    {{ strtoupper($q->question_type) }}
+                                                </span>
+                                            </td>
+                                            <td class="py-3 px-6 text-center align-top">
+                                                <span
                                                     class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 font-bold text-xs">
                                                     {{ strtoupper($q->answer) }}
                                                 </span>
@@ -189,7 +244,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="py-10">
+                                            <td colspan="5" class="py-10">
                                                 <p class="text-center text-sm text-gray-500 dark:text-gray-400">
                                                     Tidak ada soal tersedia / semua sudah ter-mapping ke
                                                     {{ $mappableType === 'exam' ? 'ujian' : 'kuis' }} ini.
