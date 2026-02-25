@@ -90,7 +90,9 @@
 
 <body
     class="h-full bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300 antialiased"
-    x-data @resize.window="if (window.innerWidth < 1280) { $store.sidebar.isExpanded = false; }">
+    x-data
+    x-init="@if(request()->routeIs('monitor-participants.*')) $store.sidebar.isExpanded = false @endif"
+    @resize.window="if (window.innerWidth < 1280) { $store.sidebar.isExpanded = false; }">
 
     <div class="min-h-screen flex">
 

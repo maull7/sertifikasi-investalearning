@@ -15,6 +15,8 @@ class MappingQuestionController extends Controller
     {
         $examId = $request->query('exam_id');
         $subjectId = $request->query('subject_id');
+        $sortBy = $request->query('sort_by', 'created_at');
+        $sortOrder = $request->query('sort_order', 'desc');
 
         $exams = Exam::with('package')
             ->where('type', 'posttest')
@@ -25,10 +27,18 @@ class MappingQuestionController extends Controller
         $mapped = collect();
         $subjects = Subject::orderBy('name')->get();
 
+        $allowedSort = ['mapel', 'soal', 'jawaban', 'jenis', 'created_at'];
+        if (! in_array($sortBy, $allowedSort)) {
+            $sortBy = 'created_at';
+        }
+        if (! in_array($sortOrder, ['asc', 'desc'])) {
+            $sortOrder = 'desc';
+        }
+
         if ($examId) {
             $selectedExam = Exam::findOrFail($examId);
             $query = BankQuestion::with('subject')
-                ->whereNotIn('id', function ($sub) use ($selectedExam) {
+                ->whereNotIn('bank_questions.id', function ($sub) use ($selectedExam) {
                     $sub->select('id_question_bank')
                         ->from('mapping_questions')
                         ->where('id_exam', $selectedExam->id);
@@ -36,7 +46,18 @@ class MappingQuestionController extends Controller
             if ($subjectId) {
                 $query->where('subject_id', $subjectId);
             }
-            $questions = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
+
+            match ($sortBy) {
+                'mapel' => $query->join('subjects', 'bank_questions.subject_id', '=', 'subjects.id')
+                    ->orderBy('subjects.name', $sortOrder)
+                    ->select('bank_questions.*'),
+                'soal' => $query->orderBy('question', $sortOrder),
+                'jawaban' => $query->orderBy('answer', $sortOrder),
+                'jenis' => $query->orderBy('question_type', $sortOrder),
+                default => $query->orderBy('bank_questions.created_at', $sortOrder),
+            };
+
+            $questions = $query->paginate(10)->withQueryString();
             $mapped = $selectedExam->mappingQuestions()
                 ->with('questionBank.subject')
                 ->latest()
@@ -52,17 +73,29 @@ class MappingQuestionController extends Controller
             'examId' => $examId,
             'subjectId' => $subjectId,
             'subjects' => $subjects,
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
         ]);
     }
 
     public function index(Request $request, Exam $exam)
     {
         $subjectId = $request->query('subject_id');
+        $sortBy = $request->query('sort_by', 'created_at');
+        $sortOrder = $request->query('sort_order', 'desc');
 
         $subjets = Subject::orderBy('name')->get();
 
+        $allowedSort = ['mapel', 'soal', 'jawaban', 'jenis', 'created_at'];
+        if (! in_array($sortBy, $allowedSort)) {
+            $sortBy = 'created_at';
+        }
+        if (! in_array($sortOrder, ['asc', 'desc'])) {
+            $sortOrder = 'desc';
+        }
+
         $query = BankQuestion::with('subject')
-            ->whereNotIn('id', function ($sub) use ($exam) {
+            ->whereNotIn('bank_questions.id', function ($sub) use ($exam) {
                 $sub->select('id_question_bank')
                     ->from('mapping_questions')
                     ->where('id_exam', $exam->id);
@@ -71,10 +104,17 @@ class MappingQuestionController extends Controller
             $query->where('subject_id', $subjectId);
         }
 
-        $questions = $query
-            ->orderBy('created_at', 'desc')
-            ->paginate(10)
-            ->withQueryString();
+        match ($sortBy) {
+            'mapel' => $query->join('subjects', 'bank_questions.subject_id', '=', 'subjects.id')
+                ->orderBy('subjects.name', $sortOrder)
+                ->select('bank_questions.*'),
+            'soal' => $query->orderBy('question', $sortOrder),
+            'jawaban' => $query->orderBy('answer', $sortOrder),
+            'jenis' => $query->orderBy('question_type', $sortOrder),
+            default => $query->orderBy('bank_questions.created_at', $sortOrder),
+        };
+
+        $questions = $query->paginate(10)->withQueryString();
 
         $mapped = $exam->mappingQuestions()
             ->with('questionBank.subject')
@@ -89,6 +129,8 @@ class MappingQuestionController extends Controller
             'questions' => $questions,
             'mapped' => $mapped,
             'subjectId' => $subjectId,
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
         ]);
     }
 

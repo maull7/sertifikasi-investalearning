@@ -36,13 +36,12 @@ class ParticipantMonitorController extends Controller
 
         $query = Package::with('masterType')
             ->withCount([
-                'userJoins as participants_count' => fn($q) => $q->where('status', 'approved')
+                'userJoins as participants_count' => fn ($q) => $q->where('status', 'approved'),
             ])
             ->having('participants_count', '>', 0)
             ->when(
                 $search,
-                fn($q, $search) =>
-                $q->where('title', 'like', "%{$search}%")
+                fn ($q, $search) => $q->where('title', 'like', "%{$search}%")
             );
 
         // ⬇ FILTER DULU SEBELUM PAGINATE
@@ -69,7 +68,7 @@ class ParticipantMonitorController extends Controller
             ->where('id_package', $package->id)
             ->where('status', 'approved')
             ->when($search, function ($q, $search) {
-                $q->whereHas('user', fn($u) => $u->where('name', 'like', "%{$search}%")
+                $q->whereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%"));
             })
             ->orderBy('created_at', 'desc')
@@ -109,10 +108,18 @@ class ParticipantMonitorController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        $rankingChartData = $rankedWithPosition->take(15)->map(fn($r) => [
-            'label' => \Illuminate\Support\Str::limit($r['user_join']->user->name ?? '-', 20),
+        $rankingChartData = $rankedWithPosition->map(fn ($r) => [
+            'label' => $r['user_join']->user->name ?? '-',
             'score' => round($r['avg_tryout'] ?? 0, 1),
         ])->values()->all();
+
+        $subjects = $package->mappedSubjects()->with('quizzes')->get();
+        $userIds = $rankedWithPosition->pluck('user_join.user_id')->flatten()->unique()->all();
+        $transQuizzes = TransQuiz::with('quiz')
+            ->where('package_id', $package->id)
+            ->whereIn('user_id', $userIds)
+            ->get();
+        $subjectChartData = $this->buildSubjectChartData($rankedWithPosition, $subjects, $transQuizzes);
 
         $package->load('masterType');
 
@@ -121,6 +128,7 @@ class ParticipantMonitorController extends Controller
             'participants' => $participants,
             'search' => $search,
             'rankingChartData' => $rankingChartData,
+            'subjectChartData' => $subjectChartData,
         ]);
     }
 
@@ -165,8 +173,8 @@ class ParticipantMonitorController extends Controller
         $tryoutQuery = TransQuestion::with('exam')
             ->where('id_user', $user->id)
             ->where('id_package', $package->id)
-            ->when($dateFrom, fn($q) => $q->where('created_at', '>=', $dateFrom))
-            ->when($examType !== '', fn($q) => $q->whereHas('exam', fn($eq) => $eq->where('type', $examType)));
+            ->when($dateFrom, fn ($q) => $q->where('created_at', '>=', $dateFrom))
+            ->when($examType !== '', fn ($q) => $q->whereHas('exam', fn ($eq) => $eq->where('type', $examType)));
         $tryoutHistoryAll = (clone $tryoutQuery)->orderByDesc('created_at')->get();
         $tryoutScores = [];
         foreach ($exams as $exam) {
@@ -178,8 +186,8 @@ class ParticipantMonitorController extends Controller
         $tryoutAverage = count($tryoutScores) > 0 ? array_sum($tryoutScores) / count($tryoutScores) : null;
 
         $tryoutHistory = (clone $tryoutQuery)->orderByDesc('created_at')->paginate(10, ['*'], 'tryout_page')->withQueryString();
-        $tryoutChartData = $tryoutHistoryAll->map(fn($t) => [
-            'label' => ($t->exam?->title ?? 'Tryout') . ' · ' . $t->created_at->format('d/m'),
+        $tryoutChartData = $tryoutHistoryAll->map(fn ($t) => [
+            'label' => ($t->exam?->title ?? 'Tryout').' · '.$t->created_at->format('d/m'),
             'score' => (float) $t->total_score,
             'date' => $t->created_at->format('Y-m-d H:i'),
         ])->values()->all();
@@ -187,11 +195,11 @@ class ParticipantMonitorController extends Controller
         $quizQuery = TransQuiz::with('quiz.subject')
             ->where('user_id', $user->id)
             ->where('package_id', $package->id)
-            ->when($dateFrom, fn($q) => $q->where('created_at', '>=', $dateFrom));
+            ->when($dateFrom, fn ($q) => $q->where('created_at', '>=', $dateFrom));
         $quizHistoryAll = (clone $quizQuery)->orderByDesc('created_at')->get();
         $quizHistory = (clone $quizQuery)->orderByDesc('created_at')->paginate(10, ['*'], 'quiz_page')->withQueryString();
-        $quizBySubject = $quizHistoryAll->groupBy(fn($t) => $t->quiz?->subject?->name ?? 'Lainnya');
-        $quizChartData = $quizBySubject->map(fn($items) => $items->first())->map(fn($t) => [
+        $quizBySubject = $quizHistoryAll->groupBy(fn ($t) => $t->quiz?->subject?->name ?? 'Lainnya');
+        $quizChartData = $quizBySubject->map(fn ($items) => $items->first())->map(fn ($t) => [
             'label' => $t->quiz?->subject?->name ?? 'Kuis',
             'score' => (float) $t->total_score,
         ])->values()->all();
@@ -210,6 +218,40 @@ class ParticipantMonitorController extends Controller
             'quizHistory' => $quizHistory,
             'quizChartData' => $quizChartData,
         ]);
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int, array{user_join: UserJoin, avg_tryout: float|null, rank: int}>  $rankedWithPosition
+     * @param  \Illuminate\Support\Collection<int, \App\Models\Subject>  $subjects
+     * @param  \Illuminate\Support\Collection<int, \App\Models\TransQuiz>  $transQuizzes
+     * @return array{labels: array<int, string>, datasets: array<int, array{label: string, data: array<int, float|null>, backgroundColor: string}>}
+     */
+    private function buildSubjectChartData($rankedWithPosition, $subjects, $transQuizzes): array
+    {
+        $labels = $rankedWithPosition->map(fn ($r) => $r['user_join']->user->name ?? '-')->values()->all();
+        $colors = ['rgb(99, 102, 241)', 'rgb(34, 197, 94)', 'rgb(234, 179, 8)', 'rgb(239, 68, 68)', 'rgb(168, 85, 247)', 'rgb(20, 184, 166)'];
+        $datasets = [];
+        $subjectIndex = 0;
+
+        foreach ($subjects as $subject) {
+            $quizIds = $subject->quizzes->pluck('id')->all();
+            $data = [];
+            foreach ($rankedWithPosition as $r) {
+                $userId = $r['user_join']->user_id;
+                $userQuizzes = $transQuizzes->filter(fn ($t) => (int) $t->user_id === (int) $userId && in_array((int) $t->quiz_id, array_map('intval', $quizIds), true));
+                $avg = $userQuizzes->isEmpty() ? null : round($userQuizzes->avg('total_score'), 1);
+                $data[] = $avg;
+            }
+            $color = $colors[$subjectIndex % count($colors)];
+            $datasets[] = [
+                'label' => $subject->name,
+                'data' => $data,
+                'backgroundColor' => $color,
+            ];
+            $subjectIndex++;
+        }
+
+        return ['labels' => $labels, 'datasets' => $datasets];
     }
 
     private function periodToDate(?string $period): ?Carbon
@@ -268,7 +310,7 @@ class ParticipantMonitorController extends Controller
                 $r['avg_tryout'] !== null ? round($r['avg_tryout'], 2) : '-',
             ];
         })->all();
-        $fileName = 'laporan-monitor-' . str_replace(' ', '-', $package->title) . '-' . now()->format('Y-m-d') . '.xlsx';
+        $fileName = 'laporan-monitor-'.str_replace(' ', '-', $package->title).'-'.now()->format('Y-m-d').'.xlsx';
 
         return Excel::download(new MonitorPackageExport($package->title, $rows), $fileName);
     }
@@ -289,7 +331,7 @@ class ParticipantMonitorController extends Controller
             ->where('id_package', $package->id)
             ->orderByDesc('created_at')
             ->get()
-            ->map(fn($t) => [
+            ->map(fn ($t) => [
                 $t->exam?->title ?? 'Tryout',
                 $t->total_score ?? 0,
                 $t->status ?? '-',
@@ -300,14 +342,14 @@ class ParticipantMonitorController extends Controller
             ->where('package_id', $package->id)
             ->orderByDesc('created_at')
             ->get()
-            ->map(fn($q) => [
+            ->map(fn ($q) => [
                 $q->quiz?->subject?->name ?? '-',
                 $q->quiz?->title ?? 'Kuis',
                 $q->total_score ?? 0,
                 $q->created_at?->format('d/m/Y H:i') ?? '-',
             ])->all();
 
-        $filename = 'laporan-monitor-' . str_replace(' ', '-', $user->name) . '-' . now()->format('Y-m-d') . '.xlsx';
+        $filename = 'laporan-monitor-'.str_replace(' ', '-', $user->name).'-'.now()->format('Y-m-d').'.xlsx';
 
         return Excel::download(
             new MonitorParticipantExport($user->name, $package->title, $tryoutRows, $quizRows),
