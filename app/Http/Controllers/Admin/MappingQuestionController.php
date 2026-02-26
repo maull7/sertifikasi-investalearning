@@ -19,8 +19,8 @@ class MappingQuestionController extends Controller
         $sortOrder = $request->query('sort_order', 'desc');
 
         $exams = Exam::with('package')
-            ->where('type', 'posttest')
-            ->orderBy('created_at', 'desc')->get();
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         $selectedExam = null;
         $questions = collect();
@@ -36,14 +36,20 @@ class MappingQuestionController extends Controller
         }
 
         if ($examId) {
-            $selectedExam = Exam::findOrFail($examId);
+            $selectedExam = Exam::findOrFail($examId)->load('subjects');
+            $examSubjectIds = $selectedExam->subjects->pluck('id')->all();
+
             $query = BankQuestion::with('subject')
                 ->whereNotIn('bank_questions.id', function ($sub) use ($selectedExam) {
                     $sub->select('id_question_bank')
                         ->from('mapping_questions')
                         ->where('id_exam', $selectedExam->id);
                 });
-            if ($subjectId) {
+
+            if (! empty($examSubjectIds)) {
+                $query->whereIn('bank_questions.subject_id', $examSubjectIds);
+            }
+            if ($subjectId && in_array((int) $subjectId, array_map('intval', $examSubjectIds), true)) {
                 $query->where('subject_id', $subjectId);
             }
 
@@ -72,7 +78,7 @@ class MappingQuestionController extends Controller
             'mapped' => $mapped,
             'examId' => $examId,
             'subjectId' => $subjectId,
-            'subjects' => $subjects,
+            'subjects' => $selectedExam ? $selectedExam->subjects : collect(),
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
         ]);
@@ -84,7 +90,8 @@ class MappingQuestionController extends Controller
         $sortBy = $request->query('sort_by', 'created_at');
         $sortOrder = $request->query('sort_order', 'desc');
 
-        $subjets = Subject::orderBy('name')->get();
+        $exam->load('subjects');
+        $examSubjectIds = $exam->subjects->pluck('id')->all();
 
         $allowedSort = ['mapel', 'soal', 'jawaban', 'jenis', 'created_at'];
         if (! in_array($sortBy, $allowedSort)) {
@@ -100,7 +107,11 @@ class MappingQuestionController extends Controller
                     ->from('mapping_questions')
                     ->where('id_exam', $exam->id);
             });
-        if ($subjectId) {
+
+        if (! empty($examSubjectIds)) {
+            $query->whereIn('bank_questions.subject_id', $examSubjectIds);
+        }
+        if ($subjectId && in_array((int) $subjectId, array_map('intval', $examSubjectIds), true)) {
             $query->where('subject_id', $subjectId);
         }
 
@@ -125,7 +136,7 @@ class MappingQuestionController extends Controller
         return view('admin.mapping-question.index', [
             'mappable' => $exam,
             'mappableType' => 'exam',
-            'subjets' => $subjets,
+            'subjets' => $exam->subjects,
             'questions' => $questions,
             'mapped' => $mapped,
             'subjectId' => $subjectId,
@@ -157,12 +168,24 @@ class MappingQuestionController extends Controller
 
     public function random(Request $request, Exam $exam)
     {
-        $validated = $request->validate([
-            'subject_id' => ['nullable', 'exists:subjects,id'],
-            'total' => ['required', 'integer', 'min:1', 'max:1000'],
-        ]);
+        $exam->load('subjects');
+        $examSubjectIds = $exam->subjects->pluck('id')->all();
 
-        $subjectId = $validated['subject_id'] ?? null;
+        if (empty($examSubjectIds)) {
+            return redirect()
+                ->route('mapping-questions.manage', $exam)
+                ->with('error', 'Ujian ini belum memiliki mata pelajaran. Atur jumlah soal per mapel di Edit Ujian terlebih dahulu.');
+        }
+
+        $rules = [
+            'total' => ['required', 'integer', 'min:1', 'max:1000'],
+        ];
+        if (! empty($examSubjectIds)) {
+            $rules['subject_id'] = ['nullable', 'integer', 'in:'.implode(',', $examSubjectIds)];
+        }
+
+        $validated = $request->validate($rules);
+        $subjectId = isset($validated['subject_id']) ? (int) $validated['subject_id'] : null;
         $total = $validated['total'];
 
         $query = BankQuestion::query()
@@ -172,6 +195,9 @@ class MappingQuestionController extends Controller
                     ->where('id_exam', $exam->id);
             });
 
+        if (! empty($examSubjectIds)) {
+            $query->whereIn('subject_id', $examSubjectIds);
+        }
         if ($subjectId) {
             $query->where('subject_id', $subjectId);
         }

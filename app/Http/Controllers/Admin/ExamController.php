@@ -37,10 +37,16 @@ class ExamController extends Controller
     public function store(RequestExam $request)
     {
         $package = Package::findOrFail($request->validated('package_id'));
-        $exam = Exam::create($request->safe()->except('subject_id'));
+        $exam = Exam::create($request->safe()->except(['subject_id', 'subject_questions']));
 
-        $subjectIds = $package->mappedSubjects()->get()->pluck('id');
-        $exam->subjects()->sync($subjectIds);
+        $subjects = $package->mappedSubjects()->get();
+        $subjectQuestions = $request->validated('subject_questions') ?? [];
+        $sync = [];
+        foreach ($subjects as $subject) {
+            $count = (int) ($subjectQuestions[$subject->id] ?? 0);
+            $sync[$subject->id] = ['questions_count' => max(0, $count)];
+        }
+        $exam->subjects()->sync($sync);
 
         return redirect()->route('exams.index')->with('success', 'Ujian berhasil ditambahkan.');
     }
@@ -57,17 +63,32 @@ class ExamController extends Controller
         $data = Exam::with(['package', 'subjects'])->findOrFail($id);
         $packages = Package::all();
 
-        return view('admin.exam.edit', compact('data', 'packages'));
+        $existingSubjectQuestions = old('subject_questions');
+        if ($existingSubjectQuestions === null) {
+            $existingSubjectQuestions = $data->subjects->keyBy('id')->map(
+                fn($s) => (int) ($s->pivot->questions_count ?? 0)
+            )->all();
+        }
+
+        return view('admin.exam.edit', compact('data', 'packages', 'existingSubjectQuestions'));
     }
 
     public function update(RequestExam $request, string $id)
     {
         $exam = Exam::findOrFail($id);
-        $exam->update($request->safe()->except(['subject_id']));
+        $exam->update($request->safe()->except(['subject_id', 'subject_questions']));
 
         if ($request->has('package_id')) {
             $package = Package::findOrFail($request->validated('package_id'));
-            $exam->subjects()->sync($package->mappedSubjects()->get()->pluck('id'));
+            $subjects = $package->mappedSubjects()->get();
+            $subjectQuestions = $request->validated('subject_questions') ?? [];
+            $currentPivot = $exam->subjects()->get()->keyBy('id');
+            $sync = [];
+            foreach ($subjects as $subject) {
+                $count = (int) ($subjectQuestions[$subject->id] ?? $currentPivot->get($subject->id)?->pivot?->questions_count ?? 0);
+                $sync[$subject->id] = ['questions_count' => max(0, $count)];
+            }
+            $exam->subjects()->sync($sync);
         }
 
         return redirect()->route('exams.index')->with('success', 'Ujian berhasil diperbarui.');
@@ -85,7 +106,7 @@ class ExamController extends Controller
     {
         $subjects = $package->mappedSubjects()
             ->get()
-            ->map(fn ($s) => ['id' => $s->id, 'name' => $s->name, 'code' => $s->code])
+            ->map(fn($s) => ['id' => $s->id, 'name' => $s->name, 'code' => $s->code])
             ->values()
             ->all();
 

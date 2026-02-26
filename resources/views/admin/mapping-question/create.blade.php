@@ -66,7 +66,7 @@
                 deleteModalOpen: false,
                 deleteUrl: '',
                 questionTitle: '',
-                autoCount: {{ (int) ($selectedExam->total_questions ?? 10) }},
+                autoCount: {{ (int) ($selectedExam->planned_questions_count ?? 10) }},
                 confirmDelete(url, title) {
                     this.deleteUrl = url;
                     this.questionTitle = title;
@@ -85,6 +85,15 @@
 
                 {{-- Kiri: Pilih Soal --}}
                 <div class="space-y-4">
+                    @if ($subjects->isEmpty())
+                        <div
+                            class="rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10 p-4 text-sm text-amber-800 dark:text-amber-200">
+                            <p class="font-medium">Ujian ini belum memiliki mata pelajaran.</p>
+                            <p class="mt-1">Atur jumlah soal per mapel di <a
+                                    href="{{ route('exams.edit', $selectedExam->id) }}" class="underline font-semibold">Edit
+                                    Ujian</a> terlebih dahulu.</p>
+                        </div>
+                    @endif
                     <x-card :padding="false" title="Pilih Soal dari Bank">
                         <div
                             class="border-b border-gray-100 dark:border-gray-800 px-6 py-4 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
@@ -99,8 +108,8 @@
                                     <input type="hidden" name="sort_by" value="{{ $sortBy ?? 'created_at' }}">
                                     <input type="hidden" name="sort_order" value="{{ $sortOrder ?? 'desc' }}">
                                     <div class="w-full md:w-60">
-                                        <x-select name="subject_id" label="Filter Soal Dengan Mapel" inline>
-                                            <option value="">Semua Mapel</option>
+                                        <x-select name="subject_id" label="Filter Soal Berdasarkan Mapel Ujian" inline>
+                                            <option value="">Semua Mapel Ujian</option>
                                             @foreach ($subjects as $subject)
                                                 <option value="{{ $subject->id }}"
                                                     {{ (int) $subjectId === $subject->id ? 'selected' : '' }}>
@@ -134,8 +143,8 @@
                                             Tambah Acak
                                         </label>
                                         <div class="flex items-center gap-2">
-                                            <input type="number" name="total" min="1" max="1000"
-                                                value="{{ (int) ($selectedExam->total_questions ?? 5) }}"
+                                            <input type="number" name="total" min="1" max="1000" readonly
+                                                value="{{ (int) ($selectedExam->planned_questions_count ?? 5) }}"
                                                 class="w-20 px-2 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                                             <x-button type="submit" variant="secondary" size="sm" class="rounded-lg">
                                                 <i class="ti ti-dice-3 mr-1 text-sm"></i> Acak
@@ -149,7 +158,8 @@
                                         Pilih Otomatis
                                     </label>
                                     <div class="flex items-center gap-2">
-                                        <input type="number" min="1" max="1000" x-model.number="autoCount"
+                                        <input type="number" readonly min="1" max="1000"
+                                            x-model.number="autoCount"
                                             class="w-20 px-2 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                                         <x-button type="button" variant="secondary" size="sm" class="rounded-lg"
                                             @click="autoSelect()">
@@ -171,43 +181,53 @@
                                             @php
                                                 $sortBy = $sortBy ?? 'created_at';
                                                 $sortOrder = $sortOrder ?? 'desc';
-                                                $sortUrl = fn($col) => route('mapping-questions.create', array_filter([
-                                                    'exam_id' => $selectedExam->id ?? null,
-                                                    'subject_id' => $subjectId ?? null,
-                                                    'mapped_page' => request('mapped_page'),
-                                                    'page' => request('page'),
-                                                    'sort_by' => $col,
-                                                    'sort_order' => ($sortBy === $col && $sortOrder === 'asc') ? 'desc' : 'asc',
-                                                ]));
+                                                $sortUrl = fn($col) => route(
+                                                    'mapping-questions.create',
+                                                    array_filter([
+                                                        'exam_id' => $selectedExam->id ?? null,
+                                                        'subject_id' => $subjectId ?? null,
+                                                        'mapped_page' => request('mapped_page'),
+                                                        'page' => request('page'),
+                                                        'sort_by' => $col,
+                                                        'sort_order' =>
+                                                            $sortBy === $col && $sortOrder === 'asc' ? 'desc' : 'asc',
+                                                    ]),
+                                                );
                                             @endphp
-                                            <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
+                                            <th
+                                                class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
                                                 <a href="{{ $sortUrl('mapel') }}"
                                                     class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                                                     Mapel
                                                     @if ($sortBy === 'mapel')
-                                                        <i class="ti {{ $sortOrder === 'asc' ? 'ti-sort-ascending' : 'ti-sort-descending' }} text-sm"></i>
+                                                        <i
+                                                            class="ti {{ $sortOrder === 'asc' ? 'ti-sort-ascending' : 'ti-sort-descending' }} text-sm"></i>
                                                     @else
                                                         <i class="ti ti-arrows-sort text-sm opacity-50"></i>
                                                     @endif
                                                 </a>
                                             </th>
-                                            <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
+                                            <th
+                                                class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
                                                 <a href="{{ $sortUrl('soal') }}"
                                                     class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                                                     Soal
                                                     @if ($sortBy === 'soal')
-                                                        <i class="ti {{ $sortOrder === 'asc' ? 'ti-sort-ascending' : 'ti-sort-descending' }} text-sm"></i>
+                                                        <i
+                                                            class="ti {{ $sortOrder === 'asc' ? 'ti-sort-ascending' : 'ti-sort-descending' }} text-sm"></i>
                                                     @else
                                                         <i class="ti ti-arrows-sort text-sm opacity-50"></i>
                                                     @endif
                                                 </a>
                                             </th>
-                                            <th class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
+                                            <th
+                                                class="py-3 px-6 text-[11px] font-bold uppercase text-gray-400 tracking-wider">
                                                 <a href="{{ $sortUrl('jenis') }}"
                                                     class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                                                     Jenis
                                                     @if ($sortBy === 'jenis')
-                                                        <i class="ti {{ $sortOrder === 'asc' ? 'ti-sort-ascending' : 'ti-sort-descending' }} text-sm"></i>
+                                                        <i
+                                                            class="ti {{ $sortOrder === 'asc' ? 'ti-sort-ascending' : 'ti-sort-descending' }} text-sm"></i>
                                                     @else
                                                         <i class="ti ti-arrows-sort text-sm opacity-50"></i>
                                                     @endif
@@ -219,7 +239,8 @@
                                                     class="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors justify-center w-full">
                                                     Jawaban
                                                     @if ($sortBy === 'jawaban')
-                                                        <i class="ti {{ $sortOrder === 'asc' ? 'ti-sort-ascending' : 'ti-sort-descending' }} text-sm"></i>
+                                                        <i
+                                                            class="ti {{ $sortOrder === 'asc' ? 'ti-sort-ascending' : 'ti-sort-descending' }} text-sm"></i>
                                                     @else
                                                         <i class="ti ti-arrows-sort text-sm opacity-50"></i>
                                                     @endif
@@ -268,7 +289,8 @@
                                                     {{ ($q->question_type ?? 'Text') === 'Image'
                                                         ? 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300'
                                                         : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300' }}">
-                                                        <i class="ti {{ ($q->question_type ?? 'Text') === 'Image' ? 'ti-photo' : 'ti-text-size' }} mr-1"></i>
+                                                        <i
+                                                            class="ti {{ ($q->question_type ?? 'Text') === 'Image' ? 'ti-photo' : 'ti-text-size' }} mr-1"></i>
                                                         {{ $q->question_type ?? 'Text' }}
                                                     </span>
                                                 </td>

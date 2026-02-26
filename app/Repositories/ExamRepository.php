@@ -29,10 +29,6 @@ class ExamRepository implements ExamRepositoryInterface
 
     public function countQuestions(Exam $exam): int
     {
-        if ($this->isPretest($exam)) {
-            return (int) $exam->total_questions;
-        }
-
         return MappingQuestion::where('id_exam', $exam->id)->count();
     }
 
@@ -59,47 +55,14 @@ class ExamRepository implements ExamRepositoryInterface
 
     public function getOrCreateExamAttempt(User $user, Package $package, Exam $exam): ExamAttempt
     {
-        $attempt = ExamAttempt::firstOrCreate(
+        return ExamAttempt::firstOrCreate(
             [
                 'user_id' => $user->id,
                 'package_id' => $package->id,
                 'exam_id' => $exam->id,
             ],
             ['started_at' => now()]
-        );
-
-        if ($this->isPretest($exam)) {
-            $ids = $attempt->question_ids ?? [];
-
-            if (empty($ids)) {
-                $exam->loadMissing('subjects');
-                $subjectIds = $exam->subjects->pluck('id');
-                if ($subjectIds->isEmpty()) {
-                    $subjectIds = $package->getSubjectsForPackage()->pluck('id');
-                }
-
-                $limit = (int) max(1, $exam->total_questions);
-
-                $query = BankQuestion::query();
-
-                if ($subjectIds->count() === 1) {
-                    $query->where('subject_id', $subjectIds->first());
-                } else {
-                    $query->whereIn('subject_id', $subjectIds);
-                }
-
-                $ids = $query
-                    ->inRandomOrder()
-                    ->limit($limit)
-                    ->pluck('id')
-                    ->values()
-                    ->all();
-
-                $attempt->update(['question_ids' => $ids]);
-            }
-        }
-
-        return $attempt->fresh();
+        )->fresh();
     }
 
     public function getExamAttempt(User $user, Package $package, Exam $exam): ?ExamAttempt

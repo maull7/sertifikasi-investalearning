@@ -51,7 +51,7 @@
                     <thead>
                         <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
                             <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Paket</th>
-                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Mata
+                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Total Mata
                                 Pelajaran</th>
                             <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Judul</th>
                             <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Durasi</th>
@@ -74,7 +74,8 @@
                                 <td class="py-4 px-8">
                                     <span
                                         class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
-                                        {{ $value->subjects->isNotEmpty() ? $value->subjects->pluck('name')->join(', ') : '-' }}
+
+                                        {{ $value->subjects->count() > 0 ? $value->subjects->count() . ' Mata Pelajaran' : '-' }}
                                     </span>
                                 </td>
                                 <td class="py-4 px-8">
@@ -103,10 +104,9 @@
                                     </span>
                                 </td>
                                 <td class="py-4 px-8 text-center">
-                                    @php($total = $value->total_questions ?? $value->mappingQuestions()->count())
                                     <span
                                         class="inline-flex items-center justify-center px-3 py-1 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-xs font-semibold">
-                                        {{ $total }} Soal
+                                        {{ $value->planned_questions_count }} Soal
                                     </span>
                                 </td>
                                 <td class="py-4 px-8">
@@ -131,7 +131,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="py-24">
+                                <td colspan="7" class="py-24">
                                     <div
                                         class="flex flex-col items-center justify-center text-center max-w-[280px] mx-auto">
                                         <div class="space-y-1">
