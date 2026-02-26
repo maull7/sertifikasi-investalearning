@@ -8,7 +8,6 @@ use App\Models\TransQuestion;
 use App\Models\User;
 use App\Repositories\Contracts\ExamRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class ExamService
@@ -19,7 +18,7 @@ class ExamService
 
     public function ensureUserCanAccessExam(User $user, Package $package, Exam $exam): void
     {
-        if (!$this->examRepository->userJoinedPackage($user, $package)) {
+        if (! $this->examRepository->userJoinedPackage($user, $package)) {
             abort(403, 'Anda belum bergabung dengan package ini.');
         }
 
@@ -34,24 +33,13 @@ class ExamService
     }
 
     /**
-     * Pretest: soal random dari mapel paket (attempt.question_ids).
-     * Posttest: soal dari mapping_questions.
+     * Pretest & Posttest: soal dari mapping_questions (admin memilih soal).
      */
     public function getQuestionPage(User $user, Package $package, Exam $exam, int $page, int $perPage = 1): LengthAwarePaginator
     {
         $this->ensureUserCanAccessExam($user, $package, $exam);
 
-        if ($this->isPretest($exam)) {
-            $attempt = $this->examRepository->getOrCreateExamAttempt($user, $package, $exam);
-            return $this->examRepository->getQuestionsPageForExamAttempt($attempt, $page, $perPage);
-        }
-
         return $this->examRepository->getQuestionsPage($exam, $page, $perPage);
-    }
-
-    private function isPretest(Exam $exam): bool
-    {
-        return strtolower((string) ($exam->type ?? '')) === 'pretest';
     }
 
     /**
@@ -98,17 +86,7 @@ class ExamService
     {
         $this->ensureUserCanAccessExam($user, $package, $exam);
 
-        $isPretest = $this->isPretest($exam);
-
-        if ($isPretest) {
-            $attempt = $this->examRepository->getExamAttempt($user, $package, $exam);
-            if (! $attempt) {
-                abort(404, 'Sesi ujian tidak ditemukan. Silakan mulai ujian dari halaman package.');
-            }
-            $questionsCollection = $this->examRepository->getQuestionsForExamAttempt($attempt);
-        } else {
-            $questionsCollection = $this->examRepository->getAllMappingsWithQuestions($exam);
-        }
+        $questionsCollection = $this->examRepository->getAllMappingsWithQuestions($exam);
 
         $totalQuestions = $questionsCollection->count();
         $correctAnswers = 0;
@@ -133,7 +111,7 @@ class ExamService
                     $userAnswer = strtoupper(trim($userAnswer));
                 }
 
-                $question = $isPretest ? $item->questionBank : $item->questionBank;
+                $question = $item->questionBank;
                 if (! $question) {
                     continue;
                 }

@@ -7,7 +7,7 @@
         deleteModalOpen: false,
         deleteUrl: '',
         questionTitle: '',
-        autoCount: {{ (int) ($mappable->total_questions ?? 10) }},
+        autoCount: {{ (int) ($mappable->planned_questions_count ?? 10) }},
         confirmDelete(url, title) {
             this.deleteUrl = url;
             this.questionTitle = title;
@@ -58,7 +58,7 @@
                                 <input type="hidden" name="sort_by" value="{{ $sortBy ?? 'created_at' }}">
                                 <input type="hidden" name="sort_order" value="{{ $sortOrder ?? 'desc' }}">
                                 <div class="w-full md:w-60">
-                                    <x-select name="subject_id" label="Filter Mata Pelajaran" inline>
+                                    <x-select name="subject_id" label="Filter Berdasarkan Mapel Ujian" inline>
                                         <option value="">Semua Mata Pelajaran</option>
                                         @foreach ($subjets as $subject)
                                             <option value="{{ $subject->id }}"
@@ -92,8 +92,8 @@
                                         Tambah Acak
                                     </label>
                                     <div class="flex items-center gap-2">
-                                        <input type="number" name="total" min="1" max="1000"
-                                            value="{{ (int) ($mappable->total_questions ?? 5) }}"
+                                        <input type="number" readonly name="total" min="1" max="1000"
+                                            value="{{ (int) ($mappable->planned_questions_count ?? 0) }}"
                                             class="w-20 px-2 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                                         <x-button type="submit" variant="secondary" size="sm" class="rounded-lg">
                                             <i class="ti ti-dice-3 mr-1 text-sm"></i> Acak
@@ -107,7 +107,7 @@
                                     Pilih Otomatis
                                 </label>
                                 <div class="flex items-center gap-2">
-                                    <input type="number" min="1" max="1000" x-model.number="autoCount"
+                                    <input type="number" readonly min="1" max="1000" x-model.number="autoCount"
                                         class="w-20 px-2 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                                     <x-button type="button" variant="secondary" size="sm" class="rounded-lg"
                                         @click="autoSelect()">

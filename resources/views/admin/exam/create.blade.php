@@ -52,6 +52,7 @@
                             subjects: [],
                             loading: false,
                             baseUrl: '{{ route('exams.subjects-by-package', ['package' => 0]) }}',
+                            existingCounts: @json([]),
                             loadSubjects() {
                                 const id = this.packageId || (this.$refs.packageSelect && this.$refs.packageSelect.value);
                                 if (!id) { this.subjects = []; return; }
@@ -59,7 +60,12 @@
                                 const url = this.baseUrl.replace(/\/0$/, '/' + id);
                                 fetch(url, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
                                     .then(r => r.json())
-                                    .then(d => { this.subjects = d.subjects || []; })
+                                    .then(d => {
+                                        this.subjects = (d.subjects || []).map(s => ({
+                                            ...s,
+                                            questions_count: this.existingCounts[s.id] ?? 0
+                                        }));
+                                    })
                                     .catch(() => { this.subjects = []; })
                                     .finally(() => { this.loading = false; });
                             }
@@ -83,21 +89,28 @@
                             @endforeach
                         </x-select>
                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400" x-show="loading" x-cloak>Memuat mata pelajaran...</p>
-                        {{-- Tampilan mata pelajaran terpilih --}}
+                        {{-- Daftar mapel + jumlah soal per mapel --}}
                         <div class="mt-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 overflow-hidden" x-show="!loading && subjects.length > 0" x-cloak x-transition>
                             <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50">
-                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Mata pelajaran yang terpilih</span>
-                                <span class="ml-2 text-xs text-gray-500 dark:text-gray-400" x-text="'( ' + subjects.length + ' mapel dari mapping paket )'"></span>
+                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Jumlah soal per mata pelajaran</span>
+                                <span class="ml-2 text-xs text-gray-500 dark:text-gray-400" x-text="'( ' + subjects.length + ' mapel )'"></span>
                             </div>
-                            <ul class="p-3 flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                            <div class="p-4 space-y-3 max-h-60 overflow-y-auto">
                                 <template x-for="(s, i) in subjects" :key="s.id">
-                                    <li class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20">
-                                        <span class="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold" x-text="i + 1"></span>
-                                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200" x-text="s.name"></span>
-                                        <span class="text-xs text-gray-500 dark:text-gray-400" x-show="s.code" x-text="s.code ? '(' + s.code + ')' : ''"></span>
-                                    </li>
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                                        <div class="flex items-center gap-2 flex-1 min-w-0">
+                                            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold shrink-0" x-text="i + 1"></span>
+                                            <span class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate" x-text="s.name"></span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400 shrink-0" x-show="s.code" x-text="s.code ? '(' + s.code + ')' : ''"></span>
+                                        </div>
+                                        <div class="flex items-center gap-2 sm:w-40">
+                                            <label class="text-xs font-medium text-gray-500 dark:text-gray-400 shrink-0">Jumlah soal:</label>
+                                            <input type="number" min="0" :name="'subject_questions[' + s.id + ']'" x-model.number="s.questions_count"
+                                                class="w-20 px-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                        </div>
+                                    </div>
                                 </template>
-                            </ul>
+                            </div>
                         </div>
                         <div class="mt-4 rounded-xl border border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-800/20 p-4 text-center" x-show="packageId && !loading && subjects.length === 0" x-cloak>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Paket ini belum memiliki mapping mata pelajaran. Atur mapel di <a href="{{ route('mapping-package.index') }}" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Mapping Paket</a>.</p>
@@ -136,14 +149,6 @@
                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Nilai minimum untuk lulus (0-100)</p>
                     </div>
 
-                    {{-- Total Questions --}}
-                    <div>
-                        <x-input label="Jumlah Soal Ujian (Opsional)" name="total_questions" type="number" min="1"
-                            placeholder="Contoh: 50" value="{{ old('total_questions') }}" />
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            Isi jumlah soal yang direncanakan untuk ujian ini (boleh dikosongkan).
-                        </p>
-                    </div>
                     {{-- Show result after --}}
                     <div class="md:col-span-2">
                         <label class="flex items-center gap-3 cursor-pointer">

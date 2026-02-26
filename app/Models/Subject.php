@@ -50,4 +50,9 @@ class Subject extends Model
         return $this->belongsToMany(Exam::class, 'exam_subject', 'subject_id', 'exam_id')
             ->withTimestamps();
     }
+
+    public function questions()
+    {
+        return $this->hasMany(BankQuestion::class, 'subject_id');
+    }
 }

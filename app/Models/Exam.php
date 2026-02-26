@@ -16,10 +16,15 @@ class Exam extends Model
         'description',
         'duration',
         'passing_grade',
-        'total_questions',
         'type',
         'show_result_after',
     ];
+
+    /** Jumlah soal rencana dari exam_subject (questions_count per mapel). */
+    public function getPlannedQuestionsCountAttribute(): int
+    {
+        return (int) $this->subjects->sum(fn($s) => (int) ($s->pivot->questions_count ?? 0));
+    }
 
     protected function casts(): array
     {
@@ -42,6 +47,7 @@ class Exam extends Model
     public function subjects(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Subject::class, 'exam_subject', 'exam_id', 'subject_id')
+            ->withPivot('questions_count')
             ->withTimestamps();
     }
 }

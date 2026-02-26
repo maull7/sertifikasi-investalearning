@@ -109,7 +109,7 @@
                                 <i class="ti ti-list-numbers text-2xl text-sky-500"></i>
                             </div>
                             <div>
-                                @php($total = $data->total_questions ?? $data->mappingQuestions()->count())
+                                @php($total = $data->mappingQuestions()->count())
                                 <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $total }}</p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">Soal</p>
                             </div>

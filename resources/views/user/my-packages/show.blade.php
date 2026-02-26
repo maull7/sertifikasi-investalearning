@@ -345,9 +345,7 @@
                 <div class="space-y-4">
                     @foreach ($exams as $examItem)
                         @php
-                            $totalQuestions = $examItem->type === 'pretest'
-                                ? (int) $examItem->total_questions
-                                : ($posttestQuestionCounts->get($examItem->id) ?? 0);
+                            $totalQuestions = $posttestQuestionCounts->get($examItem->id) ?? 0;
                             $attempts = $examAttemptsByExam->get($examItem->id, collect());
                         @endphp
                         <div
