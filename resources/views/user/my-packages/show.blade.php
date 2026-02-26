@@ -69,6 +69,88 @@
             </div>
         </x-card>
 
+        {{-- Pretest (ujian tipe pretest tampil di atas materi) --}}
+        @php
+            $exams = \App\Models\Exam::with('subjects')->where('package_id', $package->id)->get();
+            $pretestExams = $exams->filter(fn($e) => $e->type === 'pretest');
+            $questionCountsByExam = \App\Models\MappingQuestion::whereIn('id_exam', $exams->pluck('id'))->selectRaw('id_exam, count(*) as cnt')->groupBy('id_exam')->pluck('cnt', 'id_exam');
+        @endphp
+
+        @if ($pretestExams->count() > 0)
+            <x-card title="Pretest">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Kerjakan pretest untuk mengukur kemampuan awal sebelum mempelajari materi.</p>
+                <div class="space-y-4">
+                    @foreach ($pretestExams as $examItem)
+                        @php
+                            $totalQuestions = $questionCountsByExam->get($examItem->id) ?? $examItem->planned_questions_count ?? 0;
+                            $attempts = $examAttemptsByExam->get($examItem->id, collect());
+                        @endphp
+                        <div
+                            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-500/10 dark:to-indigo-500/10 rounded-xl border border-blue-100 dark:border-blue-800">
+                            <div class="flex items-center gap-4 flex-1 min-w-0">
+                                <div
+                                    class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0">
+                                    <i class="ti ti-clipboard-check text-xl"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="flex flex-wrap gap-2 items-center mb-2">
+                                        <h4 class="font-bold text-gray-900 dark:text-white">{{ $examItem->title }}</h4>
+                                        <span
+                                            class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-xs font-semibold rounded-full">
+                                            <i class="ti ti-copyleft"></i> Pretest
+                                        </span>
+                                        @if ($examItem->subjects->isNotEmpty())
+                                            <span
+                                                class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-xs font-semibold rounded-full">
+                                                <i class="ti ti-school"></i> {{ $examItem->subjects->pluck('name')->join(', ') }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="flex flex-wrap items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+                                        <span class="inline-flex items-center gap-1">
+                                            <i class="ti ti-help-circle"></i>
+                                            {{ $totalQuestions }} Soal
+                                        </span>
+                                        @if ($examItem->duration)
+                                            <span class="inline-flex items-center gap-1">
+                                                <i class="ti ti-clock"></i>
+                                                {{ $examItem->duration }} Menit
+                                            </span>
+                                        @endif
+                                        @if ($examItem->passing_grade)
+                                            <span class="inline-flex items-center gap-1">
+                                                <i class="ti ti-target"></i>
+                                                Passing Grade: {{ $examItem->passing_grade }}%
+                                            </span>
+                                        @endif
+                                    </div>
+                                    @if ($examItem->description)
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            {{ Str::limit(strip_tags($examItem->description), 80) }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                @if ($attempts->isNotEmpty())
+                                    <x-button variant="secondary"
+                                        href="{{ route('user.exams.attempts', ['package' => $package->id, 'exam' => $examItem->id]) }}"
+                                        class="rounded-xl">
+                                        <i class="ti ti-chart-bar mr-2"></i> Lihat Hasil ({{ $attempts->count() }})
+                                    </x-button>
+                                @endif
+                                <x-button variant="primary"
+                                    href="{{ route('user.exams.show', ['package' => $package->id, 'exam' => $examItem->id]) }}"
+                                    class="rounded-xl shadow-lg shadow-indigo-500/20">
+                                    <i class="ti ti-arrow-right mr-2"></i> {{ $attempts->isNotEmpty() ? 'Kerjakan Lagi' : 'Mulai Pretest' }}
+                                </x-button>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </x-card>
+        @endif
+
         {{-- Materials List (dikelompokkan per Mata Pelajaran) --}}
         <x-card title="Materi Pembelajaran">
             @if ($subjects->sum(fn($s) => $s->materials->count()) > 0)
@@ -336,16 +418,15 @@
         @endif
 
         @php
-            $exams = \App\Models\Exam::with('subjects')->where('package_id', $package->id)->get();
-            $posttestQuestionCounts = \App\Models\MappingQuestion::whereIn('id_exam', $exams->pluck('id'))->selectRaw('id_exam, count(*) as cnt')->groupBy('id_exam')->pluck('cnt', 'id_exam');
+            $posttestExams = $exams->filter(fn($e) => $e->type !== 'pretest');
         @endphp
 
-        @if ($exams->count() > 0)
+        @if ($posttestExams->count() > 0)
             <x-card title="Try Out / Ujian">
                 <div class="space-y-4">
-                    @foreach ($exams as $examItem)
+                    @foreach ($posttestExams as $examItem)
                         @php
-                            $totalQuestions = $posttestQuestionCounts->get($examItem->id) ?? 0;
+                            $totalQuestions = $questionCountsByExam->get($examItem->id) ?? $examItem->planned_questions_count ?? 0;
                             $attempts = $examAttemptsByExam->get($examItem->id, collect());
                         @endphp
                         <div
