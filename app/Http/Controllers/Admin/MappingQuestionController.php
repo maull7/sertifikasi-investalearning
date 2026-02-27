@@ -25,6 +25,8 @@ class MappingQuestionController extends Controller
         $selectedExam = null;
         $questions = collect();
         $mapped = collect();
+        $toAddPerSubject = [];
+        $subjectStatus = [];
         $subjects = Subject::orderBy('name')->get();
 
         $allowedSort = ['mapel', 'soal', 'jawaban', 'jenis', 'created_at'];
@@ -69,6 +71,40 @@ class MappingQuestionController extends Controller
                 ->latest()
                 ->paginate(10, ['*'], 'mapped_page')
                 ->withQueryString();
+
+            $toAddPerSubject = $selectedExam->subjects->keyBy('id')->map(function ($s) use ($selectedExam) {
+                $needed = (int) ($s->pivot->questions_count ?? 0);
+                $already = $selectedExam->mappingQuestions()
+                    ->whereHas('questionBank', fn ($q) => $q->where('subject_id', $s->id))
+                    ->count();
+
+                return max(0, $needed - $already);
+            })->filter(fn ($n) => $n > 0)->all();
+        }
+
+        $subjectNeeds = $selectedExam
+            ? $selectedExam->subjects->map(fn ($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+                'needed' => (int) ($s->pivot->questions_count ?? 0),
+            ])->filter(fn ($s) => $s['needed'] > 0)->values()->all()
+            : [];
+
+        if ($selectedExam) {
+            $subjectStatus = $selectedExam->subjects->map(function ($s) use ($selectedExam) {
+                $needed = (int) ($s->pivot->questions_count ?? 0);
+                $mapped = $selectedExam->mappingQuestions()
+                    ->whereHas('questionBank', fn ($q) => $q->where('subject_id', $s->id))
+                    ->count();
+
+                return [
+                    'id' => $s->id,
+                    'name' => $s->name,
+                    'needed' => $needed,
+                    'mapped' => $mapped,
+                    'is_full' => $needed > 0 && $mapped >= $needed,
+                ];
+            })->filter(fn ($s) => $s['needed'] > 0)->values()->all();
         }
 
         return view('admin.mapping-question.create', [
@@ -79,6 +115,9 @@ class MappingQuestionController extends Controller
             'examId' => $examId,
             'subjectId' => $subjectId,
             'subjects' => $selectedExam ? $selectedExam->subjects : collect(),
+            'subjectNeeds' => $subjectNeeds,
+            'subjectStatus' => $subjectStatus ?? [],
+            'toAddPerSubject' => $toAddPerSubject ?? [],
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
         ]);
@@ -133,12 +172,45 @@ class MappingQuestionController extends Controller
             ->paginate(10, ['*'], 'mapped_page')
             ->withQueryString();
 
+        $subjectNeeds = $exam->subjects->map(fn ($s) => [
+            'id' => $s->id,
+            'name' => $s->name,
+            'needed' => (int) ($s->pivot->questions_count ?? 0),
+        ])->filter(fn ($s) => $s['needed'] > 0)->values()->all();
+
+        $subjectStatus = $exam->subjects->map(function ($s) use ($exam) {
+            $needed = (int) ($s->pivot->questions_count ?? 0);
+            $mappedCount = $exam->mappingQuestions()
+                ->whereHas('questionBank', fn ($q) => $q->where('subject_id', $s->id))
+                ->count();
+
+            return [
+                'id' => $s->id,
+                'name' => $s->name,
+                'needed' => $needed,
+                'mapped' => $mappedCount,
+                'is_full' => $needed > 0 && $mappedCount >= $needed,
+            ];
+        })->filter(fn ($s) => $s['needed'] > 0)->values()->all();
+
+        $toAddPerSubject = $exam->subjects->keyBy('id')->map(function ($s) use ($exam) {
+            $needed = (int) ($s->pivot->questions_count ?? 0);
+            $already = $exam->mappingQuestions()
+                ->whereHas('questionBank', fn ($q) => $q->where('subject_id', $s->id))
+                ->count();
+
+            return max(0, $needed - $already);
+        })->filter(fn ($n) => $n > 0)->all();
+
         return view('admin.mapping-question.index', [
             'mappable' => $exam,
             'mappableType' => 'exam',
             'subjets' => $exam->subjects,
             'questions' => $questions,
             'mapped' => $mapped,
+            'subjectNeeds' => $subjectNeeds,
+            'subjectStatus' => $subjectStatus,
+            'toAddPerSubject' => $toAddPerSubject,
             'subjectId' => $subjectId,
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
@@ -169,51 +241,75 @@ class MappingQuestionController extends Controller
     public function random(Request $request, Exam $exam)
     {
         $exam->load('subjects');
-        $examSubjectIds = $exam->subjects->pluck('id')->all();
+        $subjectsWithCount = $exam->subjects->filter(fn ($s) => ((int) ($s->pivot->questions_count ?? 0)) > 0);
 
-        if (empty($examSubjectIds)) {
+        if ($subjectsWithCount->isEmpty()) {
             return redirect()
-                ->route('mapping-questions.manage', $exam)
-                ->with('error', 'Ujian ini belum memiliki mata pelajaran. Atur jumlah soal per mapel di Edit Ujian terlebih dahulu.');
+                ->back()
+                ->with('error', 'Ujian ini belum memiliki mata pelajaran dengan jumlah soal. Atur jumlah soal per mapel di Edit Ujian terlebih dahulu.');
         }
 
-        $rules = [
-            'total' => ['required', 'integer', 'min:1', 'max:1000'],
-        ];
-        if (! empty($examSubjectIds)) {
-            $rules['subject_id'] = ['nullable', 'integer', 'in:'.implode(',', $examSubjectIds)];
+        $mappedBySubject = $exam->mappingQuestions()
+            ->with('questionBank:id,subject_id')
+            ->get()
+            ->pluck('questionBank')
+            ->filter()
+            ->groupBy('subject_id')
+            ->map(fn ($q) => $q->count());
+
+        $added = 0;
+        $subjectsWithoutQuestions = [];
+        foreach ($subjectsWithCount as $subject) {
+            $needed = (int) ($subject->pivot->questions_count ?? 0);
+            if ($needed <= 0) {
+                continue;
+            }
+
+            $alreadyMapped = (int) ($mappedBySubject->get($subject->id) ?? $mappedBySubject->get((string) $subject->id) ?? 0);
+            $shortfall = max(0, $needed - $alreadyMapped);
+            if ($shortfall === 0) {
+                continue;
+            }
+
+            $ids = BankQuestion::query()
+                ->where('subject_id', $subject->id)
+                ->whereNotIn('id', function ($sub) use ($exam) {
+                    $sub->select('id_question_bank')
+                        ->from('mapping_questions')
+                        ->where('id_exam', $exam->id);
+                })
+                ->inRandomOrder()
+                ->limit($shortfall)
+                ->pluck('id');
+
+            if ($ids->isEmpty()) {
+                $subjectsWithoutQuestions[] = $subject->name;
+            }
+
+            foreach ($ids as $id) {
+                MappingQuestion::firstOrCreate([
+                    'id_exam' => $exam->id,
+                    'id_question_bank' => $id,
+                ]);
+                $added++;
+            }
         }
 
-        $validated = $request->validate($rules);
-        $subjectId = isset($validated['subject_id']) ? (int) $validated['subject_id'] : null;
-        $total = $validated['total'];
+        $referer = $request->headers->get('referer', '');
+        $fromCreate = str_contains($referer, route('mapping-questions.create'));
+        $redirect = redirect()
+            ->to($fromCreate ? route('mapping-questions.create', ['exam_id' => $exam->id]) : route('mapping-questions.manage', $exam));
 
-        $query = BankQuestion::query()
-            ->whereNotIn('id', function ($sub) use ($exam) {
-                $sub->select('id_question_bank')
-                    ->from('mapping_questions')
-                    ->where('id_exam', $exam->id);
-            });
-
-        if (! empty($examSubjectIds)) {
-            $query->whereIn('subject_id', $examSubjectIds);
+        if ($added > 0) {
+            $redirect->with('success', "Soal acak berhasil ditambahkan ({$added} soal).");
+        } else {
+            $redirect->with('success', 'Semua mapel sudah memenuhi jumlah soal yang diperlukan.');
         }
-        if ($subjectId) {
-            $query->where('subject_id', $subjectId);
+        if (! empty($subjectsWithoutQuestions)) {
+            $redirect->with('warning', 'Mapel berikut tidak memiliki soal tersedia di bank: '.implode(', ', $subjectsWithoutQuestions).'. Silakan tambah soal ke bank untuk mapel tersebut terlebih dahulu.');
         }
 
-        $ids = $query->inRandomOrder()->limit($total)->pluck('id');
-
-        foreach ($ids as $id) {
-            MappingQuestion::firstOrCreate([
-                'id_exam' => $exam->id,
-                'id_question_bank' => $id,
-            ]);
-        }
-
-        return redirect()
-            ->route('mapping-questions.manage', $exam)
-            ->with('success', 'Soal acak berhasil ditambahkan.');
+        return $redirect;
     }
 
     public function show(Exam $exam, MappingQuestion $mapping)

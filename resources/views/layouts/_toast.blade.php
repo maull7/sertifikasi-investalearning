@@ -10,6 +10,9 @@
         @if(session('error'))
             this.add({ detail: { type: 'error', message: '{{ session('error') }}' } });
         @endif
+        @if(session('warning'))
+            this.add({ detail: { type: 'warning', message: {!! \Illuminate\Support\Js::from(session('warning')) !!} } });
+        @endif
     },
 
     add(e) {

@@ -7,19 +7,27 @@
         deleteModalOpen: false,
         deleteUrl: '',
         questionTitle: '',
-        autoCount: {{ (int) ($mappable->planned_questions_count ?? 10) }},
+        toAddPerSubject: {{ \Illuminate\Support\Js::from($toAddPerSubject ?? []) }},
         confirmDelete(url, title) {
             this.deleteUrl = url;
             this.questionTitle = title;
             this.deleteModalOpen = true;
         },
         autoSelect() {
-            const n = parseInt(this.autoCount) || 0;
             const tbody = this.$refs.questionTbody;
             if (!tbody) return;
-            const boxes = tbody.querySelectorAll('input[type=checkbox]');
-            boxes.forEach((box, idx) => {
-                box.checked = idx < n;
+            const limits = { ...this.toAddPerSubject };
+            tbody.querySelectorAll('tr').forEach((row) => {
+                const box = row.querySelector('input[type=checkbox]');
+                if (!box) return;
+                const sid = parseInt(row.dataset.subjectId, 10);
+                const left = limits[sid] ?? 0;
+                if (left > 0) {
+                    box.checked = true;
+                    limits[sid] = left - 1;
+                } else {
+                    box.checked = false;
+                }
             });
         }
     }">
@@ -45,6 +53,48 @@
         </div>
 
         <div class="space-y-8">
+            {{-- Keterangan Jumlah Soal per Mapel --}}
+            @if (!empty($subjectStatus))
+                @php $allFull = collect($subjectStatus)->every(fn ($s) => $s['is_full']); @endphp
+                @if ($allFull)
+                    <div class="rounded-xl border border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-500/10 px-4 py-4 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center shrink-0">
+                            <i class="ti ti-circle-check text-2xl text-emerald-600 dark:text-emerald-400"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-emerald-800 dark:text-emerald-200">Soal Sudah Penuh</p>
+                            <p class="text-sm text-emerald-600 dark:text-emerald-400">Semua mapel telah memenuhi jumlah soal sesuai konfigurasi ujian.</p>
+                        </div>
+                    </div>
+                @endif
+                <div class="rounded-xl border border-indigo-200 bg-indigo-50/50 dark:border-indigo-800 dark:bg-indigo-500/10 px-4 py-3 text-sm">
+                    <p class="font-semibold text-indigo-800 dark:text-indigo-200 mb-2">
+                        <i class="ti ti-info-circle mr-1"></i> Status soal per mata pelajaran:
+                    </p>
+                    <ul class="flex flex-wrap gap-2">
+                        @foreach ($subjectStatus as $ss)
+                            <li class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 border {{ $ss['is_full'] ? 'border-emerald-200 dark:border-emerald-800' : 'border-indigo-100 dark:border-indigo-800' }}">
+                                <span class="font-medium text-gray-900 dark:text-white">{{ $ss['name'] }}</span>
+                                <span class="text-indigo-600 dark:text-indigo-400 font-bold">{{ $ss['mapped'] }}/{{ $ss['needed'] }}</span>
+                                <span class="text-gray-500 dark:text-gray-400">soal</span>
+                                @if ($ss['is_full'])
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
+                                        <i class="ti ti-check"></i> Penuh
+                                    </span>
+                                @else
+                                    <span class="text-amber-600 dark:text-amber-400 text-xs">perlu {{ $ss['needed'] - $ss['mapped'] }} lagi</span>
+                                @endif
+                            </li>
+                        @endforeach
+                    </ul>
+                    @if (!$allFull)
+                        <p class="text-xs text-indigo-600 dark:text-indigo-400 mt-2">
+                            Tombol Acak dan Pilih Otomatis akan mengambil/memilih soal sesuai sisa kebutuhan per mapel.
+                        </p>
+                    @endif
+                </div>
+            @endif
+
             {{-- Kiri: Pilih Soal --}}
             <div class="space-y-4">
                 <x-card :padding="false" title="Pilih Soal dari Bank">
@@ -80,25 +130,28 @@
                                 </div>
                             </form>
                         </div>
-                        {{-- Random --}}
+                        {{-- Acak & Pilih Otomatis --}}
+                        @php $hasToAdd = !empty($toAddPerSubject); @endphp
                         <div class="flex flex-col gap-3">
                             <form action="{{ route('mapping-questions.random', $mappable) }}" method="POST"
                                 class="flex items-end gap-2">
                                 @csrf
-                                <input type="hidden" name="subject_id" value="{{ $subjectId }}">
                                 <div>
                                     <label
                                         class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">
                                         Tambah Acak
                                     </label>
-                                    <div class="flex items-center gap-2">
-                                        <input type="number" readonly name="total" min="1" max="1000"
-                                            value="{{ (int) ($mappable->planned_questions_count ?? 0) }}"
-                                            class="w-20 px-2 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+                                    @if ($hasToAdd)
                                         <x-button type="submit" variant="secondary" size="sm" class="rounded-lg">
                                             <i class="ti ti-dice-3 mr-1 text-sm"></i> Acak
                                         </x-button>
-                                    </div>
+                                    @else
+                                        <x-button type="submit" variant="secondary" size="sm" class="rounded-lg" disabled>
+                                            <i class="ti ti-dice-3 mr-1 text-sm"></i> Acak
+                                        </x-button>
+                                    @endif
+                                    <p class="text-[10px] text-gray-400 mt-1">Ambil soal random per mapel sesuai kebutuhan
+                                    </p>
                                 </div>
                             </form>
                             <div>
@@ -106,14 +159,18 @@
                                     class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">
                                     Pilih Otomatis
                                 </label>
-                                <div class="flex items-center gap-2">
-                                    <input type="number" readonly min="1" max="1000" x-model.number="autoCount"
-                                        class="w-20 px-2 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+                                @if ($hasToAdd)
                                     <x-button type="button" variant="secondary" size="sm" class="rounded-lg"
                                         @click="autoSelect()">
                                         <i class="ti ti-checklist mr-1 text-sm"></i> Pilih
                                     </x-button>
-                                </div>
+                                @else
+                                    <x-button type="button" variant="secondary" size="sm" class="rounded-lg" disabled>
+                                        <i class="ti ti-checklist mr-1 text-sm"></i> Pilih
+                                    </x-button>
+                                @endif
+                                <p class="text-[10px] text-gray-400 mt-1">Centang soal per mapel sesuai kebutuhan (dari
+                                    halaman ini)</p>
                             </div>
                         </div>
                     </div>
@@ -197,7 +254,8 @@
                                 </thead>
                                 <tbody class="divide-y divide-gray-50 dark:divide-gray-800" x-ref="questionTbody">
                                     @forelse ($questions as $q)
-                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group">
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors group"
+                                            data-subject-id="{{ $q->subject_id ?? '' }}">
                                             <td class="py-3 px-6 align-top">
                                                 <input type="checkbox" name="question_ids[]" value="{{ $q->id }}"
                                                     class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
