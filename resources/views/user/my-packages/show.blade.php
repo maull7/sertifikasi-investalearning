@@ -73,16 +73,21 @@
         @php
             $exams = \App\Models\Exam::with('subjects')->where('package_id', $package->id)->get();
             $pretestExams = $exams->filter(fn($e) => $e->type === 'pretest');
-            $questionCountsByExam = \App\Models\MappingQuestion::whereIn('id_exam', $exams->pluck('id'))->selectRaw('id_exam, count(*) as cnt')->groupBy('id_exam')->pluck('cnt', 'id_exam');
+            $questionCountsByExam = \App\Models\MappingQuestion::whereIn('id_exam', $exams->pluck('id'))
+                ->selectRaw('id_exam, count(*) as cnt')
+                ->groupBy('id_exam')
+                ->pluck('cnt', 'id_exam');
         @endphp
 
         @if ($pretestExams->count() > 0)
             <x-card title="Pretest">
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Kerjakan pretest untuk mengukur kemampuan awal sebelum mempelajari materi.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Kerjakan pretest untuk mengukur kemampuan awal
+                    sebelum mempelajari materi.</p>
                 <div class="space-y-4">
                     @foreach ($pretestExams as $examItem)
                         @php
-                            $totalQuestions = $questionCountsByExam->get($examItem->id) ?? $examItem->planned_questions_count ?? 0;
+                            $totalQuestions =
+                                $questionCountsByExam->get($examItem->id) ?? ($examItem->planned_questions_count ?? 0);
                             $attempts = $examAttemptsByExam->get($examItem->id, collect());
                         @endphp
                         <div
@@ -93,17 +98,22 @@
                                     <i class="ti ti-clipboard-check text-xl"></i>
                                 </div>
                                 <div class="min-w-0">
-                                    <div class="flex flex-wrap gap-2 items-center mb-2">
-                                        <h4 class="font-bold text-gray-900 dark:text-white">{{ $examItem->title }}</h4>
-                                        <span
-                                            class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-xs font-semibold rounded-full">
-                                            <i class="ti ti-copyleft"></i> Pretest
-                                        </span>
-                                        @if ($examItem->subjects->isNotEmpty())
+                                    <div class="mb-2">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h4 class="font-bold text-gray-900 dark:text-white">{{ $examItem->title }}</h4>
                                             <span
-                                                class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-xs font-semibold rounded-full">
-                                                <i class="ti ti-school"></i> {{ $examItem->subjects->pluck('name')->join(', ') }}
+                                                class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-xs font-semibold rounded-full shrink-0">
+                                                <i class="ti ti-copyleft"></i> Pretest
                                             </span>
+                                        </div>
+                                        @if ($examItem->subjects->isNotEmpty())
+                                            <div class="flex flex-wrap gap-1.5 mt-2">
+                                                @foreach ($examItem->subjects as $s)
+                                                    <span class="inline-flex items-center px-2 py-0.5 bg-blue-100/80 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-[11px] font-medium rounded-md truncate max-w-[200px]" title="{{ $s->name }}">
+                                                        {{ Str::limit($s->name, 35) }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
                                         @endif
                                     </div>
                                     <div class="flex flex-wrap items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
@@ -142,7 +152,8 @@
                                 <x-button variant="primary"
                                     href="{{ route('user.exams.show', ['package' => $package->id, 'exam' => $examItem->id]) }}"
                                     class="rounded-xl shadow-lg shadow-indigo-500/20">
-                                    <i class="ti ti-arrow-right mr-2"></i> {{ $attempts->isNotEmpty() ? 'Kerjakan Lagi' : 'Mulai Pretest' }}
+                                    <i class="ti ti-arrow-right mr-2"></i>
+                                    {{ $attempts->isNotEmpty() ? 'Kerjakan Lagi' : 'Mulai Pretest' }}
                                 </x-button>
                             </div>
                         </div>
@@ -165,51 +176,60 @@
                             $pct = $progress['total'] > 0 ? round(($progress['read'] / $progress['total']) * 100) : 0;
                         @endphp
                         {{-- Header Mata Pelajaran + Progress --}}
-                        <div class="border-b border-gray-200 dark:border-gray-700 pb-3">
-                            <div class="flex flex-wrap items-center justify-between gap-2">
-                                <h3 class="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <span
-                                        class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
-                                        <i class="ti ti-book text-sm"></i>
-                                    </span>
-                                    {{ $subject->name }}
-                                    @if ($subject->code)
-                                        <span
-                                            class="text-xs font-medium text-gray-500 dark:text-gray-400">({{ $subject->code }})</span>
-                                    @endif
-                                </h3>
+                        <div class="rounded-xl bg-gradient-to-r from-indigo-50/80 to-violet-50/50 dark:from-indigo-500/10 dark:to-violet-500/5 border border-indigo-100/80 dark:border-indigo-900/50 p-4 mb-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div class="flex items-center gap-3">
-                                    <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
-                                        {{ $progress['read'] }}/{{ $progress['total'] }} materi dibaca
+                                    <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 shrink-0">
+                                        <i class="ti ti-book text-lg"></i>
                                     </span>
-                                    <div class="w-24 h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"
-                                        title="{{ $pct }}%">
-                                        <div class="h-full rounded-full bg-indigo-600 transition-all duration-300"
-                                            style="width: {{ $pct }}%"></div>
+                                    <div>
+                                        <h3 class="text-base font-bold text-gray-900 dark:text-white">
+                                            {{ $subject->name }}
+                                        </h3>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            @if ($subject->code)
+                                                <span class="text-[11px] font-medium px-1.5 py-0.5 rounded bg-indigo-100/80 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300">{{ $subject->code }}</span>
+                                            @endif
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ $subject->materials->count() }} materi</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4 sm:ml-auto">
+                                    <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+                                        {{ $progress['read'] }}/{{ $progress['total'] }} dibaca
+                                    </span>
+                                    <div class="flex items-center gap-2 min-w-[100px]">
+                                        <div class="flex-1 h-2 rounded-full bg-indigo-100 dark:bg-indigo-900/50 overflow-hidden" title="{{ $pct }}%">
+                                            <div class="h-full rounded-full bg-indigo-500 dark:bg-indigo-400 transition-all duration-500" style="width: {{ $pct }}%"></div>
+                                        </div>
+                                        <span class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 w-8">{{ $pct }}%</span>
                                     </div>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-10">
-                                {{ $subject->materials->count() }} materi</p>
                         </div>
                         {{-- Daftar Materi di bawah mata pelajaran --}}
-                        <div
-                            class="space-y-3 ml-0 md:ml-4 pl-0 md:pl-4 border-l-0 md:border-l-2 border-indigo-100 dark:border-indigo-900/50">
+                        <div class="space-y-3">
                             @forelse ($subject->materials as $material)
                                 @php
                                     $statusMateri = \App\Models\StatusMateri::where('id_user', Auth::id())
                                         ->where('id_material', $material->id)
                                         ->first();
+                                    $isCompleted = $statusMateri && $statusMateri->status == 'completed';
                                 @endphp
                                 <div
-                                    class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors {{ $statusMateri && $statusMateri->status == 'completed' ? 'opacity-80' : '' }}">
-                                    <div
-                                        class="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg flex items-center justify-center shrink-0">
-                                        @if ($material->materi_type == 'File')
-                                            <i
-                                                class="{{ $material->file_icon }} text-xl {{ $material->file_type === 'pdf' ? 'text-rose-600' : 'text-blue-600' }}"></i>
-                                        @else
-                                            <i class="ti ti-video text-xl text-indigo-600"></i>
+                                    class="flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 {{ $isCompleted ? 'bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-200/60 dark:border-emerald-800/40' : 'bg-white dark:bg-gray-800/30 border-gray-100 dark:border-gray-700/50 hover:border-indigo-200 dark:hover:border-indigo-800/50 hover:shadow-sm' }}">
+                                    <div class="relative shrink-0">
+                                        <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 {{ $material->materi_type == 'File' ? 'bg-rose-50 dark:bg-rose-500/10' : 'bg-indigo-50 dark:bg-indigo-500/10' }}">
+                                            @if ($material->materi_type == 'File')
+                                                <i class="{{ $material->file_icon }} text-xl {{ $material->file_type === 'pdf' ? 'text-rose-600 dark:text-rose-400' : 'text-blue-600 dark:text-blue-400' }}"></i>
+                                            @else
+                                                <i class="ti ti-video text-xl text-indigo-600 dark:text-indigo-400"></i>
+                                            @endif
+                                        </div>
+                                        @if ($isCompleted)
+                                            <span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white">
+                                                <i class="ti ti-check text-xs"></i>
+                                            </span>
                                         @endif
                                     </div>
                                     <div class="flex-1 min-w-0">
@@ -369,7 +389,8 @@
                                         <span><i class="ti ti-help-circle mr-0.5"></i> {{ $quizItem->total_questions }}
                                             Soal</span>
                                         @if ($quizItem->duration)
-                                            <span><i class="ti ti-clock mr-0.5"></i> {{ $quizItem->duration }} Menit</span>
+                                            <span><i class="ti ti-clock mr-0.5"></i> {{ $quizItem->duration }}
+                                                Menit</span>
                                         @endif
                                         @if ($quizItem->passing_grade)
                                             <span><i class="ti ti-target mr-0.5"></i> KKM
@@ -426,7 +447,8 @@
                 <div class="space-y-4">
                     @foreach ($posttestExams as $examItem)
                         @php
-                            $totalQuestions = $questionCountsByExam->get($examItem->id) ?? $examItem->planned_questions_count ?? 0;
+                            $totalQuestions =
+                                $questionCountsByExam->get($examItem->id) ?? ($examItem->planned_questions_count ?? 0);
                             $attempts = $examAttemptsByExam->get($examItem->id, collect());
                         @endphp
                         <div
@@ -447,7 +469,8 @@
                                             @if ($examItem->subjects->isNotEmpty())
                                                 <span
                                                     class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 text-xs font-semibold rounded-full">
-                                                    <i class="ti ti-school"></i> {{ $examItem->subjects->pluck('name')->join(', ') }}
+                                                    <i class="ti ti-school"></i>
+                                                    {{ $examItem->subjects->pluck('name')->join(', ') }}
                                                 </span>
                                             @endif
                                         @else
@@ -457,7 +480,8 @@
                                             </span>
                                         @endif
                                     </div>
-                                    <div class="flex flex-wrap items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+                                    <div
+                                        class="flex flex-wrap items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
                                         <span class="inline-flex items-center gap-1">
                                             <i class="ti ti-help-circle"></i>
                                             {{ $totalQuestions }} Soal
@@ -493,7 +517,8 @@
                                 <x-button variant="primary"
                                     href="{{ route('user.exams.show', ['package' => $package->id, 'exam' => $examItem->id]) }}"
                                     class="rounded-xl shadow-lg shadow-indigo-500/20">
-                                    <i class="ti ti-arrow-right mr-2"></i> {{ $attempts->isNotEmpty() ? 'Kerjakan Lagi' : 'Mulai Ujian' }}
+                                    <i class="ti ti-arrow-right mr-2"></i>
+                                    {{ $attempts->isNotEmpty() ? 'Kerjakan Lagi' : 'Mulai Ujian' }}
                                 </x-button>
                             </div>
                         </div>

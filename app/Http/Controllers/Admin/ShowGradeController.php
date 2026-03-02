@@ -32,8 +32,13 @@ class ShowGradeController extends Controller
             $q->whereIn('id', $packageIds);
         })
             ->get();
-
-        $exams = Exam::orderBy('title')->get();
+        if ($user->role === 'Petugas') {
+            $exams = Exam::whereHas('package', function ($q) use ($packageIds) {
+                $q->whereIn('package_id', $packageIds);
+            })->orderBy('title')->get();
+        } else {
+            $exams = Exam::orderBy('title')->get();
+        }
 
         $packageId = $request->get('package_id');
         $examId = $request->get('exam_id');
@@ -47,17 +52,15 @@ class ShowGradeController extends Controller
                 $q->whereIn('id_package', $packageIds);
             })
 
-            ->when($packageId, fn($q) => $q->where('id_package', $packageId))
-            ->when($examId, fn($q) => $q->where('id_exam', $examId))
+            ->when($packageId, fn ($q) => $q->where('id_package', $packageId))
+            ->when($examId, fn ($q) => $q->where('id_exam', $examId))
             ->when(
                 $examType,
-                fn($q) =>
-                $q->whereHas('exam', fn($e) => $e->where('type', $examType))
+                fn ($q) => $q->whereHas('exam', fn ($e) => $e->where('type', $examType))
             )
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
-
 
         $chartData = collect();
 
@@ -70,12 +73,11 @@ class ShowGradeController extends Controller
                     $q->whereIn('id_package', $packageIds);
                 })
 
-                ->when($packageId, fn($q) => $q->where('id_package', $packageId))
-                ->when($examId, fn($q) => $q->where('id_exam', $examId))
+                ->when($packageId, fn ($q) => $q->where('id_package', $packageId))
+                ->when($examId, fn ($q) => $q->where('id_exam', $examId))
                 ->when(
                     $examType,
-                    fn($q) =>
-                    $q->whereHas('exam', fn($e) => $e->where('type', $examType))
+                    fn ($q) => $q->whereHas('exam', fn ($e) => $e->where('type', $examType))
                 )
                 ->orderByDesc('total_score')
                 ->limit(10)
