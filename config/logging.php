@@ -21,6 +21,11 @@ return [
     'default' => env('LOG_CHANNEL', 'stack'),
 
     /*
+    | Production (Hostinger VPS): LOG_CHANNEL=daily, LOG_LEVEL=error, LOG_DAILY_DAYS=30
+    | Development: LOG_CHANNEL=daily, LOG_LEVEL=debug
+    */
+
+    /*
     |--------------------------------------------------------------------------
     | Deprecations Log Channel
     |--------------------------------------------------------------------------
@@ -54,7 +59,7 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            'channels' => explode(',', (string) env('LOG_STACK', 'daily,error_daily')),
             'ignore_exceptions' => false,
         ],
 
@@ -69,7 +74,15 @@ return [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
-            'days' => env('LOG_DAILY_DAYS', 14),
+            'days' => env('LOG_DAILY_DAYS', 30),
+            'replace_placeholders' => true,
+        ],
+
+        'error_daily' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/error.log'),
+            'level' => 'error',
+            'days' => env('LOG_DAILY_DAYS', 30),
             'replace_placeholders' => true,
         ],
 

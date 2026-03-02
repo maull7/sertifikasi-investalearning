@@ -25,5 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->context(fn () => [
+            'url' => request()?->fullUrl(),
+            'method' => request()?->method(),
+            'user_id' => auth()->id(),
+        ]);
     })->create();
