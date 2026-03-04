@@ -42,10 +42,14 @@
             display: flex;
             flex-direction: column;
         }
+        .header-brand {
+            text-align: center;
+        }
+
         .header-left,
         .header-center,
         .header-right {
-            display: table-cell;
+            display: inline-block;
             vertical-align: middle;
             padding: 0 8px;
         }
@@ -56,7 +60,7 @@
         }
 
         .header-center {
-            width: 64%;
+            width: 60%;
             text-align: center;
         }
 
@@ -382,33 +386,18 @@
 
                 <div class="participant-line"></div>
 
-<<<<<<< HEAD
                 <div class="participant-desc">
                     As Participant In Examination Prepation Training of<br>
                     <strong>"{{ $certificate->type?->name_type ?? '-' }}"</strong><br>
-                    @if($certificate->training_date_start && $certificate->training_date_end)
-                        Jakarta, {{ \Carbon\Carbon::parse($certificate->training_date_start)->format('d F') }} - {{ \Carbon\Carbon::parse($certificate->training_date_end)->format('d F Y') }}
-                    @elseif($certificate->training_date_start)
+                    @if ($certificate->training_date_start && $certificate->training_date_end)
+                        Jakarta, {{ \Carbon\Carbon::parse($certificate->training_date_start)->format('d F') }}
+                        -
+                        {{ \Carbon\Carbon::parse($certificate->training_date_end)->format('d F Y') }}
+                    @elseif ($certificate->training_date_start)
                         Jakarta, {{ \Carbon\Carbon::parse($certificate->training_date_start)->format('d F Y') }}
                     @else
                         Jakarta, 12 - 14 Month Years
                     @endif
-=======
-            <div class="mt-large">
-                <div class="qr-box">
-                    @php
-                        $verifyUrl = route('certificates.verify', $certificate);
-                    @endphp
-                    <div>Scan untuk verifikasi sertifikat:</div>
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ urlencode($verifyUrl) }}" alt="QR Verifikasi">
-                </div>
-            </div>
-
-            <div class="sign-row">
-                <div class="sign-col">
-                    <div class="sign-line"></div>
-                    <div class="sign-label">Tanda Tangan</div>
->>>>>>> 273ffd0f80f68914a7a41fa0a1280da68866bd31
                 </div>
 
                 <div class="signatures">
@@ -427,87 +416,6 @@
         </div>
     </div>
 
-    {{-- PAGE 2 --}}
-    <div class="page">
-        <div class="frame">
-            <div class="header-brand">
-                <div class="header-left">
-                    @if($logoData)
-                        <img src="data:image/png;base64,{{ $logoData }}" alt="Logo" class="brand-logo">
-                    @endif
-                </div>
-                <div class="header-center">
-                    <div class="brand-title">INVESTALEARNING</div>
-                    <div class="brand-subtitle">Be Champion With Us</div>
-                </div>
-                <div class="header-right">
-                    @if($logoData)
-                        <img src="data:image/png;base64,{{ $logoData }}" alt="Logo" class="brand-logo">
-                    @endif
-                </div>
-            </div>
-
-            <div class="page2-title-block">
-                <h2>
-                    JENJANG KUALIFIKASI 4 BIDANG PASAR MODAL<br>
-                    SUBBIDANG PERANTARA PEDAGANG EFEK PEMASARAN
-                </h2>
-            </div>
-
-            <div class="page2-paragraphs">
-                <p>
-                    Sesuai keputusan Menteri ketenagakerjaan Republik Indonesia Nomor 20 Tahun 2024 Tentang Penetapan
-                    Standar Kompetensi Kerja Nasional Indonesia Kategori Aktivitas Keuangan Dan Asuransi Golongan Pokok
-                    Aktivitas Penunjang Jasa Keuangan, Bukan Asuransi Dan Dana Pensiun Bidang Pasar Modal.
-                </p>
-                <p>
-                    Dan Keputusan Anggota Dewan Komisioner Otoritas Jasa Keuangan Nomor Kep-11/D.02/2024 Tentang
-                    Kerangka Kualitas Nasional Indonesia Bidang Pasar Modal.
-                </p>
-            </div>
-
-            <div class="table-wrapper">
-                <table class="cert-table">
-                    <thead>
-                        <tr>
-                            <th class="td-no">NO</th>
-                            <th class="td-code">KODE</th>
-                            <th class="td-desc">DESKRIPSI</th>
-                            <th class="td-topic">TOPIK</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php $i = 1; @endphp
-                        @forelse($certificate->package?->materials ?? [] as $material)
-                            <tr>
-                                <td class="td-no">{{ $i }}</td>
-                                <td class="td-code">{{ $material->subject->code ?? '-' }}</td>
-                                <td class="td-desc">{{ $material->description ?? '-' }}</td>
-                                <td class="td-topic">{{ $material->topic ?? '-' }}</td>
-                            </tr>
-                            @php $i++; @endphp
-                        @empty
-                            <tr>
-                                <td colspan="4" style="text-align: center; padding: 15px; font-size: 10px; color: #6b7280; font-style: italic;">
-                                    Belum ada materi pada paket ini.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="footer-facilitator">
-                <span>
-                    <strong>NAMA FASILITATOR:</strong>
-                    @forelse ($certificate->teachers ?? [] as $teacher)
-                        {{ $teacher->name }}@if(!$loop->last), @endif
-                    @empty
-                        Nama Fasilitator belum tersedia.
-                    @endforelse
-                </span>
-            </div>
-        </div>
-    </div>
+    {{-- Hanya 1 halaman untuk versi PDF (lebih sederhana & stabil) --}}
 </body>
 </html>

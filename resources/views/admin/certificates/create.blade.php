@@ -8,7 +8,8 @@
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Buat Sertifikat</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1">
-                    Pilih jenis & paket, lalu pilih peserta yang akan dibuatkan sertifikat
+                    Membuat data sertifikat untuk para peserta berdasarkan <span class="font-semibold text-gray-700 dark:text-gray-200">jenis paket</span>.
+                    Di setiap sertifikat akan tercetak nama paket pelatihan, nama peserta, serta nama pengajar/PIC InvestaLearning dalam satu grup.
                 </p>
             </div>
 
@@ -18,30 +19,25 @@
         </div>
 
         <x-card title="Filter">
-            <form method="GET" action="{{ route('certificates.create') }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="text-xs font-semibold text-gray-500 dark:text-gray-400">Jenis</label>
-                    <select name="id_master_type"
-                        id="type"
-                        class="mt-2 w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="">Pilih Jenis</option>
-                        @foreach($types as $type)
-                            <option value="{{ $type->id }}" @selected((int) $typeId === $type->id)>{{ $type->name_type }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
+            <form method="GET" action="{{ route('certificates.create') }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-1">
                     <label class="text-xs font-semibold text-gray-500 dark:text-gray-400">Paket</label>
                     <select name="id_package"
                         id="package"
                         class="mt-2 w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
                         <option value="">Pilih Paket</option>
-                      
+                        @foreach($packages as $package)
+                            <option value="{{ $package->id }}" @selected((int) $packageId === $package->id)>
+                                {{ $package->title }}
+                                @if($package->masterType)
+                                    ({{ $package->masterType->name_type }})
+                                @endif
+                            </option>
+                        @endforeach
                     </select>
                 </div>
 
-                <div class="flex items-end">
+                <div class="flex items-end md:justify-end">
                     <x-button type="submit" variant="primary" class="rounded-xl w-full">
                         Tampilkan Peserta
                     </x-button>
@@ -59,11 +55,10 @@
             @endif
         </x-card>
 
-        @if($typeId && $packageId)
+        @if($packageId)
             <x-card :padding="false" title="Pilih Peserta">
                 <form method="POST" action="{{ route('certificates.store') }}">
                     @csrf
-                    <input type="hidden" name="id_master_type" value="{{ $typeId }}">
                     <input type="hidden" name="id_package" value="{{ $packageId }}">
 
                     <div class="w-full overflow-x-auto">
@@ -129,8 +124,7 @@
                                                 <input type="text" 
                                                     name="certificate_numbers[{{ $user->id }}]" 
                                                     placeholder="Nomor Sertifikat"
-                                                    class="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
-                                                    required>
+                                                    class="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
                                             </div>
                                             <span x-show="!selected" class="text-xs text-gray-400">-</span>
                                         </td>
@@ -140,15 +134,13 @@
                                                     <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Tanggal Mulai</label>
                                                     <input type="date" 
                                                         name="training_date_starts[{{ $user->id }}]" 
-                                                        class="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
-                                                        required>
+                                                        class="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
                                                 </div>
                                                 <div>
                                                     <label class="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Tanggal Selesai</label>
                                                     <input type="date" 
                                                         name="training_date_ends[{{ $user->id }}]" 
-                                                        class="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
-                                                        required>
+                                                        class="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
                                                 </div>
                                             </div>
                                             <span x-show="!selected" class="text-xs text-gray-400">-</span>
@@ -289,7 +281,7 @@
         @else
             <x-card>
                 <div class="text-sm text-gray-500 dark:text-gray-400">
-                    Pilih <span class="font-semibold">Jenis</span> dan <span class="font-semibold">Paket</span>, lalu klik
+                    Pilih <span class="font-semibold">Paket</span> terlebih dahulu, lalu klik
                     <span class="font-semibold">Tampilkan Peserta</span>.
                 </div>
             </x-card>
@@ -298,31 +290,5 @@
 @endsection
 
 @push('scripts')
-<script>
-document.getElementById('type').addEventListener('change', function () {
-    let typeId = this.value;
-    let packageSelect = document.getElementById('package');
-
-    packageSelect.innerHTML = '<option value="">Loading...</option>';
-
-    if (!typeId) {
-        packageSelect.innerHTML = '<option value="">Pilih Paket</option>';
-        return;
-    }
-
-    fetch(`/get-package/${typeId}`)
-        .then(res => res.json())
-        .then(data => {
-            packageSelect.innerHTML = '<option value="">Pilih Paket</option>';
-
-            data.forEach(pkg => {
-                packageSelect.innerHTML += `
-                    <option value="${pkg.id}">${pkg.title}</option>
-                `;
-            });
-        });
-});
-</script>
-
 @endpush
 

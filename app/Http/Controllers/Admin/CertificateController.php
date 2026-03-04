@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\User;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreCertificateRequest;
+use App\Models\Certificate;
+use App\Models\DetailCertificate;
+use App\Models\MasterType;
 use App\Models\Package;
 use App\Models\Teacher;
-use Illuminate\View\View;
-use App\Models\MasterType;
-use App\Models\Certificate;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\DetailCertificate;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\Admin\StoreCertificateRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class CertificateController extends Controller
 {
@@ -30,27 +30,25 @@ class CertificateController extends Controller
 
     public function create(Request $request): View
     {
-        $types = MasterType::query()->orderBy('name_type')->get();
-
-        $typeId = $request->integer('id_master_type') ?: null;
         $packageId = $request->integer('id_package') ?: null;
 
         $packages = Package::query()
-            ->when($typeId, function ($query) use ($typeId) {
-                $query->where('id_master_types', $typeId);
-            })
+            ->with('masterType')
             ->orderBy('title')
             ->get();
 
         $users = collect();
         $teachers = Teacher::query()->orderBy('name')->get();
 
-        if ($typeId || $packageId) {
+        $typeId = null;
+        if ($packageId) {
+            $selectedPackage = Package::with('masterType')->findOrFail($packageId);
+            $typeId = $selectedPackage->id_master_types;
+
             $users = User::where('role', 'User')
 
                 ->whereHas('joinedPackages.package', function ($q) use ($packageId, $typeId) {
 
-                    // 🔹 filter paket (kalau dipilih)
                     if ($packageId) {
                         $q->where('packages.id', $packageId);
                     }
@@ -85,13 +83,15 @@ class CertificateController extends Controller
                 ->get();
         }
 
-        return view('admin.certificates.create', compact('types', 'packages', 'typeId', 'packageId', 'users', 'teachers'));
+        return view('admin.certificates.create', compact('packages', 'typeId', 'packageId', 'users', 'teachers'));
     }
 
     public function store(StoreCertificateRequest $request): RedirectResponse
     {
-        $typeId = (int) $request->validated('id_master_type');
         $packageId = (int) $request->validated('id_package');
+        // Tidak menggunakan withTrashed karena Package tidak memakai SoftDeletes
+        $package = Package::findOrFail($packageId);
+        $typeId = (int) $package->id_master_types;
         /** @var array<int, int> $userIds */
         $userIds = $request->validated('user_ids');
         /** @var array<string|null> $certificateNumbers */
@@ -130,7 +130,7 @@ class CertificateController extends Controller
     {
         $certificate->load([
             'user',
-            'package.materials',
+            'package.masterType',
             'type',
             'teachers',
         ]);
@@ -147,13 +147,13 @@ class CertificateController extends Controller
 
         $certificate->load([
             'user',
-            'package.materials',
+            'package.masterType',
             'type',
             'teachers',
         ]);
 
-        $baseName = 'sertifikat-' . Str::slug($certificate->user?->name ?? 'peserta') . '-' . $certificate->id;
-        $pngFileName = $baseName . '.png';
+        $baseName = 'sertifikat-'.Str::slug($certificate->user?->name ?? 'peserta').'-'.$certificate->id;
+        $pngFileName = $baseName.'.png';
 
         $pdf = Pdf::loadView('admin.certificates.pdf', compact('certificate'))
             ->setPaper('a4', 'landscape')
@@ -181,43 +181,43 @@ class CertificateController extends Controller
 
         // Jika ekstensi Imagick tidak tersedia, fallback ke PDF
         if (! class_exists(\Imagick::class)) {
-            return $pdf->download($baseName . '.pdf');
+            return $pdf->download($baseName.'.pdf');
         }
 
         // Konversi PDF menjadi gambar PNG
         $pdfContent = $pdf->output();
-        $tmpPath = storage_path('app/certificate-temp-' . $certificate->id . '-' . uniqid('', true) . '.pdf');
+        $tmpPath = storage_path('app/certificate-temp-'.$certificate->id.'-'.uniqid('', true).'.pdf');
         file_put_contents($tmpPath, $pdfContent);
 
-        $imagick = new \Imagick();
+        $imagick = new \Imagick;
         $imagick->setResolution(300, 300);
-        
+
         // Baca semua halaman PDF
         $imagick->readImage($tmpPath);
-        
+
         // Jika ada lebih dari 1 halaman, gabungkan menjadi satu gambar vertikal
         if ($imagick->getNumberImages() > 1) {
             // Set format PNG untuk semua halaman
             $imagick->setImageFormat('png');
-            
+
             // Gabungkan semua halaman menjadi satu gambar vertikal
-            $combined = new \Imagick();
+            $combined = new \Imagick;
             $combined->setResolution(300, 300);
-            
+
             foreach ($imagick as $page) {
                 $page->setImageFormat('png');
                 $page->setImageCompressionQuality(100);
                 $combined->addImage($page);
             }
-            
+
             // Gabungkan semua halaman secara vertikal
             $combined->resetIterator();
             $finalImage = $combined->appendImages(true);
             $finalImage->setImageFormat('png');
             $finalImage->setImageCompressionQuality(100);
-            
+
             $imageData = $finalImage->getImageBlob();
-            
+
             $finalImage->clear();
             $finalImage->destroy();
             $combined->clear();
@@ -235,7 +235,7 @@ class CertificateController extends Controller
 
         return response($imageData, 200, [
             'Content-Type' => 'image/png',
-            'Content-Disposition' => 'attachment; filename="' . $pngFileName . '"',
+            'Content-Disposition' => 'attachment; filename="'.$pngFileName.'"',
         ]);
     }
 
