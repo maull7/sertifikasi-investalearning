@@ -28,6 +28,11 @@ class DashboardController extends Controller
             ->with('package')
             ->get();
 
+        $joinedPackages = UserJoin::where('user_id', $user->id)
+            ->with(['package.mappedSubjects.materials', 'package.masterType'])
+            ->whereHas('package', fn($q) => $q->where('status', 'active'))
+            ->paginate(12);
+
         $types = MasterType::query()->orderBy('name_type')->get();
 
         // daftar paket untuk filter chart (hanya paket yang diikuti user)
@@ -95,7 +100,8 @@ class DashboardController extends Controller
             'packageActive',
             'types',
             'packagesForFilter',
-            'examsForFilter'
+            'examsForFilter',
+            'joinedPackages'
         ));
     }
 
@@ -117,8 +123,8 @@ class DashboardController extends Controller
         $query = TransQuestion::query()
             ->where('id_user', $user->id)
             ->whereIn('id_package', $joinedPackageIds)
-            ->when($packageId, fn ($q) => $q->where('id_package', $packageId))
-            ->when($examId, fn ($q) => $q->where('id_exam', $examId))
+            ->when($packageId, fn($q) => $q->where('id_package', $packageId))
+            ->when($examId, fn($q) => $q->where('id_exam', $examId))
             ->when($periodDays, function ($q) use ($periodDays) {
                 $q->where('created_at', '>=', Carbon::now()->subDays($periodDays));
             })
@@ -142,4 +148,3 @@ class DashboardController extends Controller
         return response()->json($chartData);
     }
 }
-
