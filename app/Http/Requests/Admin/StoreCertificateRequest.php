@@ -14,9 +14,8 @@ class StoreCertificateRequest extends FormRequest
     public function rules(): array
     {
         $userIds = $this->input('user_ids', []);
-        
+
         $rules = [
-            'id_master_type' => ['required', 'integer', 'exists:master_types,id'],
             'id_package' => ['required', 'integer', 'exists:packages,id'],
             'user_ids' => ['required', 'array', 'min:1'],
             'user_ids.*' => ['integer', 'exists:users,id'],
@@ -31,7 +30,7 @@ class StoreCertificateRequest extends FormRequest
         foreach ($userIds as $userId) {
             $rules["certificate_numbers.{$userId}"] = ['required', 'string', 'max:255'];
             $rules["training_date_starts.{$userId}"] = ['required', 'date'];
-            $rules["training_date_ends.{$userId}"] = ['required', 'date', 'after_or_equal:training_date_starts.' . $userId];
+            $rules["training_date_ends.{$userId}"] = ['required', 'date', 'after_or_equal:training_date_starts.'.$userId];
         }
 
         return $rules;
@@ -40,7 +39,6 @@ class StoreCertificateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'id_master_type.required' => 'Jenis wajib dipilih.',
             'id_package.required' => 'Paket wajib dipilih.',
             'user_ids.required' => 'Minimal pilih satu peserta.',
             'certificate_numbers.required' => 'Nomor sertifikat wajib diisi.',

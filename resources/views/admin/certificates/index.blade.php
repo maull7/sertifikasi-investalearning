@@ -7,7 +7,10 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Sertifikat</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1">Kelola sertifikat peserta</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mt-1">
+                    Membuat data sertifikat peserta berdasarkan <span class="font-semibold text-gray-700 dark:text-gray-200">jenis paket</span>,
+                    sehingga setiap sertifikat memuat informasi paket pelatihan, data peserta, serta pengajar dalam satu grup.
+                </p>
             </div>
 
             <x-button variant="primary" href="{{ route('certificates.create') }}" class="rounded-xl">
