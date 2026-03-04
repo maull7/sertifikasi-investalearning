@@ -3,215 +3,332 @@
 @section('title', 'Dashboard User')
 
 @section('content')
-<div class="space-y-8">
+    <div class="space-y-8">
 
-    {{-- Header --}}
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                Dashboard
-            </h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-                Selamat datang kembali, <span class="font-semibold">{{ $user->name }}</span>
-            </p>
+        {{-- Header --}}
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    Dashboard
+                </h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Selamat datang kembali, <span class="font-semibold">{{ $user->name }}</span>
+                </p>
+            </div>
+            <x-button href="{{ route('profile.edit') }}" variant="secondary" class="rounded-xl">
+                <i class="ti ti-user-edit mr-2"></i> Ubah Profil
+            </x-button>
         </div>
-        <x-button href="{{ route('profile.edit') }}" variant="secondary" class="rounded-xl">
-            <i class="ti ti-user-edit mr-2"></i> Ubah Profil
-        </x-button>
-    </div>
 
-    {{-- Stats --}}
-    @php
-        $stats = [
-            [
-                'label' => 'Paket Diikuti',
-                'value' => $totalPackages ?? 0,
-                'icon'  => 'book',
-                'color' => 'indigo',
-            ],
-            // [
-            //     'label' => 'Materi DiPelajari',
-            //     'value' => $completedMaterials ?? 0,
-            //     'icon'  => 'checklist',
-            //     'color' => 'emerald',
-            // ],
-            [
-                'label' => 'Ujian Diikuti',
-                'value' => $totalExams ?? 0,
-                'icon'  => 'file-text',
-                'color' => 'amber',
-            ],
-            // [
-            //     'label' => 'Progress Rata-rata',
-            //     'value' => ($avgProgress ?? 0) . '%',
-            //     'icon'  => 'chart-line',
-            //     'color' => 'rose',
-            // ],
-        ];
-    @endphp
+        {{-- Stats --}}
+        @php
+            $stats = [
+                [
+                    'label' => 'Paket Diikuti',
+                    'value' => $totalPackages ?? 0,
+                    'icon' => 'book',
+                    'color' => 'indigo',
+                ],
+                // [
+                //     'label' => 'Materi DiPelajari',
+                //     'value' => $completedMaterials ?? 0,
+                //     'icon'  => 'checklist',
+                //     'color' => 'emerald',
+                // ],
+                [
+                    'label' => 'Ujian Diikuti',
+                    'value' => $totalExams ?? 0,
+                    'icon' => 'file-text',
+                    'color' => 'amber',
+                ],
+                // [
+                //     'label' => 'Progress Rata-rata',
+                //     'value' => ($avgProgress ?? 0) . '%',
+                //     'icon'  => 'chart-line',
+                //     'color' => 'rose',
+                // ],
+            ];
+        @endphp
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        @foreach($stats as $stat)
-            <x-card>
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl flex items-center justify-center
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            @foreach ($stats as $stat)
+                <x-card>
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-xl flex items-center justify-center
                         bg-{{ $stat['color'] }}-50 dark:bg-{{ $stat['color'] }}-500/10
                         text-{{ $stat['color'] }}-600">
-                        <i class="ti ti-{{ $stat['icon'] }} text-xl"></i>
+                            <i class="ti ti-{{ $stat['icon'] }} text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400 font-semibold">{{ $stat['label'] }}</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                                {{ $stat['value'] }}
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-400 font-semibold">{{ $stat['label'] }}</p>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                            {{ $stat['value'] }}
-                        </p>
+                </x-card>
+            @endforeach
+        </div>
+
+        {{-- Chart Nilai Peserta (Diri Sendiri) --}}
+
+        @if ($joinedPackages->count() > 0)
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach ($joinedPackages as $userJoin)
+                    @php $package = $userJoin->package; @endphp
+                    <x-card class="hover:shadow-xl transition-all duration-300 group">
+                        <div class="space-y-4">
+                            {{-- Package Header --}}
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex-1">
+                                    <h3
+                                        class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 transition-colors">
+                                        {{ $package->title }}
+                                    </h3>
+                                    @if ($package->masterType)
+                                        <span
+                                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300 mt-2">
+                                            {{ $package->masterType->name_type }}
+                                        </span>
+                                    @endif
+                                </div>
+                                @if ($userJoin->status === 'approved')
+                                    <span
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                        <i class="ti ti-check mr-1"></i> Terdaftar
+                                    </span>
+                                @elseif ($userJoin->status === 'rejected')
+                                    <span
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">
+                                        <i class="ti ti-x mr-1"></i> Ditolak
+                                    </span>
+                                @else
+                                    <span
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-300">
+                                        <i class="ti ti-clock mr-1"></i> Menunggu Persetujuan
+                                    </span>
+                                @endif
+                            </div>
+
+                            {{-- Description --}}
+                            @if ($package->description)
+                                <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
+                                    {{ Str::limit(strip_tags($package->description), 120) }}
+                                </p>
+                            @endif
+
+                            {{-- Package Info --}}
+                            <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                                <div class="flex items-center gap-1">
+                                    <i class="ti ti-book"></i>
+                                    <span> {{ $package?->mappedSubjects?->count() ?? 0 }} Mata Pelajaran</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <i class="ti ti-calendar"></i>
+                                    <span>Bergabung {{ $userJoin->created_at->format('d M Y') }}</span>
+                                </div>
+                            </div>
+
+                            {{-- Action Button --}}
+                            <div class="pt-2">
+                                @if ($userJoin->status === 'approved')
+                                    <x-button variant="primary" href="{{ route('user.my-packages.show', $package) }}"
+                                        class="w-full rounded-xl shadow-lg shadow-indigo-500/20">
+                                        <i class="ti ti-arrow-right mr-2"></i> Lanjutkan Belajar
+                                    </x-button>
+                                @elseif($userJoin->status === 'rejected')
+                                    <x-button variant="danger" disabled class="w-full rounded-xl">
+                                        <i class="ti ti-x mr-2"></i> Pendaftaran Ditolak
+                                    </x-button>
+                                @else
+                                    <x-button variant="warning" disabled class="w-full rounded-xl">
+                                        <i class="ti ti-clock mr-2"></i> Menunggu Persetujuan
+                                    </x-button>
+                                @endif
+                            </div>
+                        </div>
+                    </x-card>
+                @endforeach
+            </div>
+
+            {{-- Pagination --}}
+            @if ($joinedPackages->hasPages())
+                <div class="pt-6">
+                    {{ $joinedPackages->links() }}
+                </div>
+            @endif
+        @else
+            <x-card>
+                <div class="flex flex-col items-center justify-center text-center py-12">
+                    <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                        <i class="ti ti-book-off text-2xl text-gray-400"></i>
                     </div>
+                    <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                        Belum ada package yang diikuti
+                    </h4>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                        Mulai jelajahi package yang tersedia dan bergabung untuk memulai pembelajaran.
+                    </p>
+                    <x-button variant="primary" href="{{ route('user.packages.index') }}" icon="plus"
+                        class="rounded-xl shadow-lg shadow-indigo-500/20">
+                        Jelajahi Package
+                    </x-button>
                 </div>
             </x-card>
-        @endforeach
+        @endif
+        <x-card title="Grafik Nilai Saya">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="lg:col-span-1 space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Filter
+                            Jenis</label>
+                        <select id="filterType"
+                            class="w-full rounded-xl border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 px-3 py-2">
+                            <option value="">Semua Jenis</option>
+                            @foreach ($types ?? [] as $type)
+                                <option value="{{ $type->id }}">{{ $type->name_type }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Filter
+                            Paket</label>
+                        <select id="filterPackage"
+                            class="w-full rounded-xl border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 px-3 py-2">
+                            <option value="">Semua Paket</option>
+                            @foreach ($packagesForFilter ?? [] as $pkg)
+                                <option value="{{ $pkg->id }}">{{ $pkg->title }}</option>
+                            @endforeach
+                        </select>
+                        <p class="mt-1 text-[11px] text-gray-400">Paket yang tampil hanya paket yang kamu ikuti.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Filter
+                            Ujian</label>
+                        <select id="filterExam"
+                            class="w-full rounded-xl border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 px-3 py-2">
+                            <option value="">Semua Ujian</option>
+                            @foreach ($examsForFilter ?? [] as $exam)
+                                <option value="{{ $exam->id }}">{{ $exam->title }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Periode</label>
+                        <select id="filterPeriod"
+                            class="w-full rounded-xl border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 px-3 py-2">
+                            <option value="">Semua</option>
+                            <option value="7">7 hari</option>
+                            <option value="30" selected>30 hari</option>
+                            <option value="90">90 hari</option>
+                        </select>
+                    </div>
+                    <div class="pt-2">
+                        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                            <span>Rata-rata</span>
+                            <span id="avgScore" class="font-semibold text-gray-900 dark:text-gray-100">-</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <span>Nilai Tertinggi</span>
+                            <span id="maxScore" class="font-semibold text-gray-900 dark:text-gray-100">-</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <span>Total Attempt</span>
+                            <span id="totalAttempts" class="font-semibold text-gray-900 dark:text-gray-100">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <div class="w-full overflow-x-auto">
+                        <div class="min-w-[700px] lg:min-w-0 h-80 relative">
+                            <div class="mb-3 flex flex-wrap items-center gap-2 text-xs">
+                                <span
+                                    class="px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-200 font-semibold">
+                                    Jenis: <span id="currentTypeText" class="font-normal">Semua Jenis</span>
+                                </span>
+                                <span
+                                    class="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold">
+                                    Paket: <span id="currentPackageText" class="font-normal">Semua Paket</span>
+                                </span>
+                                <span
+                                    class="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-200 font-semibold">
+                                    Ujian: <span id="currentExamText" class="font-normal">Semua Ujian</span>
+                                </span>
+                                <span
+                                    class="px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-200 font-semibold">
+                                    Periode: <span id="currentPeriodText" class="font-normal">30 hari</span>
+                                </span>
+                            </div>
+                            <div id="chartLoading"
+                                class="hidden absolute inset-0 z-10 bg-white/70 dark:bg-gray-950/60 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                                <div class="text-sm text-gray-500 dark:text-gray-400 font-semibold">Memuat grafik...</div>
+                            </div>
+                            <canvas id="myScoreChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </x-card>
+
+        {{-- Paket Aktif --}}
+        {{-- <x-card title="Paket yang Sedang Diikuti">
+            @forelse($packageFollow ?? [] as $package)
+                <div
+                    class="flex items-center justify-between py-3 border-b last:border-0 border-gray-100 dark:border-gray-800">
+                    <div>
+                        <p class="font-semibold text-gray-900 dark:text-white">
+                            {{ $package->package->title }}
+                        </p>
+                        <p class="text-xs text-gray-400">
+                            {{ $package->package->description }}
+                        </p>
+                    </div>
+                    <x-button size="sm" href="{{ route('user.my-packages.show', $package->package->id) }}"
+                        variant="primary" class="rounded-lg">
+                        Lanjutkan
+                    </x-button>
+                </div>
+            @empty
+                <div class="py-10 text-center">
+                    <i class="ti ti-books text-4xl text-gray-300 mb-3"></i>
+                    <p class="text-sm text-gray-500">
+                        Anda belum mengikuti paket apa pun
+                    </p>
+                </div>
+            @endforelse
+        </x-card> --}}
+        <x-card title="Paket Terbaru">
+            @forelse($packageActive ?? [] as $package)
+                <div
+                    class="flex items-center justify-between py-3 border-b last:border-0 border-gray-100 dark:border-gray-800">
+                    <div>
+                        <p class="font-semibold text-gray-900 dark:text-white">
+                            {{ $package->title }}
+                        </p>
+                        <p class="text-xs text-gray-400">
+                            {{ $package->description }}
+                        </p>
+                    </div>
+                    <x-button size="sm" href="{{ route('user.my-packages.index') }}" variant="primary"
+                        class="rounded-lg">
+                        Lihat Paket
+                    </x-button>
+                </div>
+            @empty
+                <div class="py-10 text-center">
+                    <i class="ti ti-books text-4xl text-gray-300 mb-3"></i>
+                    <p class="text-sm text-gray-500">
+                        Belum ada paket terbaru
+                    </p>
+                </div>
+            @endforelse
+        </x-card>
+
     </div>
-
-    {{-- Chart Nilai Peserta (Diri Sendiri) --}}
-    <x-card title="Grafik Nilai Saya">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div class="lg:col-span-1 space-y-3">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Filter Jenis</label>
-                    <select id="filterType"
-                        class="w-full rounded-xl border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 px-3 py-2">
-                        <option value="">Semua Jenis</option>
-                        @foreach(($types ?? []) as $type)
-                            <option value="{{ $type->id }}">{{ $type->name_type }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Filter Paket</label>
-                    <select id="filterPackage"
-                        class="w-full rounded-xl border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 px-3 py-2">
-                        <option value="">Semua Paket</option>
-                        @foreach(($packagesForFilter ?? []) as $pkg)
-                            <option value="{{ $pkg->id }}">{{ $pkg->title }}</option>
-                        @endforeach
-                    </select>
-                    <p class="mt-1 text-[11px] text-gray-400">Paket yang tampil hanya paket yang kamu ikuti.</p>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Filter Ujian</label>
-                    <select id="filterExam"
-                        class="w-full rounded-xl border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 px-3 py-2">
-                        <option value="">Semua Ujian</option>
-                        @foreach(($examsForFilter ?? []) as $exam)
-                            <option value="{{ $exam->id }}">{{ $exam->title }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">Periode</label>
-                    <select id="filterPeriod"
-                        class="w-full rounded-xl border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 px-3 py-2">
-                        <option value="">Semua</option>
-                        <option value="7">7 hari</option>
-                        <option value="30" selected>30 hari</option>
-                        <option value="90">90 hari</option>
-                    </select>
-                </div>
-                <div class="pt-2">
-                    <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                        <span>Rata-rata</span>
-                        <span id="avgScore" class="font-semibold text-gray-900 dark:text-gray-100">-</span>
-                    </div>
-                    <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        <span>Nilai Tertinggi</span>
-                        <span id="maxScore" class="font-semibold text-gray-900 dark:text-gray-100">-</span>
-                    </div>
-                    <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        <span>Total Attempt</span>
-                        <span id="totalAttempts" class="font-semibold text-gray-900 dark:text-gray-100">-</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lg:col-span-2">
-                <div class="w-full overflow-x-auto">
-                    <div class="min-w-[700px] lg:min-w-0 h-80 relative">
-                        <div class="mb-3 flex flex-wrap items-center gap-2 text-xs">
-                            <span class="px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-200 font-semibold">
-                                Jenis: <span id="currentTypeText" class="font-normal">Semua Jenis</span>
-                            </span>
-                            <span class="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold">
-                                Paket: <span id="currentPackageText" class="font-normal">Semua Paket</span>
-                            </span>
-                            <span class="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-200 font-semibold">
-                                Ujian: <span id="currentExamText" class="font-normal">Semua Ujian</span>
-                            </span>
-                            <span class="px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-200 font-semibold">
-                                Periode: <span id="currentPeriodText" class="font-normal">30 hari</span>
-                            </span>
-                        </div>
-                        <div id="chartLoading"
-                            class="hidden absolute inset-0 z-10 bg-white/70 dark:bg-gray-950/60 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                            <div class="text-sm text-gray-500 dark:text-gray-400 font-semibold">Memuat grafik...</div>
-                        </div>
-                        <canvas id="myScoreChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </x-card>
-
-    {{-- Paket Aktif --}}
-    <x-card title="Paket yang Sedang Diikuti">
-        @forelse($packageFollow ?? [] as $package)
-            <div class="flex items-center justify-between py-3 border-b last:border-0 border-gray-100 dark:border-gray-800">
-                <div>
-                    <p class="font-semibold text-gray-900 dark:text-white">
-                        {{ $package->package->title }}
-                    </p>
-                    <p class="text-xs text-gray-400">
-                         {{ $package->package->description }}
-                    </p>
-                </div>
-                <x-button size="sm" href="{{ route('user.my-packages.show', $package->package->id) }}" variant="primary" class="rounded-lg">
-                    Lanjutkan
-                </x-button>
-            </div>
-        @empty
-            <div class="py-10 text-center">
-                <i class="ti ti-books text-4xl text-gray-300 mb-3"></i>
-                <p class="text-sm text-gray-500">
-                    Anda belum mengikuti paket apa pun
-                </p>
-            </div>
-        @endforelse
-    </x-card>
-    <x-card title="Paket Terbaru">
-        @forelse($packageActive ?? [] as $package)
-            <div class="flex items-center justify-between py-3 border-b last:border-0 border-gray-100 dark:border-gray-800">
-                <div>
-                    <p class="font-semibold text-gray-900 dark:text-white">
-                        {{ $package->title }}
-                    </p>
-                    <p class="text-xs text-gray-400">
-                         {{ $package->description }}
-                    </p>
-                </div>
-                <x-button size="sm" href="{{ route('user.my-packages.index') }}" variant="primary" class="rounded-lg">
-                    Lihat Paket
-                </x-button>
-            </div>
-        @empty
-            <div class="py-10 text-center">
-                <i class="ti ti-books text-4xl text-gray-300 mb-3"></i>
-                <p class="text-sm text-gray-500">
-                   Belum ada paket terbaru
-                </p>
-            </div>
-        @endforelse
-    </x-card>
-
-</div>
 @endsection
 
 @push('scripts')
@@ -219,7 +336,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const canvas = document.getElementById('myScoreChart');
-            if (!canvas) { return; }
+            if (!canvas) {
+                return;
+            }
 
             const routeUrl = "{{ route('user.dashboard.chart-data') }}";
             const filterType = document.getElementById('filterType');
@@ -243,16 +362,26 @@
             let currentPeriodText = '30 hari';
 
             function toggleLoading(isLoading) {
-                if (!loadingEl) { return; }
+                if (!loadingEl) {
+                    return;
+                }
                 loadingEl.classList.toggle('hidden', !isLoading);
             }
 
             function buildQuery() {
                 const params = new URLSearchParams();
-                if (filterType && filterType.value) { params.set('type_id', filterType.value); }
-                if (filterPackage && filterPackage.value) { params.set('package_id', filterPackage.value); }
-                if (filterExam && filterExam.value) { params.set('exam_id', filterExam.value); }
-                if (filterPeriod && filterPeriod.value) { params.set('period_days', filterPeriod.value); }
+                if (filterType && filterType.value) {
+                    params.set('type_id', filterType.value);
+                }
+                if (filterPackage && filterPackage.value) {
+                    params.set('package_id', filterPackage.value);
+                }
+                if (filterExam && filterExam.value) {
+                    params.set('exam_id', filterExam.value);
+                }
+                if (filterPeriod && filterPeriod.value) {
+                    params.set('period_days', filterPeriod.value);
+                }
                 return params.toString() ? `?${params.toString()}` : '';
             }
 
@@ -273,10 +402,18 @@
                     const opt = filterPeriod.options[filterPeriod.selectedIndex];
                     currentPeriodText = (opt && opt.text) ? opt.text : 'Semua';
                 }
-                if (currentTypeTextEl) { currentTypeTextEl.textContent = currentTypeText; }
-                if (currentPackageTextEl) { currentPackageTextEl.textContent = currentPackageText; }
-                if (currentExamTextEl) { currentExamTextEl.textContent = currentExamText; }
-                if (currentPeriodTextEl) { currentPeriodTextEl.textContent = currentPeriodText; }
+                if (currentTypeTextEl) {
+                    currentTypeTextEl.textContent = currentTypeText;
+                }
+                if (currentPackageTextEl) {
+                    currentPackageTextEl.textContent = currentPackageText;
+                }
+                if (currentExamTextEl) {
+                    currentExamTextEl.textContent = currentExamText;
+                }
+                if (currentPeriodTextEl) {
+                    currentPeriodTextEl.textContent = currentPeriodText;
+                }
             }
 
             async function fetchChartData() {
@@ -284,7 +421,9 @@
                 try {
                     updateFilterInfo();
                     const res = await fetch(routeUrl + buildQuery(), {
-                        headers: { 'Accept': 'application/json' }
+                        headers: {
+                            'Accept': 'application/json'
+                        }
                     });
                     const data = await res.json();
                     updateChart(Array.isArray(data) ? data : []);
@@ -301,16 +440,24 @@
                 const max = total ? Math.max(...scores) : 0;
                 const avg = total ? (scores.reduce((a, b) => a + b, 0) / total) : 0;
 
-                if (avgScoreEl) { avgScoreEl.textContent = total ? avg.toFixed(1) : '-'; }
-                if (maxScoreEl) { maxScoreEl.textContent = total ? max.toFixed(1) : '-'; }
-                if (totalAttemptsEl) { totalAttemptsEl.textContent = total ? String(total) : '-'; }
+                if (avgScoreEl) {
+                    avgScoreEl.textContent = total ? avg.toFixed(1) : '-';
+                }
+                if (maxScoreEl) {
+                    maxScoreEl.textContent = total ? max.toFixed(1) : '-';
+                }
+                if (totalAttemptsEl) {
+                    totalAttemptsEl.textContent = total ? String(total) : '-';
+                }
             }
 
             function updateChart(items) {
                 updateSummary(items);
 
                 const ctx = canvas.getContext('2d');
-                if (chartInstance) { chartInstance.destroy(); }
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
 
                 // bawa metadata ke tiap titik (exam, package, type)
                 const points = items.map(i => ({
@@ -340,18 +487,25 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { display: false },
+                            legend: {
+                                display: false
+                            },
                             tooltip: {
                                 callbacks: {
                                     title: (tooltipItems) => {
                                         const item = tooltipItems?.[0]?.raw;
-                                        if (!item) { return tooltipItems?.[0]?.label ?? ''; }
+                                        if (!item) {
+                                            return tooltipItems?.[0]?.label ?? '';
+                                        }
 
                                         const exam = item.exam ? `Ujian: ${item.exam}` : null;
                                         const pkg = item.package ? `Paket: ${item.package}` : null;
                                         const type = item.type ? `Jenis: ${item.type}` : null;
-                                        const period = currentPeriodText ? `Periode: ${currentPeriodText}` : null;
-                                        return [item.x ?? tooltipItems?.[0]?.label ?? '', exam, pkg, type, period].filter(Boolean);
+                                        const period = currentPeriodText ?
+                                            `Periode: ${currentPeriodText}` : null;
+                                        return [item.x ?? tooltipItems?.[0]?.label ?? '', exam, pkg,
+                                            type, period
+                                        ].filter(Boolean);
                                     },
                                     label: (ctx) => `Nilai: ${ctx.parsed.y ?? '-'}`
                                 }
@@ -361,22 +515,39 @@
                             y: {
                                 beginAtZero: true,
                                 suggestedMax: 100,
-                                grid: { color: 'rgba(148, 163, 184, 0.18)' },
-                                ticks: { precision: 0 }
+                                grid: {
+                                    color: 'rgba(148, 163, 184, 0.18)'
+                                },
+                                ticks: {
+                                    precision: 0
+                                }
                             },
                             x: {
-                                grid: { display: false },
-                                ticks: { maxRotation: 0, autoSkip: true }
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    maxRotation: 0,
+                                    autoSkip: true
+                                }
                             }
                         }
                     }
                 });
             }
 
-            if (filterType) { filterType.addEventListener('change', fetchChartData); }
-            if (filterPackage) { filterPackage.addEventListener('change', fetchChartData); }
-            if (filterExam) { filterExam.addEventListener('change', fetchChartData); }
-            if (filterPeriod) { filterPeriod.addEventListener('change', fetchChartData); }
+            if (filterType) {
+                filterType.addEventListener('change', fetchChartData);
+            }
+            if (filterPackage) {
+                filterPackage.addEventListener('change', fetchChartData);
+            }
+            if (filterExam) {
+                filterExam.addEventListener('change', fetchChartData);
+            }
+            if (filterPeriod) {
+                filterPeriod.addEventListener('change', fetchChartData);
+            }
 
             updateFilterInfo();
             fetchChartData();

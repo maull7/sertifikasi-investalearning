@@ -93,8 +93,12 @@ Route::middleware('auth', 'akun-active')->group(function () {
     // History Exam routes
     Route::get('user/history-exams', [HistoryExamController::class, 'index'])
         ->name('user.history-exams.index');
+    Route::get('user/history-exams/show/{userJoin}', [HistoryExamController::class, 'show'])
+        ->name('user.history-exams.show');
     Route::get('user/history-exams/{id}/detail', [HistoryExamController::class, 'detail'])
         ->name('user.history-exams.detail');
+    Route::get('user/detail/{userJoin}/tryout/{transQuestion}', [HistoryExamController::class, 'tryoutDetail'])
+        ->name('user.history.tryout-detail');
 
     // Certificate User
     Route::get('user/my-certificate', [CertificateControlller::class, 'index'])->name('user.certificate.index');
@@ -221,4 +225,4 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('monitor-participants.show');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
