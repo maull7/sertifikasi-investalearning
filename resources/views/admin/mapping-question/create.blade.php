@@ -97,48 +97,82 @@
                         <div
                             class="rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10 p-4 text-sm text-amber-800 dark:text-amber-200">
                             <p class="font-medium">Ujian ini belum memiliki mata pelajaran.</p>
-                            <p class="mt-1">Atur jumlah soal per mapel di <a
-                                    href="{{ route('exams.edit', $selectedExam->id) }}" class="underline font-semibold">Edit
-                                    Ujian</a> terlebih dahulu.</p>
+                            <p class="mt-1">
+                                Atur mata pelajaran dan jumlah soal per mapel di
+                                <a href="{{ route('exams.edit', $selectedExam->id) }}" class="underline font-semibold">
+                                    Edit Ujian
+                                </a>
+                                terlebih dahulu.
+                            </p>
+                        </div>
+                    @elseif(($subjects->isNotEmpty()) && (($totalPlannedQuestions ?? 0) === 0))
+                        <div
+                            class="rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10 p-4 text-sm text-amber-800 dark:text-amber-200 flex gap-3">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center shrink-0">
+                                <i class="ti ti-alert-triangle text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold">Mata pelajaran sudah dipilih, tetapi jumlah soal masih 0.</p>
+                                <p class="mt-1">
+                                    Silakan buka
+                                    <a href="{{ route('exams.edit', $selectedExam->id) }}"
+                                        class="underline font-semibold">
+                                        Edit Ujian
+                                    </a>
+                                    lalu isi jumlah soal yang dibutuhkan untuk setiap mata pelajaran agar tombol
+                                    <span class="font-semibold">Acak</span> dan
+                                    <span class="font-semibold">Pilih Otomatis</span> bisa bekerja sesuai kebutuhan.
+                                </p>
+                            </div>
                         </div>
                     @endif
 
                     @if (!empty($subjectStatus))
                         @php $allFull = collect($subjectStatus)->every(fn ($s) => $s['is_full']); @endphp
                         @if ($allFull)
-                            <div class="rounded-xl border border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-500/10 px-4 py-4 flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center shrink-0">
+                            <div
+                                class="rounded-xl border border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-500/10 px-4 py-4 flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center shrink-0">
                                     <i class="ti ti-circle-check text-2xl text-emerald-600 dark:text-emerald-400"></i>
                                 </div>
                                 <div>
                                     <p class="font-bold text-emerald-800 dark:text-emerald-200">Soal Sudah Penuh</p>
-                                    <p class="text-sm text-emerald-600 dark:text-emerald-400">Semua mapel telah memenuhi jumlah soal sesuai konfigurasi ujian.</p>
+                                    <p class="text-sm text-emerald-600 dark:text-emerald-400">Semua mapel telah memenuhi
+                                        jumlah soal sesuai konfigurasi ujian.</p>
                                 </div>
                             </div>
                         @endif
-                        <div class="rounded-xl border border-indigo-200 bg-indigo-50/50 dark:border-indigo-800 dark:bg-indigo-500/10 px-4 py-3 text-sm">
+                        <div
+                            class="rounded-xl border border-indigo-200 bg-indigo-50/50 dark:border-indigo-800 dark:bg-indigo-500/10 px-4 py-3 text-sm">
                             <p class="font-semibold text-indigo-800 dark:text-indigo-200 mb-2">
                                 <i class="ti ti-info-circle mr-1"></i> Status soal per mata pelajaran:
                             </p>
                             <ul class="flex flex-wrap gap-2">
                                 @foreach ($subjectStatus as $ss)
-                                    <li class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 border {{ $ss['is_full'] ? 'border-emerald-200 dark:border-emerald-800' : 'border-indigo-100 dark:border-indigo-800' }}">
+                                    <li
+                                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 border {{ $ss['is_full'] ? 'border-emerald-200 dark:border-emerald-800' : 'border-indigo-100 dark:border-indigo-800' }}">
                                         <span class="font-medium text-gray-900 dark:text-white">{{ $ss['name'] }}</span>
-                                        <span class="text-indigo-600 dark:text-indigo-400 font-bold">{{ $ss['mapped'] }}/{{ $ss['needed'] }}</span>
+                                        <span
+                                            class="text-indigo-600 dark:text-indigo-400 font-bold">{{ $ss['mapped'] }}/{{ $ss['needed'] }}</span>
                                         <span class="text-gray-500 dark:text-gray-400">soal</span>
                                         @if ($ss['is_full'])
-                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
+                                            <span
+                                                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
                                                 <i class="ti ti-check"></i> Penuh
                                             </span>
                                         @else
-                                            <span class="text-amber-600 dark:text-amber-400 text-xs">perlu {{ $ss['needed'] - $ss['mapped'] }} lagi</span>
+                                            <span class="text-amber-600 dark:text-amber-400 text-xs">perlu
+                                                {{ $ss['needed'] - $ss['mapped'] }} lagi</span>
                                         @endif
                                     </li>
                                 @endforeach
                             </ul>
                             @if (!$allFull)
                                 <p class="text-xs text-indigo-600 dark:text-indigo-400 mt-2">
-                                    Tombol Acak dan Pilih Otomatis akan mengambil/memilih soal sesuai sisa kebutuhan per mapel.
+                                    Tombol Acak dan Pilih Otomatis akan mengambil/memilih soal sesuai sisa kebutuhan per
+                                    mapel.
                                 </p>
                             @endif
                         </div>
@@ -197,11 +231,13 @@
                                                 <i class="ti ti-dice-3 mr-1 text-sm"></i> Acak
                                             </x-button>
                                         @else
-                                            <x-button type="submit" variant="secondary" size="sm" class="rounded-lg" disabled>
+                                            <x-button type="submit" variant="secondary" size="sm" class="rounded-lg"
+                                                disabled>
                                                 <i class="ti ti-dice-3 mr-1 text-sm"></i> Acak
                                             </x-button>
                                         @endif
-                                        <p class="text-[10px] text-gray-400 mt-1">Ambil soal random per mapel sesuai kebutuhan</p>
+                                        <p class="text-[10px] text-gray-400 mt-1">Ambil soal random per mapel sesuai
+                                            kebutuhan</p>
                                     </div>
                                 </form>
                                 <div>
@@ -215,11 +251,13 @@
                                             <i class="ti ti-checklist mr-1 text-sm"></i> Pilih
                                         </x-button>
                                     @else
-                                        <x-button type="button" variant="secondary" size="sm" class="rounded-lg" disabled>
+                                        <x-button type="button" variant="secondary" size="sm" class="rounded-lg"
+                                            disabled>
                                             <i class="ti ti-checklist mr-1 text-sm"></i> Pilih
                                         </x-button>
                                     @endif
-                                    <p class="text-[10px] text-gray-400 mt-1">Centang soal per mapel sesuai kebutuhan (dari halaman ini)</p>
+                                    <p class="text-[10px] text-gray-400 mt-1">Centang soal per mapel sesuai kebutuhan (dari
+                                        halaman ini)</p>
                                 </div>
                             </div>
                         </div>

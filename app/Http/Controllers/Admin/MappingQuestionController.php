@@ -107,6 +107,10 @@ class MappingQuestionController extends Controller
             })->filter(fn ($s) => $s['needed'] > 0)->values()->all();
         }
 
+        $totalPlannedQuestions = $selectedExam
+            ? (int) $selectedExam->subjects->sum(fn ($s) => (int) ($s->pivot->questions_count ?? 0))
+            : 0;
+
         return view('admin.mapping-question.create', [
             'exams' => $exams,
             'selectedExam' => $selectedExam,
@@ -118,6 +122,7 @@ class MappingQuestionController extends Controller
             'subjectNeeds' => $subjectNeeds,
             'subjectStatus' => $subjectStatus ?? [],
             'toAddPerSubject' => $toAddPerSubject ?? [],
+            'totalPlannedQuestions' => $totalPlannedQuestions,
             'sortBy' => $sortBy,
             'sortOrder' => $sortOrder,
         ]);
