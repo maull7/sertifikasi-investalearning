@@ -38,7 +38,7 @@
         </div>
 
         {{-- Filter periode & tipe ujian --}}
-        <form action="{{ route('monitor-participants.show', $userJoin) }}" method="GET"
+        <form action="{{ route('user.history-exams.show', $userJoin) }}" method="GET"
             class="flex flex-wrap items-end gap-4 p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
             <div>
                 <label
