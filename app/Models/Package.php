@@ -54,6 +54,11 @@ class Package extends Model
             ->withTimestamps();
     }
 
+    public function certificateTemplate(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(CertificateTemplate::class, 'package_id');
+    }
+
     /**
      * Materi dalam paket: dari mappedSubjects (mapping mapel) atau fallback masterType->subjects.
      */

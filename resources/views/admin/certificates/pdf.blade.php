@@ -340,11 +340,28 @@
     @php
         $logoPath = public_path('img/favicon.png');
         $logoData = is_readable($logoPath) ? base64_encode(file_get_contents($logoPath)) : null;
+        $bgFrontData = null;
+        if (isset($template) && $template?->front_background_path) {
+            $bgPath = public_path('storage/'.$template->front_background_path);
+            $bgFrontData = is_readable($bgPath) ? base64_encode(file_get_contents($bgPath)) : null;
+        }
+
+        $leftSignData = null;
+        if (isset($template) && $template?->left_signature_image_path) {
+            $leftPath = public_path('storage/'.$template->left_signature_image_path);
+            $leftSignData = is_readable($leftPath) ? base64_encode(file_get_contents($leftPath)) : null;
+        }
+
+        $rightSignData = null;
+        if (isset($template) && $template?->right_signature_image_path) {
+            $rightPath = public_path('storage/'.$template->right_signature_image_path);
+            $rightSignData = is_readable($rightPath) ? base64_encode(file_get_contents($rightPath)) : null;
+        }
     @endphp
 
     {{-- PAGE 1 --}}
     <div class="page">
-        <div class="frame">
+        <div class="frame" @if($bgFrontData) style="background-image: url('data:image/png;base64,{{ $bgFrontData }}'); background-size: cover; background-position: center;" @endif>
             <div class="header-brand">
                 <div class="header-left">
                     @if($logoData)
@@ -402,20 +419,102 @@
 
                 <div class="signatures">
                     <div class="signature">
+                        @if($leftSignData)
+                            <img src="data:image/png;base64,{{ $leftSignData }}" alt="Tanda tangan kiri" style="max-height:80px; margin-bottom:4px;">
+                        @endif
                         <div class="signature-line"></div>
-                        <div class="signature-name">Lucas Bonardo</div>
-                        <div class="signature-role">Director</div>
+                        <div class="signature-name">
+                            {{ $template->left_signature_name ?? ' ' }}
+                        </div>
+                        <div class="signature-role">
+                            {{ $template->left_signature_title ?? ' ' }}
+                        </div>
                     </div>
                     <div class="signature">
+                        @if($rightSignData)
+                            <img src="data:image/png;base64,{{ $rightSignData }}" alt="Tanda tangan kanan" style="max-height:80px; margin-bottom:4px;">
+                        @endif
                         <div class="signature-line"></div>
-                        <div class="signature-name">Lisbeth Rosaria</div>
-                        <div class="signature-role">Senior Vice President</div>
+                        <div class="signature-name">
+                            {{ $template->right_signature_name ?? ' ' }}
+                        </div>
+                        <div class="signature-role">
+                            {{ $template->right_signature_title ?? ' ' }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Hanya 1 halaman untuk versi PDF (lebih sederhana & stabil) --}}
+    {{-- PAGE 2 --}}
+    <div class="page">
+        <div class="frame">
+            <div class="page2-title-block">
+                <h2>{{ $template->schema_title ?? 'SKEMA PELATIHAN' }}</h2>
+            </div>
+
+            <div class="page2-paragraphs">
+                @if(!empty($template->schema_description))
+                    {!! nl2br(e($template->schema_description)) !!}
+                @else
+                    <p>
+                        Deskripsi skema pelatihan akan ditampilkan di sini. Atur konten ini melalui menu Desain Sertifikat
+                        pada panel admin.
+                    </p>
+                @endif
+            </div>
+
+            <div class="table-wrapper">
+                <table class="cert-table">
+                    <thead>
+                        <tr>
+                            <th class="td-no">No</th>
+                            <th class="td-code">Kode</th>
+                            <th class="td-desc">Deskripsi Unit Kompetensi (UK)</th>
+                            <th class="td-topic">Topik Utama</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php
+                            $ukLines = collect(preg_split('/\r\n|\r|\n/', (string) ($template->uk_list ?? '')))
+                                ->map(fn ($line) => trim($line))
+                                ->filter();
+                        @endphp
+                        @forelse($ukLines as $index => $line)
+                            <tr>
+                                <td class="td-no">{{ $index + 1 }}</td>
+                                <td class="td-code">UK-{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</td>
+                                <td class="td-desc">{{ $line }}</td>
+                                <td class="td-topic">{{ $certificate->package?->title ?? '-' }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="td-desc">
+                                    Tidak ada daftar UK yang diisi. Daftar UK dapat diatur di menu Desain Sertifikat.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="footer-facilitator">
+                <strong>Daftar Fasilitator:</strong>
+                @php
+                    $facLines = collect(preg_split('/\r\n|\r|\n/', (string) ($template->facilitator_list ?? '')))
+                        ->map(fn ($line) => trim($line))
+                        ->filter();
+                @endphp
+                @if($facLines->isEmpty())
+                    <span>Belum ada daftar fasilitator yang diisi.</span>
+                @else
+                    @foreach($facLines as $line)
+                        <span>{{ $line }}</span>
+                    @endforeach
+                @endif
+            </div>
+        </div>
+    </div>
 </body>
 </html>

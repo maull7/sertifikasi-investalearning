@@ -37,9 +37,17 @@ class AuthenticatedSessionController extends Controller
                     'email' => 'Akun Anda belum diaktivasi. Silakan cek email atau hubungi admin...',
                 ]);
             }
+
+            if ($user->is_active === false) {
+                auth()->logout();
+
+                return back()->withErrors([
+                    'email' => 'Akun Anda telah dinonaktifkan. Silakan hubungi admin untuk informasi lebih lanjut.',
+                ]);
+            }
         }
 
-        if ($user->role === 'Admin' || 'Petugas') {
+        if (in_array($user->role, ['Admin', 'Petugas'], true)) {
             return redirect()->route('dashboard');
         }
 

@@ -30,6 +30,7 @@ class UserFactory extends Factory
             'role' => 'User',
             'status_user' => 'Teraktivasi',
             'jenis_kelamin' => 'Laki-laki',
+            'is_active' => true,
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];

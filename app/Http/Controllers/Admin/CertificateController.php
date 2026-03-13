@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreCertificateRequest;
 use App\Models\Certificate;
+use App\Models\CertificateTemplate;
 use App\Models\DetailCertificate;
 use App\Models\MasterType;
 use App\Models\Package;
@@ -152,10 +153,12 @@ class CertificateController extends Controller
             'teachers',
         ]);
 
+        $template = CertificateTemplate::where('package_id', $certificate->id_package)->first();
+
         $baseName = 'sertifikat-'.Str::slug($certificate->user?->name ?? 'peserta').'-'.$certificate->id;
         $pngFileName = $baseName.'.png';
 
-        $pdf = Pdf::loadView('admin.certificates.pdf', compact('certificate'))
+        $pdf = Pdf::loadView('admin.certificates.pdf', compact('certificate', 'template'))
             ->setPaper('a4', 'landscape')
             ->setOptions([
                 'isRemoteEnabled' => true,
