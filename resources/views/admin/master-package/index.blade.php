@@ -101,6 +101,12 @@
                                 </td>
                                 <td class="py-4 px-8">
                                     <div class="flex items-center justify-end gap-2">
+                                        <x-button variant="secondary" size="sm"
+                                            href="{{ route('master-packages.staff', $value) }}"
+                                            class="rounded-lg h-9 w-9 p-0 flex items-center justify-center"
+                                            title="Lihat Petugas Paket">
+                                            <i class="ti ti-users text-base"></i>
+                                        </x-button>
                                         <x-button variant="success" size="sm"
                                             href="{{ route('master-packages.show', $value->id) }}"
                                             class="rounded-lg h-9 w-9 p-0 flex items-center justify-center"

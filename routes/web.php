@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CertificateController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailActivation;
 use App\Http\Controllers\Admin\ExamController;
+use App\Http\Controllers\Admin\CertificateTemplateController;
 use App\Http\Controllers\Admin\MappingPackageController;
 use App\Http\Controllers\Admin\MappingQuestionController;
 use App\Http\Controllers\Admin\MasterMaterialController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Admin\QuizController;
 use App\Http\Controllers\Admin\ShowGradeController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\TeacherController;
+use App\Http\Controllers\Admin\UserStatusController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ProfileCompletionController;
 use App\Http\Controllers\ProfileController;
@@ -130,6 +132,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
             ->name('master-packages.import');
         Route::get('master-packages/download-template', [MasterPackegeController::class, 'DownloadTemplate'])
             ->name('master-packages.download-template');
+        Route::get('master-packages/{package}/staff', [MasterPackegeController::class, 'staff'])
+            ->name('master-packages.staff');
         Route::patch('master-packages/{package}/toggle-active', [MasterPackegeController::class, 'toggleActive'])
             ->name('master-packages.toggle-active');
         Route::resource('master-packages', MasterPackegeController::class);
@@ -196,8 +200,16 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Certificates
     Route::get('/get-package/{type}', [CertificateController::class, 'getPackage'])->name('get-package.type');
-
     Route::resource('certificates', CertificateController::class)->only(['index', 'create', 'store', 'show']);
+
+    // Certificate templates (desain sertifikat per paket)
+    Route::get('certificate-templates', [CertificateTemplateController::class, 'index'])->name('certificate-templates.index');
+    Route::get('certificate-templates/{package}/edit', [CertificateTemplateController::class, 'edit'])->name('certificate-templates.edit');
+    Route::put('certificate-templates/{package}', [CertificateTemplateController::class, 'update'])->name('certificate-templates.update');
+
+    // User status (aktif / nonaktif) untuk peserta
+    Route::get('user-status', [UserStatusController::class, 'index'])->name('user-status.index');
+    Route::post('user-status/bulk', [UserStatusController::class, 'bulkUpdate'])->name('user-status.bulk');
 
     Route::get('admin/pending-packages-count', [ApprovePackageController::class, 'pendingCount'])
         ->name('admin.pending-packages-count');

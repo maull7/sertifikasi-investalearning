@@ -120,6 +120,14 @@ class Sidebar extends Component
                         ['name' => 'Monitor Peserta', 'route' => 'monitor-participants.index'],
                     ],
                 ],
+                [
+                    'name' => 'Status Akun Peserta',
+                    'icon' => 'ti ti-user-off',
+                    'activePattern' => 'user-status.*',
+                    'subItems' => [
+                        ['name' => 'Status Akun Peserta', 'route' => 'user-status.index'],
+                    ],
+                ],
             ],
         ];
         $groups[] = [
@@ -141,10 +149,11 @@ class Sidebar extends Component
                 [
                     'name' => 'Data Sertifikat',
                     'icon' => 'ti ti-certificate',
-                    'activePattern' => 'certificates.*',
+                    'activePattern' => 'certificates.*|certificate-templates.*',
                     'subItems' => [
                         ['name' => 'Tambah Sertifikat', 'route' => 'certificates.create'],
                         ['name' => 'Data Sertifikat', 'route' => 'certificates.index'],
+                        ['name' => 'Desain Sertifikat', 'route' => 'certificate-templates.index'],
                     ],
                 ],
             ],

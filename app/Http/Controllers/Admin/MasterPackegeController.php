@@ -119,4 +119,14 @@ class MasterPackegeController extends Controller
         $msg = $package->status === 'active' ? 'aktifkan' : 'nonaktifkan';
         return redirect()->route('master-packages.index')->with('success', "Paket berhasil {$msg}.");
     }
+
+    public function staff(Package $package)
+    {
+        $package->load(['masterType', 'staff']);
+
+        return view('admin.master-package.staff', [
+            'package' => $package,
+            'staff' => $package->staff,
+        ]);
+    }
 }
