@@ -19,7 +19,8 @@ class PackageController extends Controller
         $types = MasterType::with('subjects', 'packages')->get();
 
         $query = Package::with(['masterType', 'mappedSubjects.materials', 'userJoins'])
-            ->where('status', 'active');
+            ->where('status', 'active')
+            ->where('is_hidden', false);
 
         if ($request->has('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
@@ -83,7 +84,8 @@ class PackageController extends Controller
         $types = MasterType::with('subjects', 'packages')->get();
 
         $query = Package::with(['masterType.subjects.materials'])
-            ->where('status', 'active');
+            ->where('status', 'active')
+            ->where('is_hidden', false);
 
         if ($request->has('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');

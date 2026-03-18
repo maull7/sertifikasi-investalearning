@@ -18,7 +18,15 @@ class Package extends Model
         'id_master_types',
         'description',
         'status',
+        'is_hidden',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_hidden' => 'boolean',
+        ];
+    }
 
     public function masterType(): BelongsTo
     {

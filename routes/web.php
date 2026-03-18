@@ -136,6 +136,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
             ->name('master-packages.staff');
         Route::patch('master-packages/{package}/toggle-active', [MasterPackegeController::class, 'toggleActive'])
             ->name('master-packages.toggle-active');
+        Route::patch('master-packages/{package}/toggle-hidden', [MasterPackegeController::class, 'toggleHidden'])
+            ->name('master-packages.toggle-hidden');
         Route::resource('master-packages', MasterPackegeController::class);
         Route::get('mapping-package', [MappingPackageController::class, 'index'])->name('mapping-package.index');
         Route::get('mapping-package/create', [MappingPackageController::class, 'create'])->name('mapping-package.create');
