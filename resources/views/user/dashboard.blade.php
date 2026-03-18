@@ -243,8 +243,8 @@
                 </div>
 
                 <div class="lg:col-span-2">
-                    <div class="w-full overflow-x-auto">
-                        <div class="min-w-[700px] lg:min-w-0 h-80 relative">
+                    <div class="w-full overflow-hidden">
+                        <div class="h-80 relative" style="overflow: hidden; touch-action: none;">
                             <div class="mb-3 flex flex-wrap items-center gap-2 text-xs">
                                 <span
                                     class="px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-200 font-semibold">
@@ -511,6 +511,11 @@
                                 }
                             }
                         },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
                         scales: {
                             y: {
                                 beginAtZero: true,
@@ -528,7 +533,8 @@
                                 },
                                 ticks: {
                                     maxRotation: 0,
-                                    autoSkip: true
+                                    autoSkip: true,
+                                    maxTicksLimit: 10,
                                 }
                             }
                         }

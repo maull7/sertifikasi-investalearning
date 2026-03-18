@@ -117,6 +117,16 @@ class MasterPackegeController extends Controller
         $package->status = $package->status === 'active' ? 'inactive' : 'active';
         $package->save();
         $msg = $package->status === 'active' ? 'aktifkan' : 'nonaktifkan';
+
+        return redirect()->route('master-packages.index')->with('success', "Paket berhasil {$msg}.");
+    }
+
+    public function toggleHidden(Package $package)
+    {
+        $package->is_hidden = ! $package->is_hidden;
+        $package->save();
+        $msg = $package->is_hidden ? 'disembunyikan dari daftar umum' : 'ditampilkan kembali ke daftar umum';
+
         return redirect()->route('master-packages.index')->with('success', "Paket berhasil {$msg}.");
     }
 

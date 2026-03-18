@@ -8,10 +8,20 @@
         toggleModal: false,
         toggleUrl: '',
         userName: '',
+        hiddenModal: false,
+        hiddenUrl: '',
+        hiddenName: '',
+        hiddenAction: '',
         confirmToggle(url, name) {
             this.toggleUrl = url;
             this.userName = name;
             this.toggleModal = true;
+        },
+        confirmHidden(url, name, action) {
+            this.hiddenUrl = url;
+            this.hiddenName = name;
+            this.hiddenAction = action;
+            this.hiddenModal = true;
         }
     }">
 
@@ -86,18 +96,25 @@
                                     {{ $value->description }}
                                 </td>
                                 <td class="py-4 px-8 text-sm text-gray-500 font-medium">
-                                    @if ($value->status === 'active')
-                                        <span
-                                            class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
-                                            Aktif
-                                        </span>
-                                    @else
-                                        <span
-                                            class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">
-                                            Nonaktif
-                                        </span>
-                                    @endif
-
+                                    <div class="flex flex-wrap gap-1.5">
+                                        @if ($value->status === 'active')
+                                            <span
+                                                class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                                                Aktif
+                                            </span>
+                                        @else
+                                            <span
+                                                class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">
+                                                Nonaktif
+                                            </span>
+                                        @endif
+                                        @if ($value->is_hidden)
+                                            <span
+                                                class="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-orange-900 dark:text-orange-300">
+                                                Hidden
+                                            </span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="py-4 px-8">
                                     <div class="flex items-center justify-end gap-2">
@@ -128,8 +145,16 @@
                                         <x-button variant="{{ $value->status === 'active' ? 'danger' : 'success' }}"
                                             size="sm" type="button"
                                             @click="confirmToggle('{{ route('master-packages.toggle-active', $value->id) }}', '{{ $value->title }}', '{{ $value->status === 'active' ? 'nonaktifkan' : 'aktifkan' }}')"
-                                            class="rounded-lg h-9 w-9 p-0 flex items-center justify-center">
+                                            class="rounded-lg h-9 w-9 p-0 flex items-center justify-center"
+                                            title="{{ $value->status === 'active' ? 'Nonaktifkan' : 'Aktifkan' }}">
                                             <i class="ti ti-toggle-left text-base"></i>
+                                        </x-button>
+                                        <x-button variant="{{ $value->is_hidden ? 'warning' : 'secondary' }}"
+                                            size="sm" type="button"
+                                            @click="confirmHidden('{{ route('master-packages.toggle-hidden', $value->id) }}', '{{ addslashes($value->title) }}', '{{ $value->is_hidden ? 'tampilkan' : 'sembunyikan' }}')"
+                                            class="rounded-lg h-9 w-9 p-0 flex items-center justify-center"
+                                            title="{{ $value->is_hidden ? 'Tampilkan Paket' : 'Sembunyikan Paket' }}">
+                                            <i class="ti ti-{{ $value->is_hidden ? 'eye' : 'eye-off' }} text-base"></i>
                                         </x-button>
                                     </div>
                                 </td>
@@ -285,6 +310,46 @@
                         <x-button variant="success" type="submit"
                             class="w-full rounded-xl shadow-lg shadow-emerald-500/20">
                             Ya, Ubah Status
+                        </x-button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {{-- Hidden Confirmation Modal --}}
+        <div x-show="hiddenModal"
+            class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm" x-cloak
+            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+
+            <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800"
+                @click.away="hiddenModal = false">
+                <div class="p-8 text-center">
+                    <div
+                        class="w-20 h-20 bg-orange-50 dark:bg-orange-500/10 text-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                        <i class="ti ti-eye-off text-4xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2" x-text="hiddenAction === 'sembunyikan' ? 'Sembunyikan Paket?' : 'Tampilkan Paket?'"></h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+                        Anda akan
+                        <span class="font-bold text-gray-900 dark:text-white" x-text="hiddenAction"></span>
+                        paket <span class="font-bold text-gray-900 dark:text-white" x-text="hiddenName"></span>.
+                    </p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                        Paket yang disembunyikan tidak akan muncul di daftar umum, namun user yang sudah join tetap bisa mengaksesnya.
+                    </p>
+                </div>
+
+                <div class="flex gap-3 p-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800">
+                    <x-button variant="secondary" class="flex-1 rounded-xl" @click="hiddenModal = false">
+                        Batal
+                    </x-button>
+                    <form :action="hiddenUrl" method="POST" class="flex-1">
+                        @csrf
+                        @method('PATCH')
+                        <x-button variant="warning" type="submit"
+                            class="w-full rounded-xl shadow-lg shadow-orange-500/20">
+                            <span x-text="hiddenAction === 'sembunyikan' ? 'Ya, Sembunyikan' : 'Ya, Tampilkan'"></span>
                         </x-button>
                     </form>
                 </div>
