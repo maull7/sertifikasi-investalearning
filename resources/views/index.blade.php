@@ -317,8 +317,8 @@
             <div class="flex justify-between items-center h-16 lg:h-18">
                 <a href="#home" class="flex items-center gap-2">
                     <img src="{{ asset('img/favicon.png') }}" alt="" class="w-8 h-8 rounded-lg">
-                    <span class="text-xl font-bold text-slate-900">Investa<span
-                            class="gradient-text">learning</span></span>
+                    <span class="text-xl font-bold text-slate-900">PT Tunas Inti Investa <span
+                            class="gradient-text">(Investalearning)</span></span>
                 </a>
                 <div class="hidden md:flex items-center gap-8">
                     <a href="#home"
@@ -605,13 +605,15 @@
                         Edukasi investasi yang <span class="gradient-text">terpercaya</span>
                     </h2>
                     <p class="text-slate-600 leading-relaxed mb-4">
-                        Investalearning hadir untuk membuat literasi finansial dan kelas investasi saham dapat diakses
+                        PT Tunas Inti Investa (Investalearning) hadir untuk membuat literasi finansial dan kelas
+                        investasi saham dapat diakses
                         siapa saja. Dari pemula hingga yang ingin siap sertifikasi—materi terstruktur, ujian, dan
                         sertifikat yang diakui.
                     </p>
                     <p class="text-slate-600 leading-relaxed">
-                        Platform kami menggabungkan kelas lengkap, latihan, dan penilaian yang memudahkan Anda membangun
-                        kompetensi investasi secara bertahap.
+                        PT Tunas Inti Investa (Investalearning) menerbitkan buku-buku pelatihan sertifikasi pasar modal,
+                        seperti : Waperd, EBUS dan Ekuitas untuk mendukung peningkatan kompetensi para peserta dalam
+                        mempersiapkan menghadapi asesmen dan mengembangkan kemampuan profesionalitas dalam bekerja.
                     </p>
                     <div class="mt-10 flex gap-10">
                         <div><span class="block text-2xl font-bold text-slate-900">50K+</span><span
