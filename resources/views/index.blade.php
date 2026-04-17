@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Kelas Saham & Investasi | Investalearning</title>
+    <title>Kelas Investasi | Investalearning</title>
     <meta name="description"
         content="Belajar investasi saham dari dasar hingga siap sertifikasi. Kelas Pasar Modal & MSDM. Materi lengkap, ujian, dan sertifikat diakui.">
     <meta name="referrer" content="strict-origin-when-cross-origin" />
