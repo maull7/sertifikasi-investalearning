@@ -5,28 +5,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="color-scheme" content="light">
+
     <title>Kelas Investasilearning | Investalearning</title>
-    <meta name="description"
-        content="Belajar investasi saham dari dasar hingga siap sertifikasi. Kelas Pasar Modal & MSDM. Materi lengkap, ujian, dan sertifikat diakui.">
-    <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <link rel="shortcut icon" href="{{ asset('img/favicon.png') }}" type="image/x-icon">
+    <meta name="description" content="Belajar investasi saham dari dasar hingga siap sertifikasi. Kelas Pasar Modal & MSDM. Materi lengkap, ujian, dan sertifikat diakui.">
+
+    {{-- Open Graph / Social --}}
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Kelas Investasilearning | Investalearning">
+    <meta property="og:description" content="Belajar investasi saham dari dasar hingga siap sertifikasi. Kelas Pasar Modal & MSDM. Materi lengkap, ujian, dan sertifikat diakui.">
+    <meta property="og:image" content="{{ asset('img/favicon.png') }}">
+    <meta name="twitter:card" content="summary_large_image">
+
+    {{-- Favicon --}}
+    <link rel="icon" href="{{ asset('img/favicon.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('img/favicon.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+
+    {{-- Preconnect --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+    {{-- Fonts --}}
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    screens: {
-                        'xs': '375px',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         @keyframes float {
 
@@ -193,9 +200,26 @@
             background-clip: text;
         }
 
-        body {
-            font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+        :focus-visible {
+            outline: 2px solid #4f46e5;
+            outline-offset: 2px;
+            border-radius: 4px;
         }
+
+        .skip-link {
+            position: absolute;
+            top: -100%;
+            left: 0;
+            z-index: 9999;
+            padding: 0.5rem 1rem;
+            background: #4f46e5;
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 0 0 4px 0;
+            transition: top 0.1s;
+        }
+        .skip-link:focus { top: 0; }
 
         .gradient-mesh {
             background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(79, 70, 229, 0.12), transparent), radial-gradient(ellipse 60% 40% at 100% 0%, rgba(99, 102, 241, 0.06), transparent);
@@ -309,30 +333,29 @@
     </style>
 </head>
 
-<body class="bg-slate-50 text-slate-900 overflow-x-hidden antialiased">
-    <!-- Navbar - minimal & elegan -->
+<body class="bg-slate-50 text-slate-900 overflow-x-hidden antialiased" style="font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;">
+
+    <a href="#main-content" class="skip-link">Langsung ke konten utama</a>
+
+    <!-- Navbar -->
     <nav x-data="{ mobileMenuOpen: false }"
-        class="fixed inset-x-0 top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/80">
+        class="fixed inset-x-0 top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/80"
+        role="navigation"
+        aria-label="Navigasi utama">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16 lg:h-18">
-                <a href="#home" class="flex items-center gap-2">
-                    <img src="{{ asset('img/favicon.png') }}" alt="" class="w-8 h-8 rounded-lg">
+                <a href="#home" class="flex items-center gap-2" aria-label="PT Tunas Inti Investa - Investalearning">
+                    <img src="{{ asset('img/favicon.png') }}" alt="Logo Investalearning" class="w-8 h-8 rounded-lg" width="32" height="32">
                     <span class="text-xl font-bold text-slate-900">PT Tunas Inti Investa <span
                             class="gradient-text">(Investalearning)</span></span>
                 </a>
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="#home"
-                        class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Beranda</a>
-                    <a href="#courses"
-                        class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Kelas</a>
-                    <a href="#books"
-                        class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Buku</a>
-                    <a href="#video"
-                        class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Video</a>
-                    <a href="#about"
-                        class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Tentang</a>
-                    <a href="#contact"
-                        class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Kontak</a>
+                <div class="hidden md:flex items-center gap-8" role="menubar">
+                    <a href="#home" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition" role="menuitem">Beranda</a>
+                    <a href="#courses" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition" role="menuitem">Kelas</a>
+                    <a href="#books" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition" role="menuitem">Buku</a>
+                    <a href="#video" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition" role="menuitem">Video</a>
+                    <a href="#about" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition" role="menuitem">Tentang</a>
+                    <a href="#contact" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition" role="menuitem">Kontak</a>
                 </div>
                 <div class="hidden md:flex items-center gap-3">
                     <a href="{{ route('login') }}"
@@ -340,8 +363,13 @@
                     <a href="{{ route('register') }}"
                         class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 hover:bg-indigo-700 transition">Daftar</a>
                 </div>
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 text-slate-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button
+                    @click="mobileMenuOpen = !mobileMenuOpen"
+                    class="md:hidden p-2 text-slate-600"
+                    :aria-expanded="mobileMenuOpen"
+                    aria-controls="mobile-menu"
+                    aria-label="Buka menu navigasi">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
@@ -349,25 +377,30 @@
             </div>
         </div>
         <div x-show="mobileMenuOpen" x-transition
-            class="md:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-2">
-            <a href="#home" class="block py-2 text-sm font-medium text-slate-600">Beranda</a>
-            <a href="#courses" class="block py-2 text-sm font-medium text-slate-600">Kelas</a>
-            <a href="#books" class="block py-2 text-sm font-medium text-slate-600">Buku</a>
-            <a href="#video" class="block py-2 text-sm font-medium text-slate-600">Video</a>
-            <a href="#about" class="block py-2 text-sm font-medium text-slate-600">Tentang</a>
-            <a href="#contact" class="block py-2 text-sm font-medium text-slate-600">Kontak</a>
+            id="mobile-menu"
+            class="md:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-2"
+            role="menu">
+            <a href="#home" class="block py-2 text-sm font-medium text-slate-600" role="menuitem">Beranda</a>
+            <a href="#courses" class="block py-2 text-sm font-medium text-slate-600" role="menuitem">Kelas</a>
+            <a href="#books" class="block py-2 text-sm font-medium text-slate-600" role="menuitem">Buku</a>
+            <a href="#video" class="block py-2 text-sm font-medium text-slate-600" role="menuitem">Video</a>
+            <a href="#about" class="block py-2 text-sm font-medium text-slate-600" role="menuitem">Tentang</a>
+            <a href="#contact" class="block py-2 text-sm font-medium text-slate-600" role="menuitem">Kontak</a>
             <a href="{{ route('register') }}"
-                class="block w-full text-center py-3 rounded-xl bg-indigo-600 text-white text-sm font-semibold mt-2">Daftar</a>
+                class="block w-full text-center py-3 rounded-xl bg-indigo-600 text-white text-sm font-semibold mt-2" role="menuitem">Daftar</a>
         </div>
     </nav>
+
+    <main id="main-content" tabindex="-1">
+
     <!-- Hero - promosi kelas saham -->
-    <section id="home" class="relative min-h-[90vh] flex items-center pt-24 pb-20 gradient-mesh">
+    <section id="home" class="relative min-h-[90vh] flex items-center pt-24 pb-20 gradient-mesh" aria-labelledby="hero-heading">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                 <div class="animate-slide-up">
                     <p class="text-sm font-semibold text-indigo-600 uppercase tracking-wider mb-4">Kelas Investasi &
                         Sertifikasi</p>
-                    <h1
+                    <h1 id="hero-heading"
                         class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.1] tracking-tight">
                         Kelas Saham<br>
                         <span class="gradient-text">Profesional</span><br>
@@ -551,7 +584,7 @@
                         <div class="relative h-80">
                             @if ($item->cover_image)
                                 <img src="{{ asset('storage/' . $item->cover_image) }}" alt="{{ $item->title }}"
-                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy">
                             @else
                                 <div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
                                     Tidak ada cover
@@ -626,7 +659,7 @@
                 </div>
                 <div class="rounded-2xl overflow-hidden shadow-xl border border-slate-200/80">
                     <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&h=400&fit=crop"
-                        alt="Belajar investasi" class="w-full h-80 object-cover">
+                        alt="Belajar investasi" class="w-full h-80 object-cover" width="600" height="320" fetchpriority="high">
                 </div>
             </div>
         </div>
@@ -794,15 +827,16 @@
 
     <!-- Scroll to Top Button -->
     <button id="scrollTop"
+        aria-label="Kembali ke atas halaman"
         class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 bg-gradient-to-br from-indigo-600 to-indigo-500 text-white w-10 h-10 xs:w-12 xs:h-12 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 z-50 opacity-0 pointer-events-none hover:shadow-indigo-500/50">
-        <svg class="w-5 h-5 xs:w-6 xs:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 xs:w-6 xs:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18">
             </path>
         </svg>
     </button>
-</body>
 
-</html>
+    </main>{{-- end #main-content --}}
+
 <script>
     // Scroll to Top Button
     const scrollTopBtn = document.getElementById('scrollTop');
@@ -815,7 +849,7 @@
             scrollTopBtn.style.opacity = '0';
             scrollTopBtn.style.pointerEvents = 'none';
         }
-    });
+    }, { passive: true });
 
     scrollTopBtn.addEventListener('click', () => {
         window.scrollTo({
@@ -861,3 +895,6 @@
         observer.observe(el);
     });
 </script>
+
+</body>
+</html>

@@ -106,13 +106,13 @@
                                 <td class="py-4 px-8">
                                     <div class="flex items-center justify-center gap-2">
                                         @if ($value->materi_type === 'File')
-                                            <a href="{{ route('master-materials.preview', $value->id) }}" target="_blank"
+                                            <a href="{{ route('master-materials.preview', $value->id) }}" target="_blank" rel="noopener noreferrer"
                                                 class="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-semibold rounded-lg transition-colors">
                                                 <i class="ti ti-eye text-sm"></i>
                                                 Preview
                                             </a>
                                         @else
-                                            <a href="{{ $value->value }}" target="_blank"
+                                            <a href="{{ $value->value }}" target="_blank" rel="noopener noreferrer"
                                                 class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold rounded-lg transition-colors">
                                                 <i class="ti ti-eye text-sm"></i>
                                                 Lihat Video

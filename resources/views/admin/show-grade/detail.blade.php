@@ -60,7 +60,7 @@
                                 @else
                                      <a href="{{asset('storage/' . $data->Question->question)}}"
                                                  class="inline-flex px-3 py-1 items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400"
-                                                target="_blank"
+                                                target="_blank" rel="noopener noreferrer"
                                                  >
                                                 <i class="ti ti-photo"></i> Lihat Gambar
                                     </a>

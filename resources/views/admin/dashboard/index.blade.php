@@ -300,9 +300,6 @@
 
                     const chartData = await response.json();
 
-                    // Tampilkan di console untuk debugging
-                    console.log('chartData:', chartData);
-
                     updateChart(chartData);
                     updateSummary(chartData);
                 } catch (error) {

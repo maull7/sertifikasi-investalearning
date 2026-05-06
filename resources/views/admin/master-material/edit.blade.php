@@ -135,7 +135,7 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <a href="{{ route('master-materials.preview', $data->id) }}" target="_blank"
+                                    <a href="{{ route('master-materials.preview', $data->id) }}" target="_blank" rel="noopener noreferrer"
                                         class="inline-flex items-center gap-1 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-semibold rounded-lg transition-colors">
                                         <i class="ti ti-eye text-sm"></i>
                                         Preview
