@@ -1,13 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminFaceToFaceSchedule;
 use App\Http\Controllers\Admin\ApprovePackageController;
 use App\Http\Controllers\Admin\BankQuestionController;
 use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\CertificateController;
+use App\Http\Controllers\Admin\CertificateTemplateController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmailActivation;
 use App\Http\Controllers\Admin\ExamController;
-use App\Http\Controllers\Admin\CertificateTemplateController;
 use App\Http\Controllers\Admin\MappingPackageController;
 use App\Http\Controllers\Admin\MappingQuestionController;
 use App\Http\Controllers\Admin\MasterMaterialController;
@@ -30,9 +31,10 @@ use App\Http\Controllers\User\HistoryExamController;
 use App\Http\Controllers\User\MyPackageController;
 use App\Http\Controllers\User\PackageController as UserPackageController;
 use App\Http\Controllers\User\QuizController as UserQuizController;
+use App\Http\Controllers\User\UserFaceToFaceScheduleController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [IndexController::class, 'index'])->name('home')->middleware('check-login');
+Route::get('/', [IndexController::class, 'index'])->name('home');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'admin'])
@@ -107,6 +109,14 @@ Route::middleware('auth', 'akun-active')->group(function () {
     Route::get('user/my-certificate/{certificate}', [CertificateControlller::class, 'detail'])->name('user.certificate.show');
     Route::get('certificates/{certificate}/download', [CertificateController::class, 'download'])
         ->name('certificates.download');
+
+    //jadwal tatap muka
+    Route::get('user/face-to-face-schedules', [UserFaceToFaceScheduleController::class, 'index'])
+        ->name('user.face-to-face-schedules.index');
+    Route::get('user/face-to-face-schedules/registered', [UserFaceToFaceScheduleController::class, 'registered'])
+        ->name('user.face-to-face-schedules.registered');
+    Route::post('user/face-to-face-schedules/{faceToFaceSchedule}/register', [UserFaceToFaceScheduleController::class, 'register'])
+        ->name('user.face-to-face-schedules.register');
 });
 
 // routes admin (Admin + Petugas)
@@ -120,6 +130,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('master-user/{user}/edit', [MasterUserController::class, 'edit'])->name('master-user.edit');
         Route::put('master-user/{user}', [MasterUserController::class, 'update'])->name('master-user.update');
         Route::delete('master-user/{user}', [MasterUserController::class, 'destroy'])->name('master-user.destroy');
+        Route::resource('admin/face-to-face-schedules', AdminFaceToFaceSchedule::class)
+            ->names('admin.face-to-face-schedules');
     });
 
     // Master & Pelatihan (hanya Admin)

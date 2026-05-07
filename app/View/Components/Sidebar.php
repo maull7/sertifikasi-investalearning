@@ -131,6 +131,21 @@ class Sidebar extends Component
             ],
         ];
         $groups[] = [
+            'title' => 'Jadwal Tatap Muka',
+            'items' => [
+                [
+                    'name' => 'Jadwal Tersedia',
+                    'icon' => 'ti ti-chart-line',
+                    'activePattern' => 'face-to-face-schedules.*',
+                    'subItems' => [
+                        ['name' => 'Jadwal Tersedia', 'route' => 'admin.face-to-face-schedules.index'],
+                        ['name' => 'Buat Jadwal Tatap Muka', 'route' => 'admin.face-to-face-schedules.create'],
+                    ],
+                ],
+
+            ],
+        ];
+        $groups[] = [
             'title' => 'Hasil',
             'items' => [
                 [
@@ -222,6 +237,21 @@ class Sidebar extends Component
                         'activePattern' => 'user.certificate.*',
                         'subItems' => [
                             ['name' => 'Sertifikat Saya', 'route' => 'user.certificate.index'],
+                        ],
+                    ],
+
+                ],
+            ],
+            [
+                'title' => 'Jadwal Tatap Muka',
+                'items' => [
+                    [
+                        'name' => 'Jadwal Tatap Muka',
+                        'icon' => 'ti ti-calendar',
+                        'activePattern' => 'user.face-to-face-schedules.*',
+                        'subItems' => [
+                            ['name' => 'Semua Jadwal', 'route' => 'user.face-to-face-schedules.index'],
+                            ['name' => 'Jadwal Terdaftar', 'route' => 'user.face-to-face-schedules.registered'],
                         ],
                     ],
 
