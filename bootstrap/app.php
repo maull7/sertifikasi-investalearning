@@ -8,6 +8,7 @@ use App\Http\Middleware\EnsureUserIsAdminOnly;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Session\TokenMismatchException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -30,4 +31,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'method' => request()?->method(),
             'user_id' => auth()->id(),
         ]);
+
+        $exceptions->render(function (TokenMismatchException $e, $request) {
+            return redirect()->route('login')
+                ->withErrors(['email' => 'Sesi Anda telah berakhir. Silakan login kembali.']);
+        });
     })->create();

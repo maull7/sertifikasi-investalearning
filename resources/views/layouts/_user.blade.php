@@ -133,9 +133,9 @@
 
                 {{-- Footer: Logout --}}
                 <div class="p-6 bg-gray-50/30 dark:bg-gray-900/40 border-t border-gray-100 dark:border-gray-900">
-                    <form method="POST" action="#">
+                    <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="button"
+                        <button type="submit"
                             class="w-full flex items-center justify-center gap-3 py-3.5 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 text-sm font-black rounded-2xl hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white transition-all shadow-sm active:scale-[0.98] group">
                             <i class="ti ti-logout-2 text-xl transition-transform group-hover:translate-x-1"></i>
                             Keluar dari Sesi

@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 
 class GoogleAuthController extends Controller
 {
@@ -25,41 +26,54 @@ class GoogleAuthController extends Controller
      */
     public function callback(): RedirectResponse
     {
-        $googleUser = Socialite::driver('google')->user();
+        try {
+            $googleUser = Socialite::driver('google')->user();
+        } catch (InvalidStateException) {
+            return redirect()->route('login')
+                ->withErrors(['email' => 'Sesi login Google tidak valid atau sudah kadaluarsa. Silakan coba lagi.']);
+        } catch (\Exception) {
+            return redirect()->route('login')
+                ->withErrors(['email' => 'Login dengan Google gagal. Silakan coba lagi atau gunakan email & password.']);
+        }
 
-        $user = User::query()->where('google_id', $googleUser->getId())->first();
+        try {
+            $user = User::query()->where('google_id', $googleUser->getId())->first();
 
-        if (! $user) {
-            $user = User::query()->where('email', $googleUser->getEmail())->first();
+            if (! $user) {
+                $user = User::query()->where('email', $googleUser->getEmail())->first();
 
-            if ($user) {
-                $user->update([
-                    'google_id' => $googleUser->getId(),
-                ]);
-            } else {
-                $user = User::query()->create([
-                    'name' => $googleUser->getName(),
-                    'email' => $googleUser->getEmail(),
-                    'google_id' => $googleUser->getId(),
-                    'password' => null,
-                    'email_verified_at' => now(),
-                    'role' => 'User',
-                    'status_user' => 'Teraktivasi',
-                    'jenis_kelamin' => 'Laki-laki',
-                ]);
+                if ($user) {
+                    $user->update([
+                        'google_id' => $googleUser->getId(),
+                    ]);
+                } else {
+                    $user = User::query()->create([
+                        'name' => $googleUser->getName(),
+                        'email' => $googleUser->getEmail(),
+                        'google_id' => $googleUser->getId(),
+                        'password' => null,
+                        'email_verified_at' => now(),
+                        'role' => 'User',
+                        'status_user' => 'Teraktivasi',
+                        'jenis_kelamin' => 'Laki-laki',
+                    ]);
+                }
             }
+
+            Auth::login($user, true);
+
+            if ($user->role === 'User' && $user->needsProfileCompletion()) {
+                return redirect()->route('profile.complete');
+            }
+
+            if ($user->role === 'Admin') {
+                return redirect()->route('dashboard');
+            }
+
+            return redirect()->intended(route('user.dashboard', absolute: false));
+        } catch (\Exception) {
+            return redirect()->route('login')
+                ->withErrors(['email' => 'Terjadi kesalahan saat memproses akun Google. Silakan coba lagi.']);
         }
-
-        Auth::login($user, true);
-
-        if ($user->role === 'User' && $user->needsProfileCompletion()) {
-            return redirect()->route('profile.complete');
-        }
-
-        if ($user->role === 'Admin') {
-            return redirect()->route('dashboard');
-        }
-
-        return redirect()->intended(route('user.dashboard', absolute: false));
     }
 }
