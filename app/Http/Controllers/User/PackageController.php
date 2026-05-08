@@ -56,26 +56,56 @@ class PackageController extends Controller
         return view('user.packages.show', compact('package', 'isJoined', 'subjects'));
     }
 
-    public function join(Package $package): RedirectResponse
+    public function checkout(Package $package): \Illuminate\View\View|\Illuminate\Http\RedirectResponse
     {
         $user = Auth::user();
 
-        $existingJoin = UserJoin::where('user_id', $user->id)
-            ->where('id_package', $package->id)
-            ->first();
-
-        if ($existingJoin) {
-            return redirect()->route('user.packages.show', $package)
-                ->with('error', 'Anda sudah bergabung dengan package ini.');
+        if (UserJoin::where('user_id', $user->id)->where('id_package', $package->id)->exists()) {
+            return redirect()->route('user.packages.show', $package)->with('error', 'Anda sudah mendaftar paket ini.');
         }
 
-        UserJoin::create([
-            'user_id' => $user->id,
-            'id_package' => $package->id,
+        $schedules = \App\Models\FaceToFaceSchedule::where('package_id', $package->id)
+            ->where('is_active', true)
+            ->withCount('sessions')
+            ->orderByDesc('id')
+            ->get();
+
+        $qrisImage       = \App\Models\Setting::get('qris_image');
+        $qrisName        = \App\Models\Setting::get('qris_name');
+        $qrisDescription = \App\Models\Setting::get('qris_description');
+
+        return view('user.packages.checkout', compact('package', 'schedules', 'qrisImage', 'qrisName', 'qrisDescription'));
+    }
+
+    public function join(Package $package, \Illuminate\Http\Request $request): RedirectResponse
+    {
+        $user = Auth::user();
+
+        if (UserJoin::where('user_id', $user->id)->where('id_package', $package->id)->exists()) {
+            return redirect()->route('user.packages.show', $package)->with('error', 'Anda sudah mendaftar paket ini.');
+        }
+
+        $request->validate([
+            'schedule_id' => 'required|exists:face_to_face_schedules,id',
+            'proof_image' => 'required|image|max:3072',
+        ]);
+
+        $userJoin = UserJoin::create([
+            'user_id'     => $user->id,
+            'id_package'  => $package->id,
+            'schedule_id' => $request->schedule_id,
+            'status'      => 'pending',
+        ]);
+
+        $path = $request->file('proof_image')->store('payments', 'public');
+        \App\Models\Payment::create([
+            'user_join_id' => $userJoin->id,
+            'proof_image'  => $path,
+            'status'       => 'pending',
         ]);
 
         return redirect()->route('user.my-packages.index')
-            ->with('success', 'Berhasil Daftar ke paket ini, tunggu konfirmasi dari admin!');
+            ->with('success', 'Pendaftaran berhasil! Menunggu konfirmasi admin.');
     }
 
     public function landing(Request $request): View

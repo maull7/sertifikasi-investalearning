@@ -150,11 +150,10 @@ class UserFaceToFaceScheduleController extends Controller
         $joinedPackageIds = $this->joinedPackageIds((int) $user->id);
 
         $allSchedules = FaceToFaceSchedule::query()
-            ->with(['package:id,title', 'teacher:id,name', 'subject:id,name'])
+            ->with(['package:id,title', 'sessions.teacher:id,name'])
             ->where('is_active', true)
             ->whereIn('package_id', $joinedPackageIds)
-            ->orderBy('schedule_date')
-            ->orderBy('start_time')
+            ->orderByDesc('id')
             ->get();
 
         $registeredScheduleIds = FaceToFaceScheduleRegistration::query()
@@ -163,10 +162,9 @@ class UserFaceToFaceScheduleController extends Controller
             ->all();
 
         $registeredSchedules = FaceToFaceSchedule::query()
-            ->with(['package:id,title', 'teacher:id,name', 'subject:id,name'])
+            ->with(['package:id,title', 'sessions.teacher:id,name'])
             ->whereIn('id', $registeredScheduleIds)
-            ->orderBy('schedule_date')
-            ->orderBy('start_time')
+            ->orderByDesc('id')
             ->get();
 
         return view('user.face-to-face-schedules.index', compact(

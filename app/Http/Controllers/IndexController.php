@@ -17,11 +17,9 @@ class IndexController extends Controller
             ->groupBy('id_master_types');
         $books = Book::paginate(10);
         $schedules = FaceToFaceSchedule::query()
-            ->with(['package:id,title', 'teacher:id,name', 'subject:id,name'])
+            ->with(['package:id,title', 'sessions' => fn($q) => $q->orderBy('session_date')->orderBy('start_time')->limit(3)])
             ->where('is_active', true)
-            ->where('schedule_date', '>=', now()->toDateString())
-            ->orderBy('schedule_date')
-            ->orderBy('start_time')
+            ->orderByDesc('id')
             ->limit(6)
             ->get();
 

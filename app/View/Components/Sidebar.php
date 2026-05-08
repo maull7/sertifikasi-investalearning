@@ -146,6 +146,19 @@ class Sidebar extends Component
             ],
         ];
         $groups[] = [
+            'title' => 'Pembayaran',
+            'items' => [
+                [
+                    'name' => 'Pengaturan QRIS',
+                    'icon' => 'ti ti-qrcode',
+                    'activePattern' => 'admin.settings.*',
+                    'subItems' => [
+                        ['name' => 'Pengaturan QRIS', 'route' => 'admin.settings.index'],
+                    ],
+                ],
+            ],
+        ];
+        $groups[] = [
             'title' => 'Hasil',
             'items' => [
                 [

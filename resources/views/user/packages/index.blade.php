@@ -103,23 +103,24 @@
                                 </p>
                             @endif
 
+                            {{-- Price --}}
+                            <div class="flex items-center gap-2">
+                                @if ($package->price)
+                                    <span
+                                        class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                        <i class="ti ti-tag text-xs"></i>
+                                        Rp {{ number_format($package->price, 0, ',', '.') }}
+                                    </span>
+                                @else
+                                    <span
+                                        class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-bold bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">
+                                        <i class="ti ti-gift text-xs"></i>
+                                        Gratis
+                                    </span>
+                                @endif
+                            </div>
+
                             {{-- Package Info --}}
-                            <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                                <div class="flex items-center gap-1">
-                                    <i class="ti ti-book"></i>
-                                    <span> {{ $package?->mappedSubjects?->count() ?? 0 }} Mata Pelajaran</span>
-                                </div>
-                                <div class="flex items-center gap-1">
-                                    <i class="ti ti-users"></i>
-                                    <span>{{ $package->userJoins->count() }} Peserta</span>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                                <div class="flex items-center gap-1">
-                                    <i class="ti ti-vocabulary"></i>
-                                    <span> {{ $package->mappedSubjects->flatMap->materials->count() ?? 0 }} Materi</span>
-                                </div>
-                            </div>
 
 
                             {{-- Action Button --}}

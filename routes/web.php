@@ -45,16 +45,16 @@ Route::get('certificates/{certificate}/verify', [CertificateController::class, '
     ->name('certificates.verify');
 
 Route::get('/user/dashboard', [UserDashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'profile-complete'])
     ->name('user.dashboard');
 Route::get('/user/dashboard/chart-data', [UserDashboardController::class, 'getChartData'])
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'profile-complete'])
     ->name('user.dashboard.chart-data');
 // Chart Data API
 Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart-data');
 
 // routes user
-Route::middleware('auth', 'akun-active')->group(function () {
+Route::middleware('auth', 'akun-active', 'profile-complete')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -68,6 +68,7 @@ Route::middleware('auth', 'akun-active')->group(function () {
     // User Package routes
     Route::get('user/packages', [UserPackageController::class, 'index'])->name('user.packages.index');
     Route::get('user/packages/{package}', [UserPackageController::class, 'show'])->name('user.packages.show');
+    Route::get('user/packages/{package}/checkout', [UserPackageController::class, 'checkout'])->name('user.packages.checkout');
     Route::post('user/packages/{package}/join', [UserPackageController::class, 'join'])->name('user.packages.join');
 
     // My Packages routes
@@ -132,6 +133,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::delete('master-user/{user}', [MasterUserController::class, 'destroy'])->name('master-user.destroy');
         Route::resource('admin/face-to-face-schedules', AdminFaceToFaceSchedule::class)
             ->names('admin.face-to-face-schedules');
+        Route::get('admin/face-to-face-schedules/{faceToFaceSchedule}/participants', [AdminFaceToFaceSchedule::class, 'participants'])
+            ->name('admin.face-to-face-schedules.participants');
     });
 
     // Master & Pelatihan (hanya Admin)
@@ -249,6 +252,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('monitor-participants.export');
     Route::get('monitor-participants/{userJoin}', [ParticipantMonitorController::class, 'show'])
         ->name('monitor-participants.show');
+
+    // Settings QRIS
+    Route::get('admin/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('admin.settings.index');
+    Route::post('admin/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update');
+
+    // Payments
+    Route::get('admin/payments', [\App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('admin.payments.index');
+    Route::patch('admin/payments/{payment}/confirm', [\App\Http\Controllers\Admin\PaymentController::class, 'confirm'])->name('admin.payments.confirm');
+    Route::patch('admin/payments/{payment}/reject', [\App\Http\Controllers\Admin\PaymentController::class, 'reject'])->name('admin.payments.reject');
 });
 
 require __DIR__ . '/auth.php';

@@ -70,6 +70,18 @@
                         required
                     >{{ old('description', $data->description) }}</x-textarea>
                 </div>
+
+                <div class="md:col-span-2">
+                    <x-input 
+                        label="Biaya Investasi (Rp)" 
+                        name="price" 
+                        type="number"
+                        placeholder="Contoh: 500000 (kosongkan jika gratis)" 
+                        value="{{ old('price', $data->price) }}"
+                        min="0"
+                    />
+                </div>
+
                 <div class="md:col-span-2">
                     <x-select 
                         label="Status Paket" 

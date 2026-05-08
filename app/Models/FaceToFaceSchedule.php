@@ -9,17 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FaceToFaceSchedule extends Model
 {
-
     use HasFactory;
 
     protected $fillable = [
         'package_id',
-        'teacher_id',
-        'subject_id',
         'title',
-        'schedule_date',
-        'start_time',
-        'end_time',
         'room_name',
         'zoom_join_url',
         'zoom_meeting_id',
@@ -30,7 +24,6 @@ class FaceToFaceSchedule extends Model
     protected function casts(): array
     {
         return [
-            'schedule_date' => 'date',
             'is_active' => 'boolean',
         ];
     }
@@ -40,14 +33,9 @@ class FaceToFaceSchedule extends Model
         return $this->belongsTo(Package::class, 'package_id');
     }
 
-    public function teacher(): BelongsTo
+    public function sessions(): HasMany
     {
-        return $this->belongsTo(Teacher::class, 'teacher_id');
-    }
-
-    public function subject(): BelongsTo
-    {
-        return $this->belongsTo(Subject::class, 'subject_id');
+        return $this->hasMany(FaceToFaceSession::class, 'schedule_id')->orderBy('session_date')->orderBy('start_time');
     }
 
     public function registrations(): HasMany
