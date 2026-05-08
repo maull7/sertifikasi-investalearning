@@ -540,27 +540,32 @@
                                         @endif
 
                                         {{-- Info: materi & peserta --}}
-                                        <div class="flex items-center gap-4 text-xs text-gray-500">
-                                            <span class="flex items-center gap-1">
-                                                <svg class="w-4 h-4 text-indigo-500" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
-                                                    </path>
-                                                </svg>
-                                                {{ $item->materials->count() }} Materi
-                                            </span>
-                                            <span class="flex items-center gap-1">
-                                                <svg class="w-4 h-4 text-indigo-500" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
-                                                    </path>
-                                                </svg>
-                                                {{ $item->userJoins->count() }} Peserta
-                                            </span>
+
+                                        {{-- Harga --}}
+                                        <div>
+                                            @if ($item->price)
+                                                <span
+                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                                    </svg>
+                                                    Rp {{ number_format($item->price, 0, ',', '.') }}
+                                                </span>
+                                            @else
+                                                <span
+                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-blue-50 text-blue-700 border border-blue-100">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                                                    </svg>
+                                                    Gratis
+                                                </span>
+                                            @endif
                                         </div>
 
                                         {{-- CTA --}}
@@ -670,130 +675,44 @@
                                 {{-- Header --}}
                                 <div
                                     class="relative bg-gradient-to-br from-indigo-600 via-indigo-500 to-violet-500 px-6 py-5 text-white overflow-hidden">
-
                                     <div class="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-2xl">
                                     </div>
-
-                                    <div class="relative z-10 flex items-start justify-between gap-4">
-                                        <div>
-                                            <p class="text-xs uppercase tracking-[0.25em] text-indigo-100 mb-2">
-                                                Paket Belajar
-                                            </p>
-
-                                            <h2 class="text-lg font-bold leading-snug">
-                                                {{ $schedule->package->title ?? 'Jadwal Kelas' }}
-                                            </h2>
-                                        </div>
-
-                                        <div
-                                            class="bg-white/15 backdrop-blur-md px-4 py-2 rounded-2xl text-center min-w-[70px]">
-                                            <p class="text-2xl font-extrabold leading-none">
-                                                {{ $schedule->schedule_date->format('d') }}
-                                            </p>
-                                            <p class="text-[11px] uppercase tracking-wider mt-1 text-indigo-100">
-                                                {{ $schedule->schedule_date->translatedFormat('M Y') }}
-                                            </p>
-                                        </div>
+                                    <div class="relative z-10">
+                                        <p class="text-xs uppercase tracking-[0.25em] text-indigo-100 mb-1">Paket
+                                            Belajar</p>
+                                        <h2 class="text-lg font-bold leading-snug">
+                                            {{ $schedule->package->title ?? 'Jadwal Kelas' }}</h2>
+                                        <p class="text-sm text-indigo-100 mt-1">{{ $schedule->title }}</p>
                                     </div>
                                 </div>
 
-                                {{-- Body --}}
-                                <div class="p-6 space-y-5">
-
-                                    {{-- Judul --}}
-                                    <div>
-                                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
-                                            Kegiatan
-                                        </p>
-
-                                        <h3 class="text-base font-bold text-slate-800 leading-relaxed">
-                                            {{ $schedule->title }}
-                                        </h3>
-                                    </div>
-
-                                    {{-- Info --}}
-                                    <div class="grid gap-3">
-
-                                        {{-- Waktu --}}
+                                {{-- Sesi (max 3) --}}
+                                <div class="p-5 space-y-2">
+                                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Sesi
+                                    </p>
+                                    @forelse ($schedule->sessions->take(3) as $session)
                                         <div
-                                            class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
-
+                                            class="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
                                             <div
-                                                class="w-11 h-11 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
+                                                class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 text-xs font-bold">
+                                                {{ $loop->iteration }}
                                             </div>
-
-                                            <div>
-                                                <p class="text-xs text-slate-400 font-medium">
-                                                    Waktu Belajar
-                                                </p>
-
-                                                <p class="text-sm font-semibold text-slate-700">
-                                                    {{ substr((string) $schedule->start_time, 0, 5) }}
-                                                    -
-                                                    {{ substr((string) $schedule->end_time, 0, 5) }}
-                                                    WIB
+                                            <div class="min-w-0">
+                                                <p class="text-sm font-semibold text-slate-800 truncate">
+                                                    {{ $session->name }}</p>
+                                                <p class="text-xs text-slate-500 mt-0.5">
+                                                    {{ $session->session_date->format('d M Y') }}
+                                                    &middot;
+                                                    {{ substr((string) $session->start_time, 0, 5) }}–{{ substr((string) $session->end_time, 0, 5) }}
+                                                    @if ($session->teacher)
+                                                        &middot; {{ $session->teacher->name }}
+                                                    @endif
                                                 </p>
                                             </div>
                                         </div>
-
-                                        {{-- Pengajar --}}
-                                        @if ($schedule->teacher)
-                                            <div
-                                                class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
-
-                                                <div
-                                                    class="w-11 h-11 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center flex-shrink-0">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                                    </svg>
-                                                </div>
-
-                                                <div>
-                                                    <p class="text-xs text-slate-400 font-medium">
-                                                        Pengajar
-                                                    </p>
-
-                                                    <p class="text-sm font-semibold text-slate-700">
-                                                        {{ $schedule->teacher->name }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        @endif
-
-                                        {{-- Tanggal --}}
-                                        <div
-                                            class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
-
-                                            <div
-                                                class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                                </svg>
-                                            </div>
-
-                                            <div>
-                                                <p class="text-xs text-slate-400 font-medium">
-                                                    Tanggal
-                                                </p>
-
-                                                <p class="text-sm font-semibold text-slate-700">
-                                                    {{ $schedule->schedule_date->translatedFormat('l, d F Y') }}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    @empty
+                                        <p class="text-sm text-slate-400">Belum ada sesi.</p>
+                                    @endforelse
                                 </div>
                             </div>
                         @endforeach

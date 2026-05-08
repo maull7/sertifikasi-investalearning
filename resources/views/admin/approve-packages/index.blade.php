@@ -72,6 +72,8 @@
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Nama Peserta</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Email</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Paket yang ingin di ikuti</th>
+                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Jadwal</th>
+                        <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Bukti Transfer</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Status</th>
                         <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">Aksi</th>
                       
@@ -85,6 +87,17 @@
                             <td class="py-4 px-8 text-sm font-medium text-gray-900 dark:text-white">{{ $value->user->name }}</td>
                             <td class="py-4 px-8 text-sm text-gray-500 dark:text-gray-400">{{ $value->user->email }}</td>
                             <td class="py-4 px-8 text-sm text-gray-700 dark:text-gray-300">{{ $value->package->title }}</td>
+                            <td class="py-4 px-8 text-sm text-gray-500 dark:text-gray-400">{{ $value->schedule?->title ?? '-' }}</td>
+                            <td class="py-4 px-8">
+                                @if ($value->payment?->proof_image)
+                                    <a href="{{ Storage::url($value->payment->proof_image) }}" target="_blank"
+                                        class="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:underline">
+                                        <i class="ti ti-photo"></i> Lihat Bukti
+                                    </a>
+                                @else
+                                    <span class="text-xs text-gray-400">-</span>
+                                @endif
+                            </td>
                             <td class="py-4 px-8">
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-300">
                                     <i class="ti ti-clock mr-1"></i> Menunggu Konfirmasi
@@ -105,7 +118,7 @@
                         </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="py-24">
+                                <td colspan="7" class="py-24">
                                 <div class="flex flex-col items-center justify-center text-center max-w-[280px] mx-auto">
                                   
                                     <div class="space-y-1">

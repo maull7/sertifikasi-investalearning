@@ -17,6 +17,7 @@ class Package extends Model
         'title',
         'id_master_types',
         'description',
+        'price',
         'status',
         'is_hidden',
     ];
@@ -25,6 +26,7 @@ class Package extends Model
     {
         return [
             'is_hidden' => 'boolean',
+            'price' => 'integer',
         ];
     }
 

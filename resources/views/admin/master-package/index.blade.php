@@ -77,6 +77,7 @@
                             <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Title</th>
                             <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Description
                             </th>
+                            <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Harga</th>
                             <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Status</th>
                             <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">
                                 Aksi</th>
@@ -94,6 +95,13 @@
                                 </td>
                                 <td class="py-4 px-8 text-sm text-gray-500 font-medium">
                                     {{ $value->description }}
+                                </td>
+                                <td class="py-4 px-8 text-sm font-semibold">
+                                    @if ($value->price)
+                                        <span class="text-emerald-600 dark:text-emerald-400">Rp {{ number_format($value->price, 0, ',', '.') }}</span>
+                                    @else
+                                        <span class="text-gray-400">Gratis</span>
+                                    @endif
                                 </td>
                                 <td class="py-4 px-8 text-sm text-gray-500 font-medium">
                                     <div class="flex flex-wrap gap-1.5">

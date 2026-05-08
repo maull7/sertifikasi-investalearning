@@ -24,6 +24,7 @@ class RequestPackage extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
+            'price' => 'nullable|integer|min:0',
             'status' => 'required|in:active,inactive',
             'id_master_types' => 'required|exists:master_types,id',
         ];

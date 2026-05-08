@@ -38,7 +38,7 @@ class ApprovePackageController extends Controller
                 ->toArray();
         }
 
-        $dataQuery = UserJoin::with('user.managedPackages', 'package')
+        $dataQuery = UserJoin::with(['user.managedPackages', 'package', 'payment'])
             ->when($search, function ($query, $search) {
                 $query->whereHas('package', function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%");
@@ -103,6 +103,19 @@ class ApprovePackageController extends Controller
     {
         $userJoin->status = 'approved';
         $userJoin->save();
+
+        // Konfirmasi payment jika ada
+        if ($userJoin->payment) {
+            $userJoin->payment->update(['status' => 'confirmed']);
+        }
+
+        // Daftarkan ke jadwal jika ada
+        if ($userJoin->schedule_id) {
+            \App\Models\FaceToFaceScheduleRegistration::firstOrCreate(
+                ['schedule_id' => $userJoin->schedule_id, 'user_id' => $userJoin->user_id],
+                ['participant_email' => $userJoin->user->email]
+            );
+        }
 
         return redirect()->route('approve-packages.index')->with('success', 'User join approved successfully.');
     }

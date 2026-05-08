@@ -70,6 +70,17 @@
                         required
                     >{{ old('description') }}</x-textarea>
                 </div>
+
+                <div class="md:col-span-2">
+                    <x-input 
+                        label="Biaya Investasi (Rp)" 
+                        name="price" 
+                        type="number"
+                        placeholder="Contoh: 500000 (kosongkan jika gratis)" 
+                        value="{{ old('price') }}"
+                        min="0"
+                    />
+                </div>
                 
                 <input type="text" hidden name="status" value="active">
             </div>

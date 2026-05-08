@@ -54,6 +54,18 @@
                     </div>
                 </div>
 
+                {{-- Price --}}
+                <div class="pt-4 border-t border-gray-100 dark:border-gray-800">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Biaya Investasi</p>
+                    @if ($package->price)
+                        <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                            Rp {{ number_format($package->price, 0, ',', '.') }}
+                        </p>
+                    @else
+                        <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">Gratis</p>
+                    @endif
+                </div>
+
                 {{-- Action Button --}}
                 <div class="pt-4 border-t border-gray-100 dark:border-gray-800">
                     @if ($isJoined)
@@ -62,13 +74,10 @@
                             <i class="ti ti-eye mr-2"></i> Lihat Package Saya
                         </x-button>
                     @else
-                        <form action="{{ route('user.packages.join', $package) }}" method="POST" class="inline">
-                            @csrf
-                            <x-button variant="primary" type="submit"
-                                class="w-full md:w-auto rounded-xl shadow-lg shadow-indigo-500/20">
-                                <i class="ti ti-plus mr-2"></i> Daftar Paket Sekarang
-                            </x-button>
-                        </form>
+                        <x-button variant="primary" href="{{ route('user.packages.checkout', $package) }}"
+                            class="w-full md:w-auto rounded-xl shadow-lg shadow-indigo-500/20">
+                            <i class="ti ti-plus mr-2"></i> Daftar Paket Sekarang
+                        </x-button>
                     @endif
                 </div>
             </div>

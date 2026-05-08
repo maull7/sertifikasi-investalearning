@@ -10,7 +10,8 @@
     <meta name="color-scheme" content="light dark">
 
     <title>{{ $title ?? '' }} | InvestaLearning</title>
-    <meta name="description" content="{{ $description ?? 'Platform belajar investasi dan sertifikasi pasar modal terpercaya.' }}">
+    <meta name="description"
+        content="{{ $description ?? 'Platform belajar investasi dan sertifikasi pasar modal terpercaya.' }}">
 
     {{-- Favicon --}}
     <link rel="icon" href="{{ asset('img/favicon.png') }}" type="image/png">
@@ -23,16 +24,23 @@
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 
     {{-- Fonts --}}
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;500;600;700;800;1,400&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;500;600;700;800;1,400&display=swap"
+        rel="stylesheet">
 
     {{-- Icons: non-blocking load --}}
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.35.0/tabler-icons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.35.0/tabler-icons.min.css"></noscript>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.35.0/tabler-icons.min.css"
+        as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.35.0/tabler-icons.min.css">
+    </noscript>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        [x-cloak] { display: none !important; }
+        [x-cloak] {
+            display: none !important;
+        }
 
         :focus-visible {
             outline: 2px solid #4f46e5;
@@ -53,7 +61,10 @@
             border-radius: 0 0 4px 0;
             transition: top 0.1s;
         }
-        .skip-link:focus { top: 0; }
+
+        .skip-link:focus {
+            top: 0;
+        }
     </style>
 
     {{-- Theme Initializer --}}
@@ -79,8 +90,7 @@
     </script>
 </head>
 
-<body
-    class="h-full text-gray-900 dark:text-gray-100 transition-colors duration-300 antialiased font-sans"
+<body class="h-full text-gray-900 dark:text-gray-100 transition-colors duration-300 antialiased font-sans"
     style="font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;">
 
     {{-- Skip to main content --}}
@@ -88,22 +98,26 @@
 
     {{-- Background dekoratif (aria-hidden agar tidak dibaca screen reader) --}}
     <div class="fixed inset-0 -z-10 bg-[#f8fafc] dark:bg-gray-950" aria-hidden="true">
-        <div class="absolute inset-0 bg-gradient-to-br from-indigo-50/60 via-transparent to-cyan-50/40 dark:from-indigo-950/20 dark:via-transparent dark:to-cyan-950/10"></div>
-        <div class="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_0.5px,transparent_0.5px),linear-gradient(to_bottom,#e2e8f0_0.5px,transparent_0.5px)] dark:bg-[linear-gradient(to_right,#1e293b_0.5px,transparent_0.5px),linear-gradient(to_bottom,#1e293b_0.5px,transparent_0.5px)] bg-[size:24px_24px] opacity-50 dark:opacity-30"></div>
+        <div
+            class="absolute inset-0 bg-gradient-to-br from-indigo-50/60 via-transparent to-cyan-50/40 dark:from-indigo-950/20 dark:via-transparent dark:to-cyan-950/10">
+        </div>
+        <div
+            class="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_0.5px,transparent_0.5px),linear-gradient(to_bottom,#e2e8f0_0.5px,transparent_0.5px)] dark:bg-[linear-gradient(to_right,#1e293b_0.5px,transparent_0.5px),linear-gradient(to_bottom,#1e293b_0.5px,transparent_0.5px)] bg-[size:24px_24px] opacity-50 dark:opacity-30">
+        </div>
     </div>
 
     <div class="min-h-screen">
-        <header class="sticky top-0 z-30 border-b border-gray-200/80 dark:border-gray-800/80 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl" role="banner">
+        <header
+            class="sticky top-0 z-30 border-b border-gray-200/80 dark:border-gray-800/80 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl"
+            role="banner">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16 md:h-18">
-                    <a
-                        href="{{ route('user.landing') }}"
-                        class="flex items-center gap-2.5 text-gray-900 dark:text-white font-bold text-lg tracking-tight hover:opacity-90 transition-opacity"
-                        aria-label="InvestaLearning - Halaman Utama">
-                        <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 text-white shadow-lg shadow-indigo-500/25" aria-hidden="true">
-                            <i class="ti ti-school text-xl"></i>
-                        </span>
-                        <span>InvestaLearning</span>
+                    <a href="#home" class="flex items-center gap-2"
+                        aria-label="PT Tunas Inti Investa - Investalearning">
+                        <img src="{{ asset('img/favicon.png') }}" alt="Logo Investalearning" class="w-8 h-8 rounded-lg"
+                            width="32" height="32">
+                        <span class="text-xl font-bold text-slate-900">PT Tunas Inti Investa <span
+                                class="gradient-text">(Investalearning)</span></span>
                     </a>
                 </div>
             </div>
