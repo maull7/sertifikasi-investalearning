@@ -30,7 +30,12 @@ class IndexController extends Controller
                     ->limit(4)
             ])
             ->where('is_active', true)
-            ->orderByDesc('id')
+            ->whereHas('sessions')
+            ->join('face_to_face_schedule_sessions as s', 's.face_to_face_schedule_id', '=', 'face_to_face_schedules.id')
+            ->orderBy('s.session_date', 'asc')
+            ->orderBy('s.start_time', 'asc')
+            ->select('face_to_face_schedules.*')
+            ->distinct()
             ->limit(6)
             ->get();
 
