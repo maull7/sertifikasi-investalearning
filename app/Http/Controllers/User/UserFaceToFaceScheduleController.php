@@ -161,6 +161,13 @@ class UserFaceToFaceScheduleController extends Controller
             ->pluck('schedule_id')
             ->all();
 
+        $registeredPackageIds = FaceToFaceSchedule::query()
+            ->whereIn('id', $registeredScheduleIds)
+            ->pluck('package_id')
+            ->unique()
+            ->values()
+            ->all();
+
         $registeredSchedules = FaceToFaceSchedule::query()
             ->with(['package:id,title', 'sessions.teacher:id,name'])
             ->whereIn('id', $registeredScheduleIds)
@@ -171,6 +178,7 @@ class UserFaceToFaceScheduleController extends Controller
             'allSchedules',
             'registeredSchedules',
             'registeredScheduleIds',
+            'registeredPackageIds',
             'activeTab',
         ));
     }

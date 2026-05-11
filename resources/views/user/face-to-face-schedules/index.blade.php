@@ -112,6 +112,10 @@
                                         <span class="inline-flex items-center gap-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 px-4 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                                             <i class="ti ti-circle-check"></i> Sudah Terdaftar
                                         </span>
+                                    @elseif (in_array($schedule->package_id, $registeredPackageIds, true))
+                                        <span class="inline-flex items-center gap-2 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-2 text-xs font-semibold text-gray-400 dark:text-gray-500 cursor-not-allowed">
+                                            <i class="ti ti-ban"></i> Sudah Terdaftar di Jadwal Lain
+                                        </span>
                                     @else
                                         <form method="POST" action="{{ route('user.face-to-face-schedules.register', $schedule) }}">
                                             @csrf

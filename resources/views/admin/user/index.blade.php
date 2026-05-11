@@ -10,7 +10,13 @@
 <div class="space-y-6 pb-20" x-data="{
     modalActivation: false,
     activateUrl: null,
-    userName: ''
+    userName: '',
+    modalPeserta: false,
+    peserta: {},
+    showPeserta(data) {
+        this.peserta = data;
+        this.modalPeserta = true;
+    }
 }">
 
     {{-- Page Header --}}
@@ -146,7 +152,22 @@
                     <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
                         @forelse ($list as $data)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors">
-                                <td class="py-3 px-4 sm:px-6 font-semibold text-sm text-gray-900 dark:text-white">{{ $data->name ?? '-' }}</td>
+                                <td class="py-3 px-4 sm:px-6">
+                                    <button type="button"
+                                        @click="showPeserta({{ \Illuminate\Support\Js::from([
+                                            'name'          => $data->name,
+                                            'email'         => $data->email,
+                                            'phone'         => $data->phone,
+                                            'jenis_kelamin' => $data->jenis_kelamin,
+                                            'profesi'       => $data->profesi,
+                                            'tanggal_lahir' => $data->tanggal_lahir ? \Carbon\Carbon::parse($data->tanggal_lahir)->format('d/m/Y') : null,
+                                            'institusi'     => $data->institusi,
+                                            'alamat'        => $data->alamat,
+                                        ]) }})"
+                                        class="font-semibold text-sm text-indigo-600 dark:text-indigo-400 hover:underline text-left">
+                                        {{ $data->name ?? '-' }}
+                                    </button>
+                                </td>
                                 <td class="py-3 px-4 sm:px-6">
                                     <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">{{ $data->email ?? '-' }}</span>
                                 </td>
@@ -276,6 +297,52 @@
                     @method('PATCH')
                     <x-button variant="primary" type="submit" class="w-full rounded-xl">Ya, Aktifkan</x-button>
                 </form>
+            </div>
+        </div>
+    </div>
+    {{-- Modal Informasi Peserta --}}
+    <div x-show="modalPeserta"
+         class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
+         x-cloak
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-800"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             @click.away="modalPeserta = false">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Informasi Peserta</h3>
+                <button @click="modalPeserta = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="ti ti-x text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-3">
+                <template x-for="[label, value] in [
+                    ['Nama',            peserta.name],
+                    ['Email',           peserta.email],
+                    ['No. Telepon',     peserta.phone],
+                    ['Jenis Kelamin',   peserta.jenis_kelamin],
+                    ['Profesi',         peserta.profesi],
+                    ['Tanggal Lahir',   peserta.tanggal_lahir],
+                    ['Institusi',       peserta.institusi],
+                    ['Alamat',          peserta.alamat],
+                ]" :key="label">
+                    <div class="flex gap-3 text-sm">
+                        <span class="w-32 shrink-0 text-gray-500 dark:text-gray-400" x-text="label"></span>
+                        <span class="font-medium text-gray-900 dark:text-white" x-text="value || '-'"></span>
+                    </div>
+                </template>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+                <x-button variant="secondary" class="rounded-xl" @click="modalPeserta = false">Tutup</x-button>
             </div>
         </div>
     </div>

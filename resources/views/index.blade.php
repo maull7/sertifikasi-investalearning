@@ -402,7 +402,7 @@
     <main id="main-content" tabindex="-1">
 
         <!-- Hero - promosi kelas saham -->
-        <section id="home" class="relative min-h-[90vh] flex items-center pt-24 pb-20 gradient-mesh"
+        <section id="home" class="relative min-h-[90vh] flex items-center pt-20 pb-10 gradient-mesh"
             aria-labelledby="hero-heading">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                 <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -412,14 +412,32 @@
                             Sertifikasi</p>
                         <h1 id="hero-heading"
                             class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.1] tracking-tight">
-                            Kelas Saham<br>
+                            Kelas Kompetensi<br>
                             <span class="gradient-text">Profesional</span><br>
                             untuk Indonesia
                         </h1>
-                        <p class="mt-6 text-lg text-slate-600 max-w-xl leading-relaxed">
-                            Belajar investasi dari dasar hingga siap sertifikasi. Pilih kelas, daftar, akses materi
-                            lengkap,
-                            ujian, dan raih sertifikat yang diakui.
+                        <p class="mt-6 text-sm text-slate-600 max-w-xl leading-relaxed">
+                            Belajar investasi dari dasar hingga siap sertifikasi melalui materi lengkap,
+                            kelas terstruktur, dan bimbingan yang dirancang untuk meningkatkan kompetensi
+                            di industri keuangan.
+
+                            <br><br>
+
+                            Investalearning menghadirkan program <strong>Investa For Campus (IFC)</strong>,
+                            sebuah program pelatihan yang ditujukan bagi mahasiswa maupun profesional yang
+                            ingin mengembangkan karir serta memperoleh sertifikasi di bidang keuangan.
+
+                            <br><br>
+
+                            IFC memberikan kesempatan untuk mengikuti pelatihan berkualitas dengan biaya
+                            yang lebih ekonomis, sehingga peserta dapat mempersiapkan diri menghadapi dunia
+                            industri dan meningkatkan peluang karir secara optimal.
+
+                            <br><br>
+
+                            Melalui program ini, Investalearning berharap dapat membantu menciptakan sumber
+                            daya manusia yang kompeten, siap bersaing, dan memiliki sertifikasi yang diakui
+                            di industri keuangan.
                         </p>
                         <div class="mt-8 flex flex-wrap gap-4">
                             <a href="{{ route('register') }}"
@@ -435,7 +453,7 @@
                                 Kelas</a>
                         </div>
                         <div class="mt-12 flex gap-10 text-slate-500">
-                            <div><span class="block text-2xl font-bold text-slate-900">50K+</span><span
+                            <div><span class="block text-2xl font-bold text-slate-900">5K+</span><span
                                     class="text-sm">Peserta</span></div>
                             <div><span class="block text-2xl font-bold text-slate-900">Kelas</span><span
                                     class="text-sm">Pasar Modal & MSDM</span></div>
@@ -493,6 +511,9 @@
                     <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto">
                         Materi lengkap, ujian, dan sertifikat. Klik jenis kelas di atas untuk langsung ke daftar.
                     </p>
+                    <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mb-4">
+                        Investa <span class="gradient-text">For Campus</span> (IFC)
+                    </h2>
                 </div>
 
                 @foreach ($jenis as $type)
@@ -563,7 +584,7 @@
                                                             stroke-width="2"
                                                             d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                                                     </svg>
-                                                    Gratis
+                                                    Call
                                                 </span>
                                             @endif
                                         </div>
@@ -843,7 +864,7 @@
                                     </p>
                                 </div>
                             </a>
-                            <p class="text-sm text-slate-500">Email: support@investalearning.com</p>
+                            <p class="text-sm text-slate-500">Email: support@investalearning1@gmail.com</p>
                         </div>
                         <div class="mt-8">
                             <a href="{{ route('register') }}"
