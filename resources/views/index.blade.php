@@ -711,7 +711,7 @@
                                 <div class="p-5 space-y-2">
                                     <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Sesi
                                     </p>
-                                    @forelse ($schedule->sessions->take(3) as $session)
+                                    @forelse ($schedule->sessions->take(4) as $session)
                                         <div
                                             class="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
                                             <div
