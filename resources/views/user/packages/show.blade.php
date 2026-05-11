@@ -34,15 +34,15 @@
                 </div>
 
                 {{-- Package Stats --}}
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+
                     <div class="text-center">
-                        <p class="text-2xl font-bold text-indigo-600">{{ $package->materials->count() }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Total Materi</p>
+                        <p class="text-2xl font-bold text-emerald-600">
+                            {{ $package->price ? 'Rp ' . number_format($package->price, 0, ',', '.') : 'Call' }}
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Harga</p>
                     </div>
-                    <div class="text-center">
-                        <p class="text-2xl font-bold text-emerald-600">{{ $package->userJoins->count() }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Total Peserta</p>
-                    </div>
+
                     <div class="text-center">
                         <p class="text-2xl font-bold text-violet-600">
                             {{ $package->status === 'active' ? 'Aktif' : 'Tidak Aktif' }}</p>
@@ -62,7 +62,7 @@
                             Rp {{ number_format($package->price, 0, ',', '.') }}
                         </p>
                     @else
-                        <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">Gratis</p>
+                        <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">Call</p>
                     @endif
                 </div>
 
@@ -84,7 +84,7 @@
         </x-card>
 
         {{-- Materials Preview (dikelompokkan per Mata Pelajaran) --}}
-        @if ($subjects->sum(fn($s) => $s->materials->count()) > 0)
+        {{-- @if ($subjects->sum(fn($s) => $s->materials->count()) > 0)
             <x-card title="Materi dalam Package">
                 <div class="space-y-8">
                     @foreach ($subjects as $subject)
@@ -150,6 +150,6 @@
                     @endforeach
                 </div>
             </x-card>
-        @endif
+        @endif --}}
     </div>
 @endsection
