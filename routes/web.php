@@ -35,6 +35,7 @@ use App\Http\Controllers\User\UserFaceToFaceScheduleController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [IndexController::class, 'index'])->name('home');
+Route::post('/contact', [IndexController::class, 'contact'])->name('contact');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'admin'])
@@ -238,6 +239,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('approve-packages.approve');
     Route::patch('approve-packages/{userJoin}/reject', [ApprovePackageController::class, 'reject'])
         ->name('approve-packages.reject');
+    Route::delete('approve-packages/{userJoin}', [ApprovePackageController::class, 'destroy'])
+        ->name('approve-packages.destroy');
 
     // Monitor Peserta
     Route::get('monitor-participants', [ParticipantMonitorController::class, 'index'])
@@ -256,6 +259,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Settings QRIS
     Route::get('admin/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('admin.settings.index');
     Route::post('admin/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update');
+
+    // Pesan Kontak
+    Route::get('admin/contact', [\App\Http\Controllers\Admin\AdminContactController::class, 'index'])->name('admin.contact.index');
+    Route::patch('admin/contact/{contactMessage}/read', [\App\Http\Controllers\Admin\AdminContactController::class, 'markRead'])->name('admin.contact.read');
+    Route::delete('admin/contact/{contactMessage}', [\App\Http\Controllers\Admin\AdminContactController::class, 'destroy'])->name('admin.contact.destroy');
 
     // Payments
     Route::get('admin/payments', [\App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('admin.payments.index');

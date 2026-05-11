@@ -156,6 +156,14 @@ class Sidebar extends Component
                         ['name' => 'Pengaturan QRIS', 'route' => 'admin.settings.index'],
                     ],
                 ],
+                [
+                    'name' => 'Pesan Kontak',
+                    'icon' => 'ti ti-mail',
+                    'activePattern' => 'admin.contact.*',
+                    'subItems' => [
+                        ['name' => 'Pesan Kontak', 'route' => 'admin.contact.index'],
+                    ],
+                ],
             ],
         ];
         $groups[] = [

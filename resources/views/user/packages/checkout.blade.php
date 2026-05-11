@@ -109,6 +109,11 @@
                     @endif
 
                     <div>
+                        <x-input label="Total Harga" name="harga" placeholder="Contoh: Modul 1 - Pengenalan"
+                            value="{{ old('harga') ?? ($package->price ? number_format($package->price, 0, ',', '.') : 'Gratis') }}"
+                            readonly />
+                    </div>
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Upload Bukti Transfer
                             <span class="text-rose-500">*</span></label>
                         <input type="file" name="proof_image" accept="image/*" required

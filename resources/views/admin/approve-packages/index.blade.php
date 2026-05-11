@@ -6,8 +6,10 @@
     <div class="space-y-8 pb-20" x-data="{
         rejectModal: false,
         approveModal: false,
+        deleteModal: false,
         approveUrl: '',
         rejectUrl: '',
+        deleteUrl: '',
         userName: '',
         paket: '',
         confirmApprove(url, name, pkt) {
@@ -21,6 +23,12 @@
             this.userName = name;
             this.paket = pkt;
             this.rejectModal = true;
+        },
+        confirmDelete(url, name, pkt) {
+            this.deleteUrl = url;
+            this.userName = name;
+            this.paket = pkt;
+            this.deleteModal = true;
         }
     }">
 
@@ -64,6 +72,10 @@
             <a href="{{ route('approve-packages.index', array_filter(array_merge(request()->only('search', 'pending_page'), ['tab' => null, 'active_page' => null]))) }}"
                 class="px-4 py-3 text-sm font-semibold border-b-2 transition-colors {{ !request('tab') ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-400' }}">
                 <i class="ti ti-clock mr-2"></i> User Perlu Konfirmasi
+            </a>
+            <a href="{{ route('approve-packages.index', array_filter(array_merge(request()->only('search'), ['tab' => 'rejected']))) }}"
+                class="px-4 py-3 text-sm font-semibold border-b-2 transition-colors {{ request('tab') === 'rejected' ? 'border-rose-500 text-rose-600 dark:text-rose-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-400' }}">
+                <i class="ti ti-circle-x mr-2"></i> Ditolak
             </a>
             <a href="{{ route('approve-packages.index', array_filter(array_merge(request()->only('search', 'active_page'), ['tab' => 'active', 'pending_page' => null]))) }}"
                 class="px-4 py-3 text-sm font-semibold border-b-2 transition-colors {{ request('tab') === 'active' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-400' }}">
@@ -182,6 +194,54 @@
                 @if ($data->hasPages())
                     <div class="px-8 py-6 border-t border-gray-50 dark:border-gray-800">
                         {{ $data->appends(request()->only(['search', 'pending_page']))->links() }}
+                    </div>
+                @endif
+            </x-card>
+        @elseif(request('tab') === 'rejected')
+            {{-- Tab: Ditolak --}}
+            <x-card :padding="false" title="Pendaftaran Ditolak">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
+                                <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Nama Peserta</th>
+                                <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Email</th>
+                                <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Paket</th>
+                                <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider">Ditolak Pada</th>
+                                <th class="py-4 px-8 text-[11px] font-bold uppercase text-gray-400 tracking-wider text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
+                            @forelse ($rejectedData as $value)
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition-colors">
+                                    <td class="py-4 px-8 text-sm font-medium text-gray-900 dark:text-white">{{ $value->user->name }}</td>
+                                    <td class="py-4 px-8 text-sm text-gray-500 dark:text-gray-400">{{ $value->user->email }}</td>
+                                    <td class="py-4 px-8 text-sm text-gray-700 dark:text-gray-300">{{ $value->package->title }}</td>
+                                    <td class="py-4 px-8 text-sm text-gray-500 dark:text-gray-400">{{ $value->updated_at->format('d M Y H:i') }}</td>
+                                    <td class="py-4 px-8 text-right">
+                                        <x-button variant="danger" size="sm" type="button"
+                                            class="rounded-lg h-9 px-3 inline-flex items-center gap-1"
+                                            @click="confirmDelete('{{ route('approve-packages.destroy', $value->id) }}', '{{ addslashes($value->user->name) }}', '{{ addslashes($value->package->title) }}')">
+                                            <i class="ti ti-trash text-base"></i> Hapus
+                                        </x-button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="py-24">
+                                        <div class="flex flex-col items-center justify-center text-center max-w-[280px] mx-auto">
+                                            <h4 class="text-base font-bold text-gray-900 dark:text-white">Tidak ada data</h4>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Belum ada pendaftaran yang ditolak.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                @if ($rejectedData->hasPages())
+                    <div class="px-8 py-6 border-t border-gray-50 dark:border-gray-800">
+                        {{ $rejectedData->appends(array_merge(request()->only('search'), ['tab' => 'rejected']))->links() }}
                     </div>
                 @endif
             </x-card>
@@ -326,6 +386,38 @@
                         @method('PATCH')
                         <x-button variant="danger" type="submit" class="w-full rounded-xl shadow-lg shadow-red-500/20">
                             Ya, Tolak
+                        </x-button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {{-- Delete Modal --}}
+        <div x-show="deleteModal"
+            class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm" x-cloak
+            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+            <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800"
+                @click.away="deleteModal = false">
+                <div class="p-8 text-center">
+                    <div class="w-20 h-20 bg-rose-50 dark:bg-rose-500/10 text-rose-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                        <i class="ti ti-trash text-4xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Hapus Data Pendaftaran?</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
+                        Data pendaftaran <span class="font-bold text-gray-900 dark:text-white" x-text="userName"></span>
+                        untuk paket <span class="font-bold" x-text="paket"></span> akan dihapus.
+                        Peserta dapat mendaftar ulang setelah ini.
+                    </p>
+                </div>
+                <div class="flex gap-3 p-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800">
+                    <x-button variant="secondary" class="flex-1 rounded-xl" @click="deleteModal = false">Batal</x-button>
+                    <form :action="deleteUrl" method="POST" class="flex-1">
+                        @csrf
+                        @method('DELETE')
+                        <x-button variant="danger" type="submit" class="w-full rounded-xl shadow-lg shadow-red-500/20">
+                            Ya, Hapus
                         </x-button>
                     </form>
                 </div>

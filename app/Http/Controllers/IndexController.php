@@ -45,4 +45,17 @@ class IndexController extends Controller
             'schedules' => $schedules,
         ]);
     }
+
+    public function contact(\Illuminate\Http\Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'message' => 'required|string|max:1000',
+        ]);
+
+        \App\Models\ContactMessage::create($data);
+
+        return redirect()->route('home', ['#contact'])->with('success', 'Pesan Anda berhasil dikirim. Terima kasih!');
+    }
 }
