@@ -56,6 +56,23 @@ class ApprovePackageController extends Controller
             ->paginate(10, ['*'], 'pending_page')
             ->withQueryString();
 
+        $rejectedQuery = UserJoin::with(['user', 'package'])
+            ->when($search, function ($query, $search) {
+                $query->whereHas('package', function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%");
+                });
+            })
+            ->where('status', 'rejected');
+
+        if ($user->role === 'Petugas') {
+            $rejectedQuery->whereIn('id_package', $packageIds);
+        }
+
+        $rejectedData = $rejectedQuery
+            ->orderBy('updated_at', 'desc')
+            ->paginate(10, ['*'], 'rejected_page')
+            ->withQueryString();
+
 
         $activeQuery = Package::with('masterType')
             ->withCount(['userJoins as approved_members_count' => function ($q) {
@@ -75,7 +92,7 @@ class ApprovePackageController extends Controller
             ->paginate(10, ['*'], 'active_page')
             ->withQueryString();
 
-        return view('admin.approve-packages.index', compact('data', 'activePackages', 'search'));
+        return view('admin.approve-packages.index', compact('data', 'rejectedData', 'activePackages', 'search'));
     }
 
     /**
@@ -126,5 +143,14 @@ class ApprovePackageController extends Controller
         $userJoin->save();
 
         return redirect()->route('approve-packages.index')->with('success', 'User join rejected successfully.');
+    }
+
+    public function destroy(UserJoin $userJoin)
+    {
+        $userJoin->payment?->delete();
+        $userJoin->delete();
+
+        return redirect()->route('approve-packages.index', ['tab' => 'rejected'] + request()->only('search'))
+            ->with('success', 'Data pendaftaran berhasil dihapus. Peserta dapat mendaftar ulang.');
     }
 }

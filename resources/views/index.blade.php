@@ -763,7 +763,7 @@
                             mempersiapkan menghadapi asesmen dan mengembangkan kemampuan profesionalitas dalam bekerja.
                         </p>
                         <div class="mt-10 flex gap-10">
-                            <div><span class="block text-2xl font-bold text-slate-900">50K+</span><span
+                            <div><span class="block text-2xl font-bold text-slate-900">5K+</span><span
                                     class="text-sm text-slate-500">Peserta</span></div>
                             <div><span class="block text-2xl font-bold text-slate-900">Kelas</span><span
                                     class="text-sm text-slate-500">Aktif</span></div>
@@ -879,24 +879,33 @@
 
                     <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
                         <p class="font-semibold text-slate-900 mb-4">Atau isi form berikut</p>
-                        <form class="space-y-4">
+                        @if (session('success'))
+                            <div class="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm font-medium text-emerald-700">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+                        <form action="{{ route('contact') }}" method="POST" class="space-y-4">
+                            @csrf
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Nama</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"
+                                <input type="text" name="name" value="{{ old('name') }}"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition @error('name') border-red-400 @enderror"
                                     placeholder="Nama Anda">
+                                @error('name')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                                <input type="email"
-                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"
+                                <input type="email" name="email" value="{{ old('email') }}"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition @error('email') border-red-400 @enderror"
                                     placeholder="email@contoh.com">
+                                @error('email')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Pesan</label>
-                                <textarea rows="3"
-                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition resize-none"
-                                    placeholder="Tulis pertanyaan Anda..."></textarea>
+                                <textarea rows="3" name="message"
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition resize-none @error('message') border-red-400 @enderror"
+                                    placeholder="Tulis pertanyaan Anda...">{{ old('message') }}</textarea>
+                                @error('message')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                             </div>
                             <button type="submit"
                                 class="w-full rounded-xl bg-slate-900 text-white py-3 text-sm font-semibold hover:bg-slate-800 transition">Kirim

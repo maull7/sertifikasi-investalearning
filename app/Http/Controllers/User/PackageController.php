@@ -53,7 +53,13 @@ class PackageController extends Controller
             $subjects->load(['materials' => fn($q) => $q->with('subject'), 'quizzes' => fn($q) => $q->with('subject')]);
         }
 
-        return view('user.packages.show', compact('package', 'isJoined', 'subjects'));
+        $schedules = \App\Models\FaceToFaceSchedule::with(['sessions.teacher:id,name'])
+            ->where('package_id', $package->id)
+            ->where('is_active', true)
+            ->orderByDesc('id')
+            ->get();
+
+        return view('user.packages.show', compact('package', 'isJoined', 'subjects', 'schedules'));
     }
 
     public function checkout(Package $package): \Illuminate\View\View|\Illuminate\Http\RedirectResponse

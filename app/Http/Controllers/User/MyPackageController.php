@@ -64,7 +64,13 @@ class MyPackageController extends Controller
             ->get()
             ->groupBy('id_exam');
 
-        return view('user.my-packages.show', compact('package', 'subjects', 'subjectProgress', 'examAttemptsByExam'));
+        $schedules = \App\Models\FaceToFaceSchedule::with(['sessions.teacher:id,name'])
+            ->where('package_id', $package->id)
+            ->where('is_active', true)
+            ->orderByDesc('id')
+            ->get();
+
+        return view('user.my-packages.show', compact('package', 'subjects', 'subjectProgress', 'examAttemptsByExam', 'schedules'));
     }
 
     public function markAsRead(Material $material): RedirectResponse
