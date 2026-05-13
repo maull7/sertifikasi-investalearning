@@ -27,8 +27,9 @@ class BankQuestionController extends Controller
         $search = $request->query('search');
         $subjectId = $request->query('subject_id') ? (int) $request->query('subject_id') : null;
         $sortNo = $request->query('sort_no');
+        $questionType = $request->query('question_type');
 
-        $data = $this->bankQuestionRepository->getAllWithPagination($search, $subjectId, 10, $sortNo);
+        $data = $this->bankQuestionRepository->getAllWithPagination($search, $subjectId, 10, $sortNo, $questionType);
         $subjects = Subject::orderBy('name')->get();
 
         return view('admin.bank-question.index', [
@@ -37,6 +38,7 @@ class BankQuestionController extends Controller
             'subjects' => $subjects,
             'subjectId' => $subjectId,
             'sortNo' => $sortNo,
+            'questionType' => $questionType,
         ]);
     }
 

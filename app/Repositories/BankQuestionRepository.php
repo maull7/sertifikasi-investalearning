@@ -17,7 +17,7 @@ class BankQuestionRepository implements BankQuestionRepositoryInterface
         $this->model = $model;
     }
 
-    public function getAllWithPagination(?string $search = null, ?int $subjectId = null, int $perPage = 10, ?string $sortNo = null): LengthAwarePaginator
+    public function getAllWithPagination(?string $search = null, ?int $subjectId = null, int $perPage = 10, ?string $sortNo = null, ?string $questionType = null): LengthAwarePaginator
     {
         $query = $this->model
             ->with('subject')
@@ -29,6 +29,9 @@ class BankQuestionRepository implements BankQuestionRepositoryInterface
             })
             ->when($subjectId, function ($query, $subjectId) {
                 $query->where('subject_id', $subjectId);
+            })
+            ->when($questionType, function ($query, $questionType) {
+                $query->where('question_type', $questionType);
             });
 
         if ($sortNo === 'asc' || $sortNo === 'desc') {

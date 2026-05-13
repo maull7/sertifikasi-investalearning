@@ -78,6 +78,15 @@
                     </x-select>
                 </div>
 
+                <!-- Filter Jenis Soal -->
+                <div class="w-full md:w-48">
+                    <x-select name="question_type" label="Filter Jenis Soal" inline class="h-12">
+                        <option value="">Semua Jenis</option>
+                        <option value="Text" {{ ($questionType ?? '') === 'Text' ? 'selected' : '' }}>Text</option>
+                        <option value="Image" {{ ($questionType ?? '') === 'Image' ? 'selected' : '' }}>Image</option>
+                    </x-select>
+                </div>
+
                 <!-- Button -->
                 <div class="flex gap-2">
                     <x-button type="submit" variant="primary" class="h-12 px-6 rounded-xl">

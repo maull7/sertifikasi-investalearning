@@ -10,7 +10,7 @@ interface BankQuestionRepositoryInterface
     /**
      * Get all bank questions with pagination, search, and optional type filter
      */
-    public function getAllWithPagination(?string $search = null, ?int $typeId = null, int $perPage = 10, ?string $sortNo = null): LengthAwarePaginator;
+    public function getAllWithPagination(?string $search = null, ?int $subjectId = null, int $perPage = 10, ?string $sortNo = null, ?string $questionType = null): LengthAwarePaginator;
 
     /**
      * Get all bank questions without pagination
