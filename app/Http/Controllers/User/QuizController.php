@@ -43,11 +43,7 @@ class QuizController extends Controller
                 'id' => $question->id,
                 'question_type' => $question->question_type,
                 'question' => $question->question,
-                'question_image_url' => $question->question_type === 'Image'
-                    ? (str_starts_with($question->question, 'http')
-                        ? $question->question
-                        : asset('storage/' . ltrim($question->question, '/')))
-                    : null,
+                'question_image_url' => $question->question_image_url,
                 'option_a' => $question->option_a,
                 'option_b' => $question->option_b,
                 'option_c' => $question->option_c,
@@ -96,11 +92,7 @@ class QuizController extends Controller
                 'id' => $question->id,
                 'question_type' => $question->question_type,
                 'question' => $question->question,
-                'question_image_url' => $question->question_type === 'Image'
-                    ? (str_starts_with($question->question, 'http')
-                        ? $question->question
-                        : asset('storage/' . ltrim($question->question, '/')))
-                    : null,
+                'question_image_url' => $question->question_image_url,
                 'option_a' => $question->option_a,
                 'option_b' => $question->option_b,
                 'option_c' => $question->option_c,

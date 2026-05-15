@@ -106,39 +106,41 @@ class BankQuestionsImport implements ToModel, WithHeadingRow, WithValidation, Sk
             return null;
         }
 
-        // Already a storage path (e.g. questions/abc.png)
-        if (Str::startsWith($value, 'questions/')) {
-            return $value;
+        // Already a valid storage path (e.g. questions/abc.png or question-images/abc.jpg)
+        if (Str::startsWith($value, 'questions/') || Str::startsWith($value, 'question-images/')) {
+            if (Storage::disk('public')->exists($value)) {
+                return $value;
+            }
+
+            return null;
         }
 
-        // URL: download into storage/app/public/questions
-        if (Str::startsWith($value, ['http://', 'https://'])) {
-            try {
-                $response = Http::timeout(20)->get($value);
-                if (!$response->successful()) {
-                    return null;
-                }
+        // Relative storage path starting with /storage/ (e.g. /storage/question-images/xxx.jpg)
+        if (Str::startsWith($value, '/storage/')) {
+            $path = ltrim($value, '/');
+            $path = Str::after($path, 'storage/');
 
-                $contentType = $response->header('Content-Type', '');
-                $extension = match (true) {
-                    str_contains($contentType, 'image/jpeg') => 'jpg',
-                    str_contains($contentType, 'image/png') => 'png',
-                    str_contains($contentType, 'image/webp') => 'webp',
-                    default => null,
-                };
-
-                if (!$extension) {
-                    return null;
-                }
-
-                $fileName = now()->timestamp . '_' . Str::random(8) . '.' . $extension;
-                $path = 'questions/' . $fileName;
-                Storage::disk('public')->put($path, $response->body());
-
+            if (Storage::disk('public')->exists($path)) {
                 return $path;
-            } catch (\Throwable $e) {
-                return null;
             }
+
+            return null;
+        }
+
+        // Relative storage path starting with storage/ (e.g. storage/question-images/xxx.jpg)
+        if (Str::startsWith($value, 'storage/')) {
+            $path = Str::after($value, 'storage/');
+
+            if (Storage::disk('public')->exists($path)) {
+                return $path;
+            }
+
+            return null;
+        }
+
+        // Full URL: simpan langsung tanpa download
+        if (Str::startsWith($value, ['http://', 'https://'])) {
+            return $value;
         }
 
         return null;
