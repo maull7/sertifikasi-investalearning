@@ -32,11 +32,19 @@ class BankQuestion extends Model
 
     public function getQuestionImageUrlAttribute(): ?string
     {
-        if (($this->question_type ?? 'Text') !== 'Image') {
+        if (($this->question_type ?? 'Text') !== 'Image' || !$this->question) {
             return null;
         }
 
-        return $this->question ? asset('storage/' . ltrim($this->question, '/')) : null;
+        if (str_starts_with($this->question, 'http')) {
+            return $this->question;
+        }
+
+        if (str_starts_with($this->question, '/storage/')) {
+            return asset(ltrim($this->question, '/'));
+        }
+
+        return asset('storage/' . ltrim($this->question, '/'));
     }
     public function MappingQuestions(): HasMany
     {

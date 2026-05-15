@@ -97,7 +97,7 @@
                     <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Gambar Soal</span>
                 </div>
                 <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-black/5 dark:bg-white/5 flex items-center justify-center">
-                    <img src="{{ asset('storage/' . $question->question) }}" alt="Question Image" class="w-full h-auto object-contain max-h-[480px]">
+                    <img src="{{ $question->question_image_url }}" alt="Question Image" class="w-full h-auto object-contain max-h-[480px]">
                 </div>
             </div>
             @endif

@@ -58,7 +58,7 @@
                                     {{ $data->Question->question ?? '-' }}
                                 </span>
                                 @else
-                                     <a href="{{asset('storage/' . $data->Question->question)}}"
+                                     <a href="{{ $data->Question->question_image_url }}"
                                                  class="inline-flex items-center px-3 py-1 gap-1 text-xs text-indigo-600 dark:text-indigo-400"
                                                 target="_blank" rel="noopener noreferrer"
                                                  >

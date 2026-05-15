@@ -104,7 +104,7 @@
                                 Soal</span>
                         </div>
                         <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800">
-                            <img src="{{ asset('storage/' . $data->question) }}" alt="Question Image"
+                            <img src="{{ $data->question_image_url }}" alt="Question Image"
                                 class="w-full h-auto object-contain max-h-96">
                         </div>
                     </div>

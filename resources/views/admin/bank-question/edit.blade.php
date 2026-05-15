@@ -137,61 +137,206 @@
                 </div>
 
                 {{-- Question Image Upload --}}
-                <div class="md:col-span-2" id="question-image-section">
+                <div class="md:col-span-2" id="question-image-section" x-data="{
+                    selectedMethod: '{{ (($data->question_type ?? 'Text') === 'Image' && $data->question) ? 'existing' : 'upload' }}',
+                    selectedImageUrl: '{{ (($data->question_type ?? 'Text') === 'Image' && $data->question) ? (str_starts_with($data->question, 'http') ? $data->question : asset('storage/' . ltrim($data->question, '/'))) : '' }}',
+                    selectedImageName: '{{ (($data->question_type ?? 'Text') === 'Image' && $data->question) ? basename($data->question) : '' }}',
+                    libraryImages: {{ $libraryImages->map(fn($img) => ['id' => $img->id, 'url' => $img->url, 'filename' => $img->filename, 'file_size' => $img->file_size_for_humans])->toJson() }},
+                    libraryModalOpen: false,
+                    selectFromLibrary(id, url, name) {
+                        this.selectedImageUrl = url;
+                        this.selectedImageName = name;
+                        document.getElementById('selected_image_id').value = id;
+                        this.selectedMethod = 'library';
+                        this.libraryModalOpen = false;
+                        document.getElementById('question_file').value = '';
+                        document.getElementById('image-preview').classList.add('hidden');
+                        document.getElementById('question_url').value = '';
+                        document.getElementById('existing-image')?.remove();
+                    },
+                    clearLibrary() {
+                        this.selectedImageUrl = '';
+                        this.selectedImageName = '';
+                        document.getElementById('selected_image_id').value = '';
+                    },
+                    onFileSelect() {
+                        this.selectedMethod = 'upload';
+                        this.clearLibrary();
+                        document.getElementById('question_url').value = '';
+                    },
+                    onUrlInput() {
+                        this.selectedMethod = 'url';
+                        this.clearLibrary();
+                        document.getElementById('question_file').value = '';
+                        document.getElementById('image-preview').classList.add('hidden');
+                    }
+                }">
                     <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                         Gambar Soal <span class="text-rose-500">*</span>
                     </label>
-                    
+
+                    {{-- Method Tabs --}}
+                    <div class="flex gap-2 mb-4">
+                        <button type="button" @click="selectedMethod = 'upload'; onFileSelect()"
+                            class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-colors"
+                            :class="selectedMethod === 'upload' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : 'bg-gray-50 text-gray-500 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'">
+                            <i class="ti ti-upload"></i> Upload Baru
+                        </button>
+                        <button type="button" @click="libraryModalOpen = true"
+                            class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-colors"
+                            :class="selectedMethod === 'library' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : 'bg-gray-50 text-gray-500 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'">
+                            <i class="ti ti-photo"></i> Pilih dari Library
+                        </button>
+                        <button type="button" @click="selectedMethod = 'url'; onUrlInput()"
+                            class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-colors"
+                            :class="selectedMethod === 'url' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : 'bg-gray-50 text-gray-500 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'">
+                            <i class="ti ti-link"></i> URL
+                        </button>
+                    </div>
+
                     {{-- Existing Image --}}
-                    @if(($data->question_type ?? 'Text') === 'Image' && $data->question)
-                    <div id="existing-image" class="mb-4">
-                        <div class="relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
-                            <img src="{{ asset('storage/' . $data->question) }}" alt="Current Image" class="w-full h-48 object-cover">
-                            <div class="absolute top-2 right-2">
-                                <button type="button" onclick="removeExistingImage()" class="w-8 h-8 bg-rose-500 hover:bg-rose-600 text-white rounded-lg flex items-center justify-center transition-colors">
+                    <div x-show="selectedMethod === 'existing'" x-cloak>
+                        <div id="existing-image" class="mb-4">
+                            <div class="relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
+                                <img :src="selectedImageUrl" alt="Current Image" class="w-full h-48 object-cover">
+                                <div class="absolute top-2 right-2">
+                                    <button type="button" @click="selectedMethod = 'upload'" class="w-8 h-8 bg-rose-500 hover:bg-rose-600 text-white rounded-lg flex items-center justify-center transition-colors">
+                                        <i class="ti ti-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Gambar saat ini. Klik X untuk menghapus atau pilih metode lain untuk menggantinya.</p>
+                        </div>
+                    </div>
+
+                    {{-- Method 1: Upload File --}}
+                    <div x-show="selectedMethod === 'upload'" x-cloak>
+                        <div class="relative">
+                            <input 
+                                type="file" 
+                                name="question_file" 
+                                id="question_file"
+                                accept="image/jpeg,image/jpg,image/png,image/webp"
+                                class="hidden"
+                                onchange="handleImageSelect(this)"
+                            >
+                            <label for="question_file" class="flex items-center justify-center gap-3 px-6 py-6 bg-gray-50 dark:bg-gray-900/50 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-all group">
+                                <div class="text-center">
+                                    <div class="w-14 h-14 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                                        <i class="ti ti-photo text-2xl text-indigo-600 dark:text-indigo-400"></i>
+                                    </div>
+                                    <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                                        Klik untuk upload gambar
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        JPG, PNG, WEBP (Max: 2MB)
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                        <div id="image-preview" class="hidden mt-4">
+                            <div class="relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
+                                <img id="preview-img" src="" alt="Preview" class="w-full h-48 object-cover">
+                                <button type="button" onclick="removeImage()" class="absolute top-2 right-2 w-8 h-8 bg-rose-500 hover:bg-rose-600 text-white rounded-lg flex items-center justify-center transition-colors">
                                     <i class="ti ti-x"></i>
                                 </button>
                             </div>
                         </div>
-                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Gambar saat ini. Klik X untuk menghapus atau upload gambar baru untuk menggantinya.</p>
                     </div>
-                    @endif
 
-                    {{-- Upload New Image --}}
-                    <div class="relative">
-                        <input 
-                            type="file" 
-                            name="question_file" 
-                            id="question_file"
-                            accept="image/jpeg,image/jpg,image/png,image/webp"
-                            class="hidden"
-                            onchange="handleImageSelect(this)"
-                        >
-                        <label for="question_file" class="flex items-center justify-center gap-3 px-6 py-6 bg-gray-50 dark:bg-gray-900/50 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-all group">
-                            <div class="text-center">
-                                <div class="w-14 h-14 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                                    <i class="ti ti-photo text-2xl text-indigo-600 dark:text-indigo-400"></i>
-                                </div>
-                                <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                                    Klik untuk upload gambar baru
-                                </p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">
-                                    JPG, PNG, WEBP (Max: 2MB)
-                                </p>
+                    {{-- Method 2: Library --}}
+                    <div x-show="selectedMethod === 'library'" x-cloak>
+                        <template x-if="selectedImageUrl">
+                            <div class="relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 mb-3">
+                                <img :src="selectedImageUrl" alt="Selected" class="w-full h-48 object-cover">
+                                <button type="button" @click="clearLibrary(); selectedMethod = 'upload'"
+                                    class="absolute top-2 right-2 w-8 h-8 bg-rose-500 hover:bg-rose-600 text-white rounded-lg flex items-center justify-center transition-colors">
+                                    <i class="ti ti-x"></i>
+                                </button>
                             </div>
-                        </label>
+                        </template>
+                        <template x-if="!selectedImageUrl">
+                            <div class="text-center py-6 bg-gray-50 dark:bg-gray-900/50 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl">
+                                <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                                    <i class="ti ti-photo text-xl text-indigo-600 dark:text-indigo-400"></i>
+                                </div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Belum ada gambar dipilih</p>
+                                <x-button variant="primary" type="button" @click="libraryModalOpen = true" class="rounded-xl">
+                                    <i class="ti ti-grid-scan mr-2"></i> Pilih dari Library
+                                </x-button>
+                            </div>
+                        </template>
+                        <input type="hidden" name="selected_image_id" id="selected_image_id" value="">
                     </div>
-                    <div id="image-preview" class="hidden mt-4">
-                        <div class="relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
-                            <img id="preview-img" src="" alt="Preview" class="w-full h-48 object-cover">
-                            <button type="button" onclick="removeImage()" class="absolute top-2 right-2 w-8 h-8 bg-rose-500 hover:bg-rose-600 text-white rounded-lg flex items-center justify-center transition-colors">
-                                <i class="ti ti-x"></i>
-                            </button>
-                        </div>
+
+                    {{-- Method 3: URL --}}
+                    <div x-show="selectedMethod === 'url'" x-cloak>
+                        <x-input 
+                            label="Masukkan URL Gambar"
+                            name="question_url"
+                            id="question_url"
+                            placeholder="https://example.com/gambar.jpg"
+                            value="{{ old('question_url') }}"
+                        />
                     </div>
+
                     @error('question_file')
                         <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
                     @enderror
+                    @error('selected_image_id')
+                        <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                    @enderror
+
+                    {{-- Library Modal --}}
+                    <div x-show="libraryModalOpen"
+                        class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm" x-cloak
+                        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+                        <div class="bg-white dark:bg-gray-900 w-full max-w-3xl max-h-[80vh] rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-800"
+                            @click.away="libraryModalOpen = false">
+                            <div class="p-6 border-b border-gray-100 dark:border-gray-800">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Pilih Gambar</h3>
+                                    <button type="button" @click="libraryModalOpen = false" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                        <i class="ti ti-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="p-6 overflow-y-auto max-h-[calc(80vh-140px)]">
+                                <template x-if="libraryImages.length === 0">
+                                    <div class="text-center py-12">
+                                        <div class="w-14 h-14 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                                            <i class="ti ti-photo-off text-xl text-gray-400"></i>
+                                        </div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada gambar di library.</p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Upload gambar terlebih dahulu melalui menu Gambar Soal.</p>
+                                    </div>
+                                </template>
+                                <template x-if="libraryImages.length > 0">
+                                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                                        <template x-for="img in libraryImages" :key="img.id">
+                                            <div @click="selectFromLibrary(img.id, img.url, img.filename)"
+                                                class="group relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 cursor-pointer hover:ring-2 hover:ring-indigo-500 transition-all">
+                                                <div class="aspect-square overflow-hidden bg-gray-100 dark:bg-gray-800">
+                                                    <img :src="img.url" :alt="img.filename" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                                </div>
+                                                <div class="p-2">
+                                                    <p class="text-[10px] font-medium text-gray-700 dark:text-gray-300 truncate" x-text="img.filename"></p>
+                                                    <p class="text-[9px] text-gray-400 dark:text-gray-500" x-text="img.file_size"></p>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="p-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+                                <x-button variant="secondary" type="button" @click="libraryModalOpen = false" class="rounded-xl">
+                                    Tutup
+                                </x-button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Options --}}
@@ -388,6 +533,9 @@
             }
             reader.readAsDataURL(file);
         }
+        // Clear other inputs
+        document.getElementById('selected_image_id').value = '';
+        document.getElementById('question_url').value = '';
     }
 
     function removeImage() {

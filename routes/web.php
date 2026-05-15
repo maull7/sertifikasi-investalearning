@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\MasterPackegeController;
 use App\Http\Controllers\Admin\MasterTypesController;
 use App\Http\Controllers\Admin\MasterUserController;
 use App\Http\Controllers\Admin\ParticipantMonitorController;
+use App\Http\Controllers\Admin\QuestionImageController;
 use App\Http\Controllers\Admin\QuizController;
 use App\Http\Controllers\Admin\ShowGradeController;
 use App\Http\Controllers\Admin\SubjectController;
@@ -214,6 +215,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::resource('teacher', TeacherController::class);
         Route::resource('quizzes', QuizController::class);
         Route::resource('books', BookController::class);
+        Route::resource('question-images', QuestionImageController::class)->only(['index', 'store', 'destroy']);
     });
 
     // Certificates

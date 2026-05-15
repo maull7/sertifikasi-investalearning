@@ -85,7 +85,7 @@
                         @if (($question->question_type ?? 'Text') === 'Text')
                             <div class="prose prose-sm dark:prose-invert max-w-none text-gray-900 dark:text-white">{!! $question->question !!}</div>
                         @else
-                            <img src="{{ asset('storage/' . ltrim($question->question ?? '', '/')) }}" alt="Soal" class="max-w-full h-auto rounded-xl border border-gray-200 dark:border-gray-700" loading="lazy" onerror="this.style.display='none'">
+                            <img src="{{ $question->question_image_url ?? (str_starts_with($question->question ?? '', 'http') ? $question->question : asset('storage/' . ltrim($question->question ?? '', '/'))) }}" alt="Soal" class="max-w-full h-auto rounded-xl border border-gray-200 dark:border-gray-700" loading="lazy" onerror="this.style.display='none'">
                         @endif
                     </div>
 
