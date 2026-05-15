@@ -368,7 +368,7 @@
                                                             @endif
                                                         </div>
                                                         @if (($q->question_type ?? 'Text') === 'Image')
-                                                            <a href="{{ asset('storage/' . $q->question) }}"
+                                                            <a href="{{ $q->question_image_url }}"
                                                                 class="inline-flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400"
                                                                 target="_blank" rel="noopener noreferrer">
                                                                 <i class="ti ti-photo"></i> Lihat Gambar
@@ -472,7 +472,7 @@
                                                                 <span class="text-xs text-gray-500 dark:text-gray-400">
                                                                     Soal berupa gambar.
                                                                 </span>
-                                                                <a href="{{ asset('storage/' . $q->question) }}"
+                                                                <a href="{{ $q->question_image_url }}"
                                                                     class="inline-flex items-center gap-1 text-[11px] text-indigo-600 dark:text-indigo-400"
                                                                     target="_blank" rel="noopener noreferrer">
                                                                     <i class="ti ti-photo"></i> Lihat Gambar

@@ -48,8 +48,9 @@ class RequestBankQuestion extends FormRequest
             'image',
             'mimes:jpg,jpeg,png,webp',
             'max:2048',
-            'required_if:question_type,Image',
         ];
+        $rules['selected_image_id'] = ['nullable', 'exists:question_images,id'];
+        $rules['question_url'] = ['nullable', 'string'];
 
         return $rules;
     }
@@ -77,7 +78,7 @@ class RequestBankQuestion extends FormRequest
             'question_file.image' => 'File harus berupa gambar.',
             'question_file.mimes' => 'Format gambar harus jpg, jpeg, png, atau webp.',
             'question_file.max' => 'Ukuran gambar maksimal 2MB.',
-            'question_file.required_if' => 'Gambar soal wajib diupload jika jenis soal Image.',
+            'selected_image_id.exists' => 'Gambar yang dipilih tidak valid.',
         ];
     }
 }

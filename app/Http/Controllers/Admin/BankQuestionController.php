@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RequestBankQuestion;
 use App\Imports\BankQuestionsImport;
 use App\Models\BankQuestion;
+use App\Models\QuestionImage;
 use App\Models\Subject;
 use App\Repositories\Contracts\BankQuestionRepositoryInterface;
 use Illuminate\Http\Request;
@@ -45,8 +46,9 @@ class BankQuestionController extends Controller
     public function create()
     {
         $subjects = Subject::all();
+        $libraryImages = QuestionImage::latest()->get();
 
-        return view('admin.bank-question.create', compact('subjects'));
+        return view('admin.bank-question.create', compact('subjects', 'libraryImages'));
     }
 
     public function store(RequestBankQuestion $request)
@@ -58,12 +60,17 @@ class BankQuestionController extends Controller
             $data['question'] = $data['question'] ?? '';
         }
 
-        // Handle image upload (stored into `question` as path)
+        // Handle image: file upload OR library selection OR URL
         if ($request->hasFile('question_file')) {
             $file = $request->file('question_file');
             $fileName = time().'_'.$file->getClientOriginalName();
             $filePath = $file->storeAs('questions', $fileName, 'public');
             $data['question'] = $filePath;
+        } elseif ($request->filled('selected_image_id')) {
+            $image = QuestionImage::findOrFail($request->selected_image_id);
+            $data['question'] = $image->path;
+        } elseif ($request->filled('question_url')) {
+            $data['question'] = $request->question_url;
         }
 
         $lastNomor = BankQuestion::where('subject_id', $data['subject_id'])->max('no');
@@ -84,8 +91,9 @@ class BankQuestionController extends Controller
     {
         $data = $this->bankQuestionRepository->findById($id);
         $subjects = Subject::all();
+        $libraryImages = QuestionImage::latest()->get();
 
-        return view('admin.bank-question.edit', compact('data', 'subjects'));
+        return view('admin.bank-question.edit', compact('data', 'subjects', 'libraryImages'));
     }
 
     public function update(RequestBankQuestion $request, string $id)
@@ -98,22 +106,37 @@ class BankQuestionController extends Controller
             $data['question'] = $data['question'] ?? '';
         }
 
-        // Handle image upload (stored into `question` as path)
+        $oldImagePath = ($question->question_type ?? 'Text') === 'Image' ? $question->question : null;
+
+        // Handle image: file upload OR library selection OR URL
         if ($request->hasFile('question_file')) {
-            if (($question->question_type ?? 'Text') === 'Image' && $question->question && Storage::disk('public')->exists($question->question)) {
-                Storage::disk('public')->delete($question->question);
+            if ($oldImagePath && Storage::disk('public')->exists($oldImagePath)) {
+                Storage::disk('public')->delete($oldImagePath);
             }
 
             $file = $request->file('question_file');
             $fileName = time().'_'.$file->getClientOriginalName();
             $filePath = $file->storeAs('questions', $fileName, 'public');
             $data['question'] = $filePath;
+        } elseif ($request->filled('selected_image_id')) {
+            if ($oldImagePath && Storage::disk('public')->exists($oldImagePath)) {
+                Storage::disk('public')->delete($oldImagePath);
+            }
+
+            $image = QuestionImage::findOrFail($request->selected_image_id);
+            $data['question'] = $image->path;
+        } elseif ($request->filled('question_url')) {
+            if ($oldImagePath && Storage::disk('public')->exists($oldImagePath)) {
+                Storage::disk('public')->delete($oldImagePath);
+            }
+
+            $data['question'] = $request->question_url;
         }
 
         // If switching Image -> Text, delete old image file if any
         if (($data['question_type'] ?? 'Text') === 'Text' && ($question->question_type ?? 'Text') === 'Image') {
-            if ($question->question && Storage::disk('public')->exists($question->question)) {
-                Storage::disk('public')->delete($question->question);
+            if ($oldImagePath && Storage::disk('public')->exists($oldImagePath)) {
+                Storage::disk('public')->delete($oldImagePath);
             }
         }
         $this->bankQuestionRepository->update($id, $data);

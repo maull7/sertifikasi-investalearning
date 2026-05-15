@@ -164,7 +164,7 @@
                                                 </span>
                                             @endif
                                             @if (($value->question_type ?? 'Text') === 'Image')
-                                                <a href="{{ asset('storage/' . $value->question) }}"
+                                                <a href="{{ $value->question_image_url }}"
                                                     class="inline-flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400"
                                                     target="_blank" rel="noopener noreferrer">
                                                     <i class="ti ti-photo"></i> Lihat Gambar
