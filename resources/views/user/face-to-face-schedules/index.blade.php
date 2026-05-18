@@ -120,6 +120,12 @@
                                                     <i
                                                         class="ti ti-user text-xs mr-1"></i>{{ $session->teacher?->name ?? '-' }}
                                                 </span>
+                                                @if ($schedule->zoom_join_url && $alreadyRegistered)
+                                                    <a href="{{ $schedule->zoom_join_url }}" target="_blank"
+                                                        class="text-[11px]  text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                                        <i class="ti ti-brand-zoom"></i> Join Zoom
+                                                    </a>
+                                                @endif
                                             </div>
                                         </div>
                                     @endforeach
