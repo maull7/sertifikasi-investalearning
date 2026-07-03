@@ -98,9 +98,10 @@
                                 </td>
                                 <td class="py-4 px-8 text-sm font-semibold">
                                     @if ($value->price)
-                                        <span class="text-emerald-600 dark:text-emerald-400">Rp {{ number_format($value->price, 0, ',', '.') }}</span>
+                                        <span class="text-emerald-600 dark:text-emerald-400">Rp
+                                            {{ number_format($value->price, 0, ',', '.') }}</span>
                                     @else
-                                        <span class="text-gray-400">Gratis</span>
+                                        <span class="text-gray-400">Call</span>
                                     @endif
                                 </td>
                                 <td class="py-4 px-8 text-sm text-gray-500 font-medium">
@@ -337,14 +338,16 @@
                         class="w-20 h-20 bg-orange-50 dark:bg-orange-500/10 text-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
                         <i class="ti ti-eye-off text-4xl"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2" x-text="hiddenAction === 'sembunyikan' ? 'Sembunyikan Paket?' : 'Tampilkan Paket?'"></h3>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2"
+                        x-text="hiddenAction === 'sembunyikan' ? 'Sembunyikan Paket?' : 'Tampilkan Paket?'"></h3>
                     <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                         Anda akan
                         <span class="font-bold text-gray-900 dark:text-white" x-text="hiddenAction"></span>
                         paket <span class="font-bold text-gray-900 dark:text-white" x-text="hiddenName"></span>.
                     </p>
                     <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                        Paket yang disembunyikan tidak akan muncul di daftar umum, namun user yang sudah join tetap bisa mengaksesnya.
+                        Paket yang disembunyikan tidak akan muncul di daftar umum, namun user yang sudah join tetap bisa
+                        mengaksesnya.
                     </p>
                 </div>
 
